@@ -6,6 +6,7 @@ import {
   useCallback,
   useEffect,
   useMemo,
+  useRef,
   useState,
 } from "react";
 import React from "react";
@@ -137,6 +138,50 @@ type SiteEditorProps = {
   slug: string;
 };
 
+/**
+ * Restores a previously saved Craft.js tree into the editor after mount.
+ *
+ * Why not use <Frame data={saved}> directly? `Frame.deserialize` runs
+ * the saved tree through `query.parseSerializedNode(...).toNode()`,
+ * which calls a strict destructure (`{ type, props, ... } = node`).
+ * If the saved tree contains an entry the resolver can't recognize
+ * (a stale component, a half-finished save, or a plain `{}` from a
+ * brand-new site), the destructure throws and the whole editor
+ * tree crashes. Doing it ourselves inside `useEditor` lets us wrap
+ * the call in try/catch and keep the default canvas drop target
+ * alive when the saved data is bad.
+ */
+function HydrateOnMount({ data }: { data: string | null }) {
+  const { actions } = useEditor();
+  const ran = useRef(false);
+
+  useEffect(() => {
+    if (ran.current) return;
+    ran.current = true;
+    if (!data) return; // No saved tree — keep the JSX default canvas.
+
+    let parsed: unknown;
+    try {
+      parsed = JSON.parse(data);
+    } catch {
+      return; // Corrupt JSON — ignore, keep default canvas.
+    }
+    if (!parsed || typeof parsed !== "object") return;
+    if (Object.keys(parsed as object).length === 0) return;
+
+    try {
+      const tree = JSON.parse(JSON.stringify(parsed));
+      actions.history.ignore().deserialize(tree);
+    } catch (err) {
+      // Bad saved tree (unrecognized component, missing type, etc.) —
+      // log and keep the default canvas so dragging still works.
+      console.warn("Failed to restore saved editor tree:", err);
+    }
+  }, [data, actions]);
+
+  return null;
+}
+
 function EditorInner({ slug }: SiteEditorProps) {
   const router = useRouter();
   const [site, setSite] = useState<Site | null>(null);
@@ -155,7 +200,17 @@ function EditorInner({ slug }: SiteEditorProps) {
           return;
         }
         setSite(s);
-        setInitialData(JSON.stringify(s.site_data ?? {}));
+        // Only pass `data` to <Frame /> when we have a real saved tree.
+        // A brand-new site returns `site_data = {}`; handing that to
+        // Frame runs `deserialize({})` which calls `replaceNodes({})`
+        // and wipes ROOT entirely — leaving no canvas, no drop target,
+        // and seemingly nothing happens when you drag from the toolbox.
+        // Falling back to `null` lets the default JSX child
+        // (<Element canvas is={Container} />) become the drop target.
+        const saved = s.site_data;
+        const hasSavedTree =
+          saved && typeof saved === "object" && Object.keys(saved).length > 0;
+        setInitialData(hasSavedTree ? JSON.stringify(saved) : null);
       })
       .catch((err) => {
         if (cancelled) return;
@@ -190,7 +245,10 @@ function EditorInner({ slug }: SiteEditorProps) {
 
   const editorKey = useMemo(() => initialData ?? "loading", [initialData]);
 
-  if (loadFailed || !site || !initialData) {
+  // `initialData` may be `null` for a brand-new site (see the load
+  // effect above) — that's a valid state meaning "render the default
+  // <Frame /> child as the canvas". Only treat `undefined` as loading.
+  if (loadFailed || !site || initialData === undefined) {
     return (
       <div className="flex h-screen items-center justify-center text-sm text-muted-foreground">
         Loading editor…
@@ -205,6 +263,7 @@ function EditorInner({ slug }: SiteEditorProps) {
       onRender={RenderNode}
     >
       <KeyboardShortcuts />
+      <HydrateOnMount data={initialData} />
       <div className="flex h-screen flex-col overflow-hidden bg-background">
         <EditorToolbar
           slug={site.slug}
@@ -254,7 +313,7 @@ function EditorInner({ slug }: SiteEditorProps) {
               </div>
               <div className="flex-1 overflow-auto p-6">
                 <div className="mx-auto min-h-full w-full max-w-4xl rounded-xl border bg-background shadow-sm">
-                  <Frame data={initialData}>
+                  <Frame>
                     <Element
                       canvas
                       is={Container}
