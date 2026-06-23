@@ -1,0 +1,455 @@
+[
+  {
+    "id": "blank",
+    "name": "Blank canvas",
+    "description": "Start from an empty page with a single section.",
+    "data": {
+      "ROOT": {
+        "type": { "resolvedName": "Container" },
+        "isCanvas": true,
+        "props": { "background": "transparent", "padding": 0 },
+        "displayName": "Container",
+        "custom": {},
+        "hidden": false,
+        "nodes": ["section-root"],
+        "linkedNodes": {}
+      },
+      "section-root": {
+        "type": { "resolvedName": "Section" },
+        "isCanvas": true,
+        "props": { "background": "#ffffff", "paddingY": 64 },
+        "displayName": "Section",
+        "custom": {},
+        "hidden": false,
+        "nodes": [],
+        "linkedNodes": {},
+        "parent": "ROOT"
+      }
+    }
+  },
+  {
+    "id": "landing",
+    "name": "Landing page",
+    "description": "Hero section with heading, text, and call-to-action.",
+    "data": {
+      "ROOT": {
+        "type": { "resolvedName": "Container" },
+        "isCanvas": true,
+        "props": { "background": "#f8fafc", "padding": 0 },
+        "displayName": "Container",
+        "custom": {},
+        "hidden": false,
+        "nodes": ["hero-section"],
+        "linkedNodes": {}
+      },
+      "hero-section": {
+        "type": { "resolvedName": "Section" },
+        "isCanvas": true,
+        "props": { "background": "#ffffff", "paddingY": 80 },
+        "displayName": "Section",
+        "custom": {},
+        "hidden": false,
+        "nodes": ["hero-heading", "hero-text", "hero-button"],
+        "linkedNodes": {},
+        "parent": "ROOT"
+      },
+      "hero-heading": {
+        "type": { "resolvedName": "Heading" },
+        "isCanvas": false,
+        "props": {
+          "text": "Build beautiful sites visually",
+          "level": "h1",
+          "color": "#0f172a",
+          "align": "center"
+        },
+        "displayName": "Heading",
+        "custom": {},
+        "hidden": false,
+        "nodes": [],
+        "linkedNodes": {},
+        "parent": "hero-section"
+      },
+      "hero-text": {
+        "type": { "resolvedName": "Text" },
+        "isCanvas": false,
+        "props": {
+          "text": "Drag and drop components to design your page. Save locally and preview anytime.",
+          "fontSize": 18,
+          "color": "#64748b",
+          "align": "center"
+        },
+        "displayName": "Text",
+        "custom": {},
+        "hidden": false,
+        "nodes": [],
+        "linkedNodes": {},
+        "parent": "hero-section"
+      },
+      "hero-button": {
+        "type": { "resolvedName": "CtaButton" },
+        "isCanvas": false,
+        "props": {
+          "text": "Start building",
+          "href": "#",
+          "variant": "primary",
+          "align": "center"
+        },
+        "displayName": "Button",
+        "custom": {},
+        "hidden": false,
+        "nodes": [],
+        "linkedNodes": {},
+        "parent": "hero-section"
+      }
+    }
+  },
+  {
+    "id": "portfolio",
+    "name": "Portfolio",
+    "description": "Showcase work with image, bio, and contact button.",
+    "data": {
+      "ROOT": {
+        "type": { "resolvedName": "Container" },
+        "isCanvas": true,
+        "props": { "background": "#fafafa", "padding": 0 },
+        "displayName": "Container",
+        "custom": {},
+        "hidden": false,
+        "nodes": ["portfolio-section"],
+        "linkedNodes": {}
+      },
+      "portfolio-section": {
+        "type": { "resolvedName": "Section" },
+        "isCanvas": true,
+        "props": { "background": "#ffffff", "paddingY": 72 },
+        "displayName": "Section",
+        "custom": {},
+        "hidden": false,
+        "nodes": [
+          "portfolio-heading",
+          "portfolio-image",
+          "portfolio-text",
+          "portfolio-button"
+        ],
+        "linkedNodes": {},
+        "parent": "ROOT"
+      },
+      "portfolio-heading": {
+        "type": { "resolvedName": "Heading" },
+        "isCanvas": false,
+        "props": {
+          "text": "Hi, I'm Alex — Product Designer",
+          "level": "h2",
+          "color": "#18181b",
+          "align": "center"
+        },
+        "displayName": "Heading",
+        "custom": {},
+        "hidden": false,
+        "nodes": [],
+        "linkedNodes": {},
+        "parent": "portfolio-section"
+      },
+      "portfolio-image": {
+        "type": { "resolvedName": "ImageBlock" },
+        "isCanvas": false,
+        "props": {
+          "src": "https://images.unsplash.com/photo-1522071820081-009f0129c71c?w=800&q=80",
+          "alt": "Team collaboration",
+          "height": 280,
+          "rounded": true,
+          "align": "center"
+        },
+        "displayName": "Image",
+        "custom": {},
+        "hidden": false,
+        "nodes": [],
+        "linkedNodes": {},
+        "parent": "portfolio-section"
+      },
+      "portfolio-text": {
+        "type": { "resolvedName": "Text" },
+        "isCanvas": false,
+        "props": {
+          "text": "I craft intuitive digital experiences for startups and growing teams. Let's work together.",
+          "fontSize": 16,
+          "color": "#52525b",
+          "align": "center"
+        },
+        "displayName": "Text",
+        "custom": {},
+        "hidden": false,
+        "nodes": [],
+        "linkedNodes": {},
+        "parent": "portfolio-section"
+      },
+      "portfolio-button": {
+        "type": { "resolvedName": "CtaButton" },
+        "isCanvas": false,
+        "props": {
+          "text": "View my work",
+          "href": "#",
+          "variant": "outline",
+          "align": "center"
+        },
+        "displayName": "Button",
+        "custom": {},
+        "hidden": false,
+        "nodes": [],
+        "linkedNodes": {},
+        "parent": "portfolio-section"
+      }
+    }
+  },
+  {
+    "id": "features",
+    "name": "Features grid",
+    "description": "Three feature cards with icons, divider, and CTA.",
+    "data": {
+      "ROOT": {
+        "type": { "resolvedName": "Container" },
+        "isCanvas": true,
+        "props": { "background": "#f8fafc", "padding": 0, "maxWidth": 1200, "marginTop": 0, "marginBottom": 0, "customId": "" },
+        "displayName": "Container",
+        "custom": {},
+        "hidden": false,
+        "nodes": ["features-section"],
+        "linkedNodes": {}
+      },
+      "features-section": {
+        "type": { "resolvedName": "Section" },
+        "isCanvas": true,
+        "props": { "background": "#f8fafc", "paddingY": 80, "maxWidth": 1100, "customId": "features" },
+        "displayName": "Section",
+        "custom": {},
+        "hidden": false,
+        "nodes": ["features-heading", "features-grid", "features-divider", "features-cta"],
+        "linkedNodes": {},
+        "parent": "ROOT"
+      },
+      "features-heading": {
+        "type": { "resolvedName": "Heading" },
+        "isCanvas": false,
+        "props": {
+          "text": "Everything you need",
+          "level": "h2",
+          "color": "#0f172a",
+          "align": "center",
+          "fontWeight": 700,
+          "letterSpacing": -0.5,
+          "customId": ""
+        },
+        "displayName": "Heading",
+        "custom": {},
+        "hidden": false,
+        "nodes": [],
+        "linkedNodes": {},
+        "parent": "features-section"
+      },
+      "features-grid": {
+        "type": { "resolvedName": "Grid" },
+        "isCanvas": true,
+        "props": { "columns": 3, "gap": 24, "background": "transparent", "padding": 0, "customId": "" },
+        "displayName": "Grid",
+        "custom": {},
+        "hidden": false,
+        "nodes": ["feature-1", "feature-2", "feature-3"],
+        "linkedNodes": {},
+        "parent": "features-section"
+      },
+      "feature-1": {
+        "type": { "resolvedName": "IconBox" },
+        "isCanvas": false,
+        "props": {
+          "icon": "Zap",
+          "title": "Lightning fast",
+          "description": "Built for speed. Every interaction feels instant.",
+          "iconColor": "#0ea5e9",
+          "titleColor": "#0f172a",
+          "bodyColor": "#475569",
+          "iconSize": 36,
+          "align": "center",
+          "customId": "feature-speed"
+        },
+        "displayName": "Icon Feature",
+        "custom": {},
+        "hidden": false,
+        "nodes": [],
+        "linkedNodes": {},
+        "parent": "features-grid"
+      },
+      "feature-2": {
+        "type": { "resolvedName": "IconBox" },
+        "isCanvas": false,
+        "props": {
+          "icon": "Shield",
+          "title": "Secure by default",
+          "description": "Your data is encrypted end-to-end and never shared.",
+          "iconColor": "#10b981",
+          "titleColor": "#0f172a",
+          "bodyColor": "#475569",
+          "iconSize": 36,
+          "align": "center",
+          "customId": "feature-security"
+        },
+        "displayName": "Icon Feature",
+        "custom": {},
+        "hidden": false,
+        "nodes": [],
+        "linkedNodes": {},
+        "parent": "features-grid"
+      },
+      "feature-3": {
+        "type": { "resolvedName": "IconBox" },
+        "isCanvas": false,
+        "props": {
+          "icon": "Heart",
+          "title": "Made with care",
+          "description": "Designed by humans, refined by feedback.",
+          "iconColor": "#f43f5e",
+          "titleColor": "#0f172a",
+          "bodyColor": "#475569",
+          "iconSize": 36,
+          "align": "center",
+          "customId": "feature-care"
+        },
+        "displayName": "Icon Feature",
+        "custom": {},
+        "hidden": false,
+        "nodes": [],
+        "linkedNodes": {},
+        "parent": "features-grid"
+      },
+      "features-divider": {
+        "type": { "resolvedName": "Divider" },
+        "isCanvas": false,
+        "props": { "color": "#e5e7eb", "thickness": 1, "style": "solid", "width": 60, "customId": "" },
+        "displayName": "Divider",
+        "custom": {},
+        "hidden": false,
+        "nodes": [],
+        "linkedNodes": {},
+        "parent": "features-section"
+      },
+      "features-cta": {
+        "type": { "resolvedName": "CtaButton" },
+        "isCanvas": false,
+        "props": {
+          "text": "Get started",
+          "href": "#",
+          "variant": "primary",
+          "size": "lg",
+          "align": "center",
+          "fullWidth": false,
+          "background": "#0f172a",
+          "textColor": "#ffffff",
+          "customId": "features-cta"
+        },
+        "displayName": "Button",
+        "custom": {},
+        "hidden": false,
+        "nodes": [],
+        "linkedNodes": {},
+        "parent": "features-section"
+      }
+    }
+  },
+  {
+    "id": "contact",
+    "name": "Contact page",
+    "description": "Hero with badge, contact form, and a video demo.",
+    "data": {
+      "ROOT": {
+        "type": { "resolvedName": "Container" },
+        "isCanvas": true,
+        "props": { "background": "#ffffff", "padding": 0, "maxWidth": 1200, "marginTop": 0, "marginBottom": 0, "customId": "" },
+        "displayName": "Container",
+        "custom": {},
+        "hidden": false,
+        "nodes": ["contact-section"],
+        "linkedNodes": {}
+      },
+      "contact-section": {
+        "type": { "resolvedName": "Section" },
+        "isCanvas": true,
+        "props": { "background": "#ffffff", "paddingY": 80, "maxWidth": 1100, "customId": "contact" },
+        "displayName": "Section",
+        "custom": {},
+        "hidden": false,
+        "nodes": ["contact-badge", "contact-heading", "contact-text", "contact-form"],
+        "linkedNodes": {},
+        "parent": "ROOT"
+      },
+      "contact-badge": {
+        "type": { "resolvedName": "Badge" },
+        "isCanvas": false,
+        "props": { "text": "We're hiring", "background": "#0ea5e9", "textColor": "#ffffff", "size": "md", "customId": "" },
+        "displayName": "Badge",
+        "custom": {},
+        "hidden": false,
+        "nodes": [],
+        "linkedNodes": {},
+        "parent": "contact-section"
+      },
+      "contact-heading": {
+        "type": { "resolvedName": "Heading" },
+        "isCanvas": false,
+        "props": {
+          "text": "Get in touch",
+          "level": "h1",
+          "color": "#0f172a",
+          "align": "left",
+          "fontWeight": 700,
+          "letterSpacing": -0.5,
+          "customId": ""
+        },
+        "displayName": "Heading",
+        "custom": {},
+        "hidden": false,
+        "nodes": [],
+        "linkedNodes": {},
+        "parent": "contact-section"
+      },
+      "contact-text": {
+        "type": { "resolvedName": "Text" },
+        "isCanvas": false,
+        "props": {
+          "text": "Have a question or want to work together? Drop us a message.",
+          "fontSize": 18,
+          "fontWeight": 400,
+          "lineHeight": 1.6,
+          "color": "#475569",
+          "align": "left",
+          "italic": false,
+          "customId": ""
+        },
+        "displayName": "Text",
+        "custom": {},
+        "hidden": false,
+        "nodes": [],
+        "linkedNodes": {},
+        "parent": "contact-section"
+      },
+      "contact-form": {
+        "type": { "resolvedName": "ContactForm" },
+        "isCanvas": false,
+        "props": {
+          "title": "Send us a message",
+          "nameLabel": "Name",
+          "emailLabel": "Email",
+          "messageLabel": "Message",
+          "submitText": "Send",
+          "background": "#f1f5f9",
+          "accent": "#0f172a",
+          "customId": "contact-form"
+        },
+        "displayName": "Contact Form",
+        "custom": {},
+        "hidden": false,
+        "nodes": [],
+        "linkedNodes": {},
+        "parent": "contact-section"
+      }
+    }
+  }
+]
