@@ -29,15 +29,21 @@ function flattenTree(
 }
 
 export function LayersPanel() {
-  const { layers, selectedId, select } = useEditor((state, query) => {
+  // Pull `actions` out of useEditor so the click handler below has a stable
+  // reference. We can't grab `actions.selectNode` from inside the selector
+  // because `state` is only passed to the selector — the closure captured
+  // there would call `undefined` at runtime.
+  const { actions } = useEditor();
+  const { layers, selectedId } = useEditor((_state, query) => {
     const selected = query.getEvent("selected").first();
     const list = flattenTree(query, "ROOT");
     return {
       layers: list,
       selectedId: selected as string | undefined,
-      select: (id: string) => (state as unknown as { actions: { selectNode: (id: string) => void } }).actions.selectNode(id),
     };
   });
+
+  const select = (id: string) => actions.selectNode(id);
 
   return (
     <Card className="flex h-full min-h-0 flex-col rounded-none border-0 border-r shadow-none">
