@@ -63,7 +63,16 @@ export async function request<T = unknown>(
 
   const finalHeaders = new Headers(headers);
   finalHeaders.set("Accept", "application/json");
-  if (body !== undefined && !(body instanceof FormData)) {
+  // Only set JSON Content-Type for plain objects/arrays. FormData and
+  // URLSearchParams must keep their own Content-Type — fetch sets the
+  // boundary-based Content-Type for FormData, and URLSearchParams needs
+  // `application/x-www-form-urlencoded` (which the caller should supply
+  // via the `headers` option, since `URLSearchParams` is not auto-detected).
+  if (
+    body !== undefined &&
+    !(body instanceof FormData) &&
+    !(body instanceof URLSearchParams)
+  ) {
     finalHeaders.set("Content-Type", "application/json");
   }
   if (auth) {
@@ -81,7 +90,9 @@ export async function request<T = unknown>(
         ? undefined
         : body instanceof FormData
           ? body
-          : JSON.stringify(body),
+          : body instanceof URLSearchParams
+            ? body
+            : JSON.stringify(body),
     // The backend uses CORS allow_origins=['*']; we never send cookies, so
     // "omit" is correct and works regardless of credentials mode.
     credentials: "omit",

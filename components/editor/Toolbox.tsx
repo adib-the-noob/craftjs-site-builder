@@ -17,6 +17,8 @@ import {
   VideoIcon,
   MinusIcon,
 } from "lucide-react";
+import { useEffect, useRef } from "react";
+
 import {
   Container,
   CtaButton,
@@ -34,7 +36,12 @@ import {
   Video,
   ContactForm,
 } from "@/components/craft";
-import { Card as UICard, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import {
+  Card as UICard,
+  CardContent,
+  CardHeader,
+  CardTitle,
+} from "@/components/ui/card";
 import { ScrollArea } from "@/components/ui/scroll-area";
 
 type Item = {
@@ -137,9 +144,34 @@ const toolboxItems: Item[] = [
   },
 ];
 
-export function Toolbox() {
+function ToolboxItem({ item }: { item: Item }) {
   const { connectors } = useEditor();
+  const ref = useRef<HTMLButtonElement>(null);
 
+  useEffect(() => {
+    const el = ref.current;
+    if (!el) return;
+    // Bind the drag-source listeners. Craft.js's `connectors.create` returns
+    // `void` (no cleanup) on this build, so re-binding on remount is safe —
+    // the previous binding is replaced when the same DOM node is reused, and
+    // detached when the node unmounts.
+    connectors.create(el, item.element);
+  }, [connectors, item.element]);
+
+  return (
+    <button
+      ref={ref}
+      type="button"
+      draggable
+      className="flex items-center gap-3 rounded-md border border-border bg-card px-3 py-2 text-left text-sm transition-colors hover:bg-muted"
+    >
+      <item.icon className="h-4 w-4 text-muted-foreground" />
+      <span className="font-medium">{item.name}</span>
+    </button>
+  );
+}
+
+export function Toolbox() {
   const groups: Item["group"][] = ["Layout", "Content", "Media", "Form"];
 
   return (
@@ -162,19 +194,7 @@ export function Toolbox() {
                     {group}
                   </p>
                   {items.map((item) => (
-                    <button
-                      key={item.name}
-                      ref={(ref) => {
-                        if (ref) {
-                          connectors.create(ref, item.element);
-                        }
-                      }}
-                      type="button"
-                      className="flex items-center gap-3 rounded-md border border-border bg-card px-3 py-2 text-left text-sm transition-colors hover:bg-muted"
-                    >
-                      <item.icon className="h-4 w-4 text-muted-foreground" />
-                      <span className="font-medium">{item.name}</span>
-                    </button>
+                    <ToolboxItem key={item.name} item={item} />
                   ))}
                 </div>
               );
