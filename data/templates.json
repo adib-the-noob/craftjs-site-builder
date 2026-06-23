@@ -186,14 +186,10 @@
         "type": { "resolvedName": "List" },
         "nodes": [],
         "props": {
-          "items": [
-            "Drag-and-drop editing with full undo/redo",
-            "Inline content editing for text and headings",
-            "Pixel-perfect control over typography and colour",
-            "Save and share with a single link"
-          ],
+          "items": "Drag-and-drop editing with full undo/redo\nInline content editing for text and headings\nPixel-perfect control over typography and colour\nSave and share with a single link",
           "ordered": false,
-          "gap": 8,
+          "spacing": 8,
+          "fontSize": 16,
           "color": "#0f172a",
           "customId": ""
         },
@@ -364,7 +360,7 @@
         "nodes": [],
         "props": {
           "text": "Available for hire",
-          "color": "#16a34a",
+          "textColor": "#16a34a",
           "background": "#dcfce7",
           "size": "sm",
           "customId": ""
@@ -545,14 +541,10 @@
         "type": { "resolvedName": "List" },
         "nodes": [],
         "props": {
-          "items": [
-            "Sketchpad — a no-account whiteboard for quick diagrams",
-            "Pulse — a tiny self-hosted uptime monitor",
-            "Lumen — a documentation theme for fast-moving teams",
-            "Forge — a CLI for scaffolding typed APIs"
-          ],
+          "items": "Sketchpad — a no-account whiteboard for quick diagrams\nPulse — a tiny self-hosted uptime monitor\nLumen — a documentation theme for fast-moving teams\nForge — a CLI for scaffolding typed APIs",
           "ordered": true,
-          "gap": 12,
+          "spacing": 12,
+          "fontSize": 16,
           "color": "#0f172a",
           "customId": ""
         },
@@ -622,8 +614,8 @@
         "type": { "resolvedName": "ContactForm" },
         "nodes": [],
         "props": {
-          "submitLabel": "Send message",
-          "accentColor": "#0f172a",
+          "submitText": "Send message",
+          "accent": "#0f172a",
           "background": "#f8fafc",
           "customId": ""
         },
@@ -718,7 +710,7 @@
         "nodes": [],
         "props": {
           "text": "Essay",
-          "color": "#1d4ed8",
+          "textColor": "#1d4ed8",
           "background": "#dbeafe",
           "size": "sm",
           "customId": ""
@@ -920,7 +912,7 @@
         "nodes": [],
         "props": {
           "text": "design · product · notes",
-          "color": "#475569",
+          "textColor": "#475569",
           "background": "#e2e8f0",
           "size": "sm",
           "customId": ""
