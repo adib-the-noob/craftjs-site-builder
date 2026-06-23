@@ -6,7 +6,6 @@ import {
   useCallback,
   useEffect,
   useMemo,
-  useRef,
   useState,
 } from "react";
 import React from "react";
@@ -23,9 +22,10 @@ import {
   ResizablePanelGroup,
 } from "@/components/ui/resizable";
 import { resolver } from "@/lib/resolver";
-import { getSite, updateSite } from "@/lib/sites";
+import { getSite, updateSite, type Site } from "@/lib/sites";
 import { getTemplateById } from "@/lib/templates";
 import { setClipboard, getClipboard } from "@/lib/clipboard";
+import { AuthGuard } from "@/components/auth/AuthGuard";
 import { toast } from "sonner";
 
 function KeyboardShortcuts() {
@@ -134,51 +134,66 @@ function KeyboardShortcuts() {
 }
 
 type SiteEditorProps = {
-  siteId: string;
+  slug: string;
 };
 
-export function SiteEditor({ siteId }: SiteEditorProps) {
+function EditorInner({ slug }: SiteEditorProps) {
   const router = useRouter();
+  const [site, setSite] = useState<Site | null>(null);
   const [initialData, setInitialData] = useState<string | null>(null);
-  const [siteName, setSiteName] = useState<string>("");
-  const saveTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+  const [loadFailed, setLoadFailed] = useState(false);
 
   useEffect(() => {
-    // We must read from localStorage in an effect because it's not available
-    // during SSR. Calling setState synchronously here is intentional.
-    // eslint-disable-next-line react-hooks/set-state-in-effect
-    const site = getSite(siteId);
-    if (!site) {
-      toast.error("Site not found");
-      router.replace("/sites");
-      return;
-    }
-    setSiteName(site.name);
-    setInitialData(JSON.stringify(site.data));
-  }, [siteId, router]);
+    let cancelled = false;
+    getSite(slug)
+      .then((s) => {
+        if (cancelled) return;
+        if (!s) {
+          toast.error("Site not found");
+          setLoadFailed(true);
+          router.replace("/sites");
+          return;
+        }
+        setSite(s);
+        setInitialData(JSON.stringify(s.site_data ?? {}));
+      })
+      .catch((err) => {
+        if (cancelled) return;
+        const message =
+          err instanceof Error ? err.message : "Could not load site";
+        toast.error(message);
+        setLoadFailed(true);
+        router.replace("/sites");
+      });
+    return () => {
+      cancelled = true;
+    };
+  }, [slug, router]);
 
   const handleLoadTemplate = useCallback(
-    (templateId: string) => {
-      const template = getTemplateById(templateId);
-      if (!template) return;
+    async (templateId: string) => {
+      const template = await getTemplateById(templateId);
+      if (!template || !site) return;
       const data = JSON.parse(JSON.stringify(template.data));
       setInitialData(JSON.stringify(data));
-      updateSite(siteId, { data });
+      try {
+        await updateSite(site.id, { data });
+        toast.success(`Loaded template "${template.name}"`);
+      } catch (err) {
+        const message =
+          err instanceof Error ? err.message : "Could not load template";
+        toast.error(message);
+      }
     },
-    [siteId]
+    [site]
   );
-
-  const refreshSiteName = useCallback(() => {
-    const site = getSite(siteId);
-    if (site) setSiteName(site.name);
-  }, [siteId]);
 
   const editorKey = useMemo(() => initialData ?? "loading", [initialData]);
 
-  if (!initialData) {
+  if (loadFailed || !site || !initialData) {
     return (
       <div className="flex h-screen items-center justify-center text-sm text-muted-foreground">
-        Loading editor...
+        Loading editor…
       </div>
     );
   }
@@ -188,24 +203,15 @@ export function SiteEditor({ siteId }: SiteEditorProps) {
       key={editorKey}
       resolver={resolver}
       onRender={RenderNode}
-      onNodesChange={(query) => {
-        if (saveTimeoutRef.current) {
-          clearTimeout(saveTimeoutRef.current);
-        }
-        saveTimeoutRef.current = setTimeout(() => {
-          const site = getSite(siteId);
-          if (!site) return;
-          updateSite(siteId, { data: JSON.parse(query.serialize()) });
-        }, 500);
-      }}
     >
       <KeyboardShortcuts />
       <div className="flex h-screen flex-col overflow-hidden bg-background">
         <EditorToolbar
-          siteId={siteId}
-          siteName={siteName}
+          slug={site.slug}
+          siteId={site.id}
+          siteName={site.name}
           onLoadTemplate={handleLoadTemplate}
-          onSiteChanged={refreshSiteName}
+          onSiteChanged={() => setSite((s) => (s ? { ...s, name: site.name } : s))}
         />
         <ResizablePanelGroup
           id="site-editor-layout"
@@ -273,5 +279,13 @@ export function SiteEditor({ siteId }: SiteEditorProps) {
         </ResizablePanelGroup>
       </div>
     </Editor>
+  );
+}
+
+export function SiteEditor({ slug }: SiteEditorProps) {
+  return (
+    <AuthGuard>
+      <EditorInner slug={slug} />
+    </AuthGuard>
   );
 }

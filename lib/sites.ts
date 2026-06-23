@@ -1,144 +1,109 @@
 "use client";
 
-import {
-  SITE_INDEX_KEY,
-  SITE_COUNTER_KEY,
-  siteKey,
-  generateSiteId,
-  STORAGE_KEY,
-  type Site,
-} from "@/lib/constants";
-import { getDefaultTemplate, getTemplateById } from "@/lib/templates";
+// Sites live in the FastAPI backend. The frontend mirrors the backend's
+// response shape as closely as possible so the rest of the app can treat
+// a `Site` as both the network payload and the in-memory model.
+//
+//   id:         integer — required for write endpoints (PUT/DELETE /sites/{id}/...)
+//   slug:       string  — used in URLs (/editor/{slug}, /preview/{slug})
+//   site_data:  Craft.js serialised state (replaces the old `data` field)
+//
+// All functions are async. Error semantics:
+//   - getSite returns null on 404
+//   - everything else throws — callers should `try/catch` and toast
 
-// Re-export Site so consumers can do `import type { Site } from "@/lib/sites"`.
-export type { Site };
+import { apiDelete, apiGet, apiPost, apiPut } from "@/lib/api";
+import type { SiteTemplate } from "@/lib/constants";
 
-function isBrowser() {
-  return typeof window !== "undefined";
+export type Site = {
+  id: number;
+  user_id: number;
+  name: string;
+  slug: string;
+  template_id: string | null;
+  site_data: Record<string, unknown> | null;
+  status: "draft" | "published" | string;
+  cdn_url: string | null;
+  created_at: string;
+  updated_at: string;
+};
+
+type SiteCreateInput = {
+  name: string;
+  template_id?: string | null;
+};
+
+type SiteUpdateContentInput = {
+  site_data: Record<string, unknown>;
+};
+
+export async function listSites(): Promise<Site[]> {
+  return apiGet<Site[]>("/sites");
 }
 
-function readIndex(): string[] {
-  if (!isBrowser()) return [];
+export async function getSite(slug: string): Promise<Site | null> {
   try {
-    const raw = localStorage.getItem(SITE_INDEX_KEY);
-    if (!raw) return [];
-    const parsed = JSON.parse(raw);
-    return Array.isArray(parsed) ? parsed.filter((x) => typeof x === "string") : [];
-  } catch {
-    return [];
+    return await apiGet<Site>(`/sites/${encodeURIComponent(slug)}`);
+  } catch (err) {
+    if (
+      err instanceof Error &&
+      "status" in err &&
+      (err as { status: number }).status === 404
+    ) {
+      return null;
+    }
+    throw err;
   }
-}
-
-function writeIndex(ids: string[]) {
-  if (!isBrowser()) return;
-  localStorage.setItem(SITE_INDEX_KEY, JSON.stringify(ids));
-}
-
-export function listSites(): Site[] {
-  const ids = readIndex();
-  const sites: Site[] = [];
-  for (const id of ids) {
-    const s = getSite(id);
-    if (s) sites.push(s);
-  }
-  return sites.sort((a, b) => b.updatedAt - a.updatedAt);
-}
-
-export function getSite(id: string): Site | null {
-  if (!isBrowser()) return null;
-  const raw = localStorage.getItem(siteKey(id));
-  if (!raw) return null;
-  try {
-    return JSON.parse(raw) as Site;
-  } catch {
-    return null;
-  }
-}
-
-export function createSite(name: string, templateId?: string): Site {
-  const id = generateSiteId();
-  const now = Date.now();
-  const template = templateId
-    ? getTemplateById(templateId)
-    : getDefaultTemplate();
-  // Deep clone template data so edits never mutate the source JSON.
-  const data = JSON.parse(JSON.stringify(template?.data ?? {}));
-  const site: Site = {
-    id,
-    name: name.trim() || "Untitled site",
-    createdAt: now,
-    updatedAt: now,
-    data,
-    meta: {
-      title: name.trim() || "Untitled site",
-    },
-  };
-  if (isBrowser()) {
-    localStorage.setItem(siteKey(id), JSON.stringify(site));
-    const idx = readIndex();
-    idx.push(id);
-    writeIndex(idx);
-    const counter = Number(localStorage.getItem(SITE_COUNTER_KEY) ?? "0") + 1;
-    localStorage.setItem(SITE_COUNTER_KEY, String(counter));
-  }
-  return site;
-}
-
-export function updateSite(
-  id: string,
-  patch: Partial<Pick<Site, "name" | "data" | "meta">>
-): Site | null {
-  const current = getSite(id);
-  if (!current) return null;
-  const updated: Site = {
-    ...current,
-    ...patch,
-    updatedAt: Date.now(),
-  };
-  if (isBrowser()) {
-    localStorage.setItem(siteKey(id), JSON.stringify(updated));
-  }
-  return updated;
-}
-
-export function deleteSite(id: string): void {
-  if (!isBrowser()) return;
-  localStorage.removeItem(siteKey(id));
-  const idx = readIndex().filter((x) => x !== id);
-  writeIndex(idx);
-}
-
-export function duplicateSite(id: string): Site | null {
-  const current = getSite(id);
-  if (!current) return null;
-  return createSite(`${current.name} (copy)`, undefined);
 }
 
 /**
- * One-time migration: if the legacy single-site key exists and the new
- * index is empty, lift it into a new site named "My Site".
+ * Public, unauthenticated fetch. Used by the SSR preview page so the public
+ * site is reachable without a token.
  */
-export function migrateLegacyState(): void {
-  if (!isBrowser()) return;
-  const idx = readIndex();
-  if (idx.length > 0) return;
-  const legacy = localStorage.getItem(STORAGE_KEY);
-  if (!legacy) return;
+export async function getPublicSite(slug: string): Promise<Site | null> {
   try {
-    const data = JSON.parse(legacy);
-    const id = generateSiteId();
-    const now = Date.now();
-    const site: Site = {
-      id,
-      name: "My Site",
-      createdAt: now,
-      updatedAt: now,
-      data,
-      meta: { title: "My Site" },
-    };
-    localStorage.setItem(siteKey(id), JSON.stringify(site));
-    writeIndex([id]);
-  } catch {
-    // ignore corrupt legacy state
+    return await apiGet<Site>(
+      `/sites/${encodeURIComponent(slug)}/public`,
+      { auth: false }
+    );
+  } catch (err) {
+    if (
+      err instanceof Error &&
+      "status" in err &&
+      (err as { status: number }).status === 404
+    ) {
+      return null;
+    }
+    throw err;
   }
 }
+
+export async function createSite(
+  name: string,
+  templateId?: string | null
+): Promise<Site> {
+  const body: SiteCreateInput = {
+    name: name.trim() || "Untitled site",
+  };
+  if (templateId) body.template_id = templateId;
+  return apiPost<Site>("/sites", body);
+}
+
+export async function updateSite(
+  id: number,
+  patch: { data?: Record<string, unknown> }
+): Promise<Site> {
+  if (!patch.data) {
+    throw new Error("updateSite: only `data` patches are supported");
+  }
+  const body: SiteUpdateContentInput = { site_data: patch.data };
+  return apiPut<Site>(`/sites/${id}/content`, body);
+}
+
+export async function deleteSite(id: number): Promise<void> {
+  await apiDelete<unknown>(`/sites/${id}`);
+}
+
+// --- Re-exports for convenience --------------------------------------------
+
+export type { SiteTemplate };

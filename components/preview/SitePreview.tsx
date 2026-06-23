@@ -1,157 +1,72 @@
 "use client";
 
-import { Editor, Frame } from "@craftjs/core";
 import Link from "next/link";
-import { useRouter } from "next/navigation";
-import { useEffect, useState } from "react";
-import { ArrowLeftIcon, ExternalLinkIcon, HashIcon } from "lucide-react";
-import { buttonVariants } from "@/components/ui/button";
-import { Badge } from "@/components/ui/badge";
-import { Button } from "@/components/ui/button";
-import { CopyIcon } from "lucide-react";
-import { toast } from "sonner";
+import { useMemo } from "react";
+
+import { Editor, Frame } from "@craftjs/core";
+
+import { RenderNode } from "@/components/editor/RenderNode";
 import { resolver } from "@/lib/resolver";
-import { getSite } from "@/lib/sites";
 import type { Site } from "@/lib/sites";
 
-type SitePreviewProps = {
-  siteId: string;
+type Props = {
+  site: Site;
 };
 
-// Inject meta tags and custom CSS at runtime in the preview iframe/page
-function PreviewHead({ site }: { site: Site }) {
-  const title = site.meta?.title || site.name;
-  const description = site.meta?.description || "";
-  const customCss = site.meta?.customCss || "";
-
-  useEffect(() => {
-    if (typeof document === "undefined") return;
-    document.title = title;
-
-    let desc = document.querySelector(
-      'meta[name="description"]'
-    ) as HTMLMetaElement | null;
-    if (description) {
-      if (!desc) {
-        desc = document.createElement("meta");
-        desc.name = "description";
-        document.head.appendChild(desc);
-      }
-      desc.content = description;
-    } else if (desc) {
-      desc.remove();
-    }
-
-    let styleEl = document.getElementById(
-      "site-preview-custom-css"
-    ) as HTMLStyleElement | null;
-    if (customCss.trim()) {
-      if (!styleEl) {
-        styleEl = document.createElement("style");
-        styleEl.id = "site-preview-custom-css";
-        document.head.appendChild(styleEl);
-      }
-      styleEl.textContent = customCss;
-    } else if (styleEl) {
-      styleEl.remove();
-    }
-
-    return () => {
-      const el = document.getElementById("site-preview-custom-css");
-      if (el) el.remove();
-    };
-  }, [title, description, customCss]);
-
-  return null;
+function getRootBackground(data: unknown): string | undefined {
+  if (!data || typeof data !== "object") return undefined;
+  const root = (data as Record<string, { props?: Record<string, unknown> }>)
+    .ROOT;
+  const bg = root?.props?.background;
+  return typeof bg === "string" ? bg : undefined;
 }
 
-function getRootBackground(data: Record<string, unknown>): string {
-  const root = data.ROOT as { props?: { background?: string } } | undefined;
-  return root?.props?.background ?? "#ffffff";
-}
+const STATUS_LABEL: Record<string, string> = {
+  draft: "Draft preview",
+  published: "Published",
+};
 
-export function SitePreview({ siteId }: SitePreviewProps) {
-  const router = useRouter();
-  const [site, setSite] = useState<Site | null>(null);
-
-  useEffect(() => {
-    // SSR safety: localStorage is not available during server render.
-    // eslint-disable-next-line react-hooks/set-state-in-effect
-    const s = getSite(siteId);
-    if (!s) {
-      toast.error("Site not found");
-      router.replace("/sites");
-      return;
-    }
-    setSite(s);
-  }, [siteId, router]);
-
-  if (!site) {
-    return (
-      <div className="flex h-screen items-center justify-center text-sm text-muted-foreground">
-        Loading preview...
-      </div>
-    );
-  }
-
-  const background = getRootBackground(site.data);
-  const previewUrl =
-    typeof window !== "undefined" ? window.location.href : `/preview/${siteId}`;
+export function SitePreview({ site }: Props) {
+  const serialized = useMemo(
+    () => JSON.stringify(site.site_data ?? {}),
+    [site.site_data],
+  );
+  const rootBackground = useMemo(
+    () => getRootBackground(site.site_data),
+    [site.site_data],
+  );
+  const statusLabel = STATUS_LABEL[site.status] ?? site.status;
 
   return (
-    <div className="min-h-screen bg-background">
-      <PreviewHead site={site} />
-      <div className="sticky top-0 z-10 border-b bg-background/95 backdrop-blur">
-        <div className="mx-auto flex h-14 max-w-6xl items-center justify-between gap-3 px-4">
-          <div className="flex items-center gap-3">
-            <Link
-              href="/sites"
-              className={buttonVariants({ variant: "ghost", size: "sm" })}
-            >
-              <ArrowLeftIcon data-icon="inline-start" />
-              All sites
-            </Link>
-            <span className="text-sm font-semibold">{site.name}</span>
-            <Badge variant="secondary" className="font-mono text-[10px]">
-              <HashIcon className="mr-0.5 h-3 w-3" />
-              {site.id}
-            </Badge>
+    <div className="min-h-screen flex flex-col bg-background">
+      <header className="border-b bg-muted/40">
+        <div className="mx-auto flex max-w-5xl items-center justify-between gap-3 px-4 py-2 text-xs">
+          <div className="flex items-center gap-2 text-muted-foreground">
+            <span className="font-mono text-foreground/80">{site.slug}</span>
+            <span aria-hidden>·</span>
+            <span>{statusLabel}</span>
           </div>
-          <div className="flex items-center gap-2">
-            <Button
-              variant="outline"
-              size="sm"
-              onClick={() => {
-                if (navigator.clipboard) {
-                  navigator.clipboard.writeText(previewUrl);
-                  toast.success("Preview URL copied");
-                }
-              }}
-            >
-              <CopyIcon data-icon="inline-start" />
-              Copy URL
-            </Button>
-            <Link
-              href={`/editor/${siteId}`}
-              className={buttonVariants({ variant: "outline", size: "sm" })}
-            >
-              <ExternalLinkIcon data-icon="inline-start" />
-              Edit
-            </Link>
-          </div>
+          <Link
+            href={`/editor/${site.slug}`}
+            className="text-foreground underline-offset-4 hover:underline"
+          >
+            Open in editor →
+          </Link>
         </div>
-      </div>
-      <div className="border-b bg-muted/30 px-4 py-2 text-center text-xs text-muted-foreground">
-        Preview mode · Site ID:{" "}
-        <code className="rounded bg-background px-1 py-0.5 font-mono text-[10px]">
-          {site.id}
-        </code>
-      </div>
-      <Editor enabled={false} resolver={resolver}>
-        <div style={{ background }}>
-          <Frame data={JSON.stringify(site.data)} />
-        </div>
-      </Editor>
+      </header>
+
+      <main
+        className="flex-1"
+        style={rootBackground ? { background: rootBackground } : undefined}
+      >
+        <Editor
+          enabled={false}
+          resolver={resolver}
+          onRender={RenderNode}
+        >
+          <Frame data={serialized} />
+        </Editor>
+      </main>
     </div>
   );
 }
