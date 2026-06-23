@@ -1,14 +1,14 @@
 import { SiteEditor } from "@/components/editor/SiteEditor";
 
 type Props = {
-  params: Promise<{ slug: string }>;
+  params: Promise<{ siteSlug: string; pageSlug: string }>;
 };
 
 export default async function EditorPage({ params }: Props) {
-  const { slug } = await params;
+  const { siteSlug, pageSlug } = await params;
   return (
     <div className="h-screen overflow-hidden">
-      <SiteEditor slug={slug} />
+      <SiteEditor siteSlug={siteSlug} pageSlug={pageSlug} />
     </div>
   );
 }

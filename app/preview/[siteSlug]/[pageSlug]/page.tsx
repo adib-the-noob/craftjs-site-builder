@@ -4,22 +4,28 @@ import { useEffect, useState } from "react";
 import { useParams } from "next/navigation";
 
 import { SitePreview } from "@/components/preview/SitePreview";
-import { getPublicSite, type Site } from "@/lib/sites";
+import {
+  findPageBySlug,
+  getPublicSite,
+  readSitePages,
+  type Site,
+} from "@/lib/sites";
 
 export default function PreviewPage() {
-  const params = useParams<{ slug: string }>();
-  const slug = params?.slug;
+  const params = useParams<{ siteSlug: string; pageSlug: string }>();
+  const siteSlug = params?.siteSlug;
+  const pageSlug = params?.pageSlug;
 
   const [site, setSite] = useState<Site | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
-    if (!slug) return;
+    if (!siteSlug) return;
     let cancelled = false;
     setLoading(true);
     setError(null);
-    getPublicSite(slug)
+    getPublicSite(siteSlug)
       .then((s) => {
         if (cancelled) return;
         setSite(s);
@@ -35,9 +41,9 @@ export default function PreviewPage() {
     return () => {
       cancelled = true;
     };
-  }, [slug]);
+  }, [siteSlug]);
 
-  if (!slug) return null;
+  if (!siteSlug || !pageSlug) return null;
 
   if (loading) {
     return (
@@ -61,5 +67,13 @@ export default function PreviewPage() {
     );
   }
 
-  return <SitePreview site={site} />;
+  // Resolve the requested page. If it doesn't exist, fall back to the
+  // home page — never render a blank canvas on a typo'd URL.
+  const pages = readSitePages(site);
+  const page = findPageBySlug(pages, pageSlug) ??
+    pages.find((p) => p.isHome) ??
+    pages[0] ??
+    null;
+
+  return <SitePreview site={site} page={page} />;
 }

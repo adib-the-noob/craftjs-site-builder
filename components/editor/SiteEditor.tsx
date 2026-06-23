@@ -23,7 +23,16 @@ import {
   ResizablePanelGroup,
 } from "@/components/ui/resizable";
 import { resolver } from "@/lib/resolver";
-import { getSite, updateSite, type Site } from "@/lib/sites";
+import {
+  findPageBySlug,
+  getSite,
+  normalisePages,
+  readSitePages,
+  updateSite,
+  writeSitePages,
+  type Site,
+  type SitePage,
+} from "@/lib/sites";
 import { getTemplateById } from "@/lib/templates";
 import { setClipboard, getClipboard } from "@/lib/clipboard";
 import { AuthGuard } from "@/components/auth/AuthGuard";
@@ -31,7 +40,7 @@ import { toast } from "sonner";
 
 function KeyboardShortcuts() {
   const router = useRouter();
-  const { actions, query } = useEditor((state, q) => ({}));
+  const { actions, query } = useEditor();
 
   useEffect(() => {
     const handler = (e: KeyboardEvent) => {
@@ -134,12 +143,8 @@ function KeyboardShortcuts() {
   return null;
 }
 
-type SiteEditorProps = {
-  slug: string;
-};
-
 /**
- * Restores a previously saved Craft.js tree into the editor after mount.
+ * Hydrates the Craft.js editor with the current page's tree after mount.
  *
  * Why not use <Frame data={saved}> directly? `Frame.deserialize` runs
  * the saved tree through `query.parseSerializedNode(...).toNode()`,
@@ -182,15 +187,48 @@ function HydrateOnMount({ data }: { data: string | null }) {
   return null;
 }
 
-function EditorInner({ slug }: SiteEditorProps) {
+/**
+ * Mirrors the editor's serialised tree onto `window.__craftEditorTree`
+ * every 1.5s so the toolbar's Save button (which sits outside the
+ * <Editor> provider) can grab the latest snapshot without dragging
+ * `useEditor` into its component tree.
+ */
+function TreeMirror() {
+  const { query } = useEditor();
+  useEffect(() => {
+    const w = window as unknown as {
+      __craftEditorTree?: Record<string, unknown>;
+    };
+    const tick = () => {
+      try {
+        w.__craftEditorTree = JSON.parse(query.serialize());
+      } catch {
+        // editor not ready — ignore
+      }
+    };
+    tick();
+    const id = window.setInterval(tick, 1500);
+    return () => window.clearInterval(id);
+  }, [query]);
+  return null;
+}
+
+function EditorInner({
+  siteSlug,
+  pageSlug,
+}: {
+  siteSlug: string;
+  pageSlug: string;
+}) {
   const router = useRouter();
   const [site, setSite] = useState<Site | null>(null);
-  const [initialData, setInitialData] = useState<string | null>(null);
+  const [pages, setPages] = useState<SitePage[] | null>(null);
   const [loadFailed, setLoadFailed] = useState(false);
 
+  // Load site + pages.
   useEffect(() => {
     let cancelled = false;
-    getSite(slug)
+    getSite(siteSlug)
       .then((s) => {
         if (cancelled) return;
         if (!s) {
@@ -200,17 +238,7 @@ function EditorInner({ slug }: SiteEditorProps) {
           return;
         }
         setSite(s);
-        // Only pass `data` to <Frame /> when we have a real saved tree.
-        // A brand-new site returns `site_data = {}`; handing that to
-        // Frame runs `deserialize({})` which calls `replaceNodes({})`
-        // and wipes ROOT entirely — leaving no canvas, no drop target,
-        // and seemingly nothing happens when you drag from the toolbox.
-        // Falling back to `null` lets the default JSX child
-        // (<Element canvas is={Container} />) become the drop target.
-        const saved = s.site_data;
-        const hasSavedTree =
-          saved && typeof saved === "object" && Object.keys(saved).length > 0;
-        setInitialData(hasSavedTree ? JSON.stringify(saved) : null);
+        setPages(normalisePages(readSitePages(s)));
       })
       .catch((err) => {
         if (cancelled) return;
@@ -223,32 +251,126 @@ function EditorInner({ slug }: SiteEditorProps) {
     return () => {
       cancelled = true;
     };
-  }, [slug, router]);
+  }, [siteSlug, router]);
+
+  // The currently active page — derived from `pages` + URL `pageSlug`.
+  // Falls back to the home page if the URL slug doesn't match (e.g.
+  // the page was just deleted or renamed).
+  const currentPage = useMemo<SitePage | null>(() => {
+    if (!pages) return null;
+    return (
+      findPageBySlug(pages, pageSlug) ??
+      pages.find((p) => p.isHome) ??
+      pages[0] ??
+      null
+    );
+  }, [pages, pageSlug]);
+
+  // Used to remount the Craft.js <Editor> when switching pages. Without
+  // this, the canvas would keep showing the previous page's tree because
+  // Craft.js state is keyed by mount, not by props.
+  const editorKey = useMemo(
+    () => (currentPage ? currentPage.id : "loading"),
+    [currentPage]
+  );
+
+  const initialData = useMemo<string | null>(() => {
+    if (!currentPage) return null;
+    const tree = currentPage.data;
+    if (!tree || typeof tree !== "object") return null;
+    if (Object.keys(tree).length === 0) return null;
+    return JSON.stringify(tree);
+  }, [currentPage]);
+
+  /**
+   * Pull the freshest tree out of Craft.js (which lives inside the
+   * <Editor> provider). Falls back to the cached `currentPage.data`
+   * if the mirror hasn't ticked yet.
+   */
+  const readLatestTree = useCallback((): Record<string, unknown> => {
+    const w = window as unknown as {
+      __craftEditorTree?: Record<string, unknown>;
+    };
+    return w.__craftEditorTree ?? currentPage?.data ?? {};
+  }, [currentPage]);
+
+  const handleSave = useCallback(async () => {
+    if (!site || !currentPage || !pages) return;
+    const tree = readLatestTree();
+    const nextPages = normalisePages(
+      pages.map((p) => (p.id === currentPage.id ? { ...p, data: tree } : p))
+    );
+    try {
+      await updateSite(site.id, {
+        data: writeSitePages(nextPages) as unknown as Record<string, unknown>,
+      });
+      setPages(nextPages);
+      toast.success(`Saved "${currentPage.title}"`);
+    } catch (err) {
+      const message = err instanceof Error ? err.message : "Save failed";
+      toast.error(message);
+    }
+  }, [site, currentPage, pages, readLatestTree]);
 
   const handleLoadTemplate = useCallback(
     async (templateId: string) => {
+      if (!site || !currentPage || !pages) return;
       const template = await getTemplateById(templateId);
-      if (!template || !site) return;
-      const data = JSON.parse(JSON.stringify(template.data));
-      setInitialData(JSON.stringify(data));
+      if (!template) return;
+      // Templates are single-page starters — they replace the *current*
+      // page only, preserving the rest of the site's pages.
+      const nextPages = normalisePages(
+        pages.map((p) =>
+          p.id === currentPage.id
+            ? { ...p, data: JSON.parse(JSON.stringify(template.data)) }
+            : p
+        )
+      );
       try {
-        await updateSite(site.id, { data });
-        toast.success(`Loaded template "${template.name}"`);
+        await updateSite(site.id, {
+          data: writeSitePages(nextPages) as unknown as Record<
+            string,
+            unknown
+          >,
+        });
+        setPages(nextPages);
+        toast.success(
+          `Loaded template "${template.name}" into "${currentPage.title}"`
+        );
       } catch (err) {
         const message =
           err instanceof Error ? err.message : "Could not load template";
         toast.error(message);
       }
     },
-    [site]
+    [site, currentPage, pages]
   );
 
-  const editorKey = useMemo(() => initialData ?? "loading", [initialData]);
+  const handleSiteChanged = useCallback(() => {
+    // Refresh from backend so name edits reflect.
+    if (!site) return;
+    getSite(site.slug).then((s) => {
+      if (s) setSite(s);
+    });
+  }, [site]);
 
-  // `initialData` may be `null` for a brand-new site (see the load
-  // effect above) — that's a valid state meaning "render the default
-  // <Frame /> child as the canvas". Only treat `undefined` as loading.
-  if (loadFailed || !site || initialData === undefined) {
+  /**
+   * Switch the active page. We save the outgoing page *first* and
+   * then navigate, so the new mount reads the just-persisted tree
+   * instead of racing against the in-flight PUT.
+   */
+  const handleSwitchPage = useCallback(
+    async (pageId: string) => {
+      if (!site || !pages) return;
+      const target = pages.find((p) => p.id === pageId);
+      if (!target || target.id === currentPage?.id) return;
+      await handleSave();
+      router.push(`/editor/${site.slug}/${target.slug}`);
+    },
+    [site, pages, currentPage, handleSave, router]
+  );
+
+  if (loadFailed || !site || !pages || !currentPage) {
     return (
       <div className="flex h-screen items-center justify-center text-sm text-muted-foreground">
         Loading editor…
@@ -263,14 +385,18 @@ function EditorInner({ slug }: SiteEditorProps) {
       onRender={RenderNode}
     >
       <KeyboardShortcuts />
+      <TreeMirror />
       <HydrateOnMount data={initialData} />
       <div className="flex h-screen flex-col overflow-hidden bg-background">
         <EditorToolbar
-          slug={site.slug}
-          siteId={site.id}
-          siteName={site.name}
+          site={site}
+          pages={pages}
+          currentPageId={currentPage.id}
+          onSave={handleSave}
           onLoadTemplate={handleLoadTemplate}
-          onSiteChanged={() => setSite((s) => (s ? { ...s, name: site.name } : s))}
+          onSiteChanged={handleSiteChanged}
+          onPagesChanged={setPages}
+          onRequestSwitchPage={handleSwitchPage}
         />
         <ResizablePanelGroup
           id="site-editor-layout"
@@ -341,10 +467,16 @@ function EditorInner({ slug }: SiteEditorProps) {
   );
 }
 
-export function SiteEditor({ slug }: SiteEditorProps) {
+export function SiteEditor({
+  siteSlug,
+  pageSlug,
+}: {
+  siteSlug: string;
+  pageSlug: string;
+}) {
   return (
     <AuthGuard>
-      <EditorInner slug={slug} />
+      <EditorInner siteSlug={siteSlug} pageSlug={pageSlug} />
     </AuthGuard>
   );
 }

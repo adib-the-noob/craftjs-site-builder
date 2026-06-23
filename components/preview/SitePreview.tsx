@@ -7,10 +7,21 @@ import { Editor, Frame } from "@craftjs/core";
 
 import { RenderNode } from "@/components/editor/RenderNode";
 import { resolver } from "@/lib/resolver";
-import type { Site } from "@/lib/sites";
+import {
+  getHomePageTree,
+  readSitePages,
+  type Site,
+  type SitePage,
+} from "@/lib/sites";
 
 type Props = {
   site: Site;
+  /**
+   * Which page to render. Defaults to the home page (preserves the
+   * legacy `/preview/[slug]` route behaviour). Pass a specific page
+   * from `/preview/[siteSlug]/[pageSlug]`.
+   */
+  page?: SitePage | null;
 };
 
 function getRootBackground(data: unknown): string | undefined {
@@ -26,15 +37,24 @@ const STATUS_LABEL: Record<string, string> = {
   published: "Published",
 };
 
-export function SitePreview({ site }: Props) {
-  const serialized = useMemo(
-    () => JSON.stringify(site.site_data ?? {}),
-    [site.site_data],
-  );
-  const rootBackground = useMemo(
-    () => getRootBackground(site.site_data),
-    [site.site_data],
-  );
+export function SitePreview({ site, page }: Props) {
+  // Resolve the tree to render. If a `page` is supplied, use its data;
+  // otherwise fall back to the home page (handles legacy single-tree
+  // sites via `getHomePageTree`).
+  const tree = useMemo(() => {
+    if (page) return page.data;
+    // No explicit page — keep the existing behaviour (home or legacy).
+    return getHomePageTree(site);
+  }, [site, page]);
+
+  const resolvedPage = useMemo<SitePage | null>(() => {
+    if (page) return page;
+    const pages = readSitePages(site);
+    return pages.find((p) => p.isHome) ?? pages[0] ?? null;
+  }, [site, page]);
+
+  const serialized = useMemo(() => JSON.stringify(tree ?? {}), [tree]);
+  const rootBackground = useMemo(() => getRootBackground(tree), [tree]);
   const statusLabel = STATUS_LABEL[site.status] ?? site.status;
 
   return (
@@ -45,9 +65,19 @@ export function SitePreview({ site }: Props) {
             <span className="font-mono text-foreground/80">{site.slug}</span>
             <span aria-hidden>·</span>
             <span>{statusLabel}</span>
+            {resolvedPage && !resolvedPage.isHome && (
+              <>
+                <span aria-hidden>·</span>
+                <span className="font-mono">/{resolvedPage.slug}</span>
+              </>
+            )}
           </div>
           <Link
-            href={`/editor/${site.slug}`}
+            href={
+              resolvedPage
+                ? `/editor/${site.slug}/${resolvedPage.slug}`
+                : `/editor/${site.slug}`
+            }
             className="text-foreground underline-offset-4 hover:underline"
           >
             Open in editor →

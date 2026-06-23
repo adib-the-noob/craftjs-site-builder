@@ -2,7 +2,7 @@
 
 import { useRouter } from "next/navigation";
 import { useEffect, useState, type ReactNode } from "react";
-import { isAuthenticated, getCurrentUser } from "@/lib/auth";
+import { clearToken, isAuthenticated, getCurrentUser } from "@/lib/auth";
 
 type AuthGuardProps = {
   children: ReactNode;
@@ -17,6 +17,11 @@ type AuthGuardProps = {
  * as a token exists in localStorage, then validates it in the background.
  * This avoids a flash of /login for already-authenticated users. The
  * background check transparently kicks them out if the token is stale.
+ *
+ * IMPORTANT: when a stale token is detected we MUST clear it from
+ * localStorage. Otherwise LoginForm's `isAuthenticated()` check returns
+ * true and immediately bounces the user back to `next` (= /sites), which
+ * the guard then rejects again — a sites → login → sites loop.
  */
 export function AuthGuard({ children }: AuthGuardProps) {
   const router = useRouter();
@@ -45,7 +50,9 @@ export function AuthGuard({ children }: AuthGuardProps) {
       if (cancelled) return;
 
       if (!user) {
-        // Token was rejected — treat as logged out.
+        // Token was rejected — drop it so LoginForm doesn't bounce us
+        // straight back here.
+        clearToken();
         setState("redirecting");
         router.replace(
           `/login?next=${encodeURIComponent(currentPath)}`
