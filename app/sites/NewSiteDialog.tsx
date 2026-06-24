@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { Button } from "@/components/ui/button";
 import {
   Dialog,
@@ -21,20 +21,49 @@ type NewSiteDialogProps = {
   onCreate: (name: string, templateId?: string) => void;
 };
 
+type TemplateOption = { value: string; label: string };
+
 export function NewSiteDialog({
   open,
   onOpenChange,
   onCreate,
 }: NewSiteDialogProps) {
-  const templates = getTemplates();
   const [name, setName] = useState("My new site");
-  const [templateId, setTemplateId] = useState<string>(templates[0]?.id ?? "blank");
+  const [templateId, setTemplateId] = useState<string>("");
+  const [templateOptions, setTemplateOptions] = useState<TemplateOption[]>([
+    { value: "", label: "Blank site" },
+  ]);
+
+  useEffect(() => {
+    if (!open) return;
+    let cancelled = false;
+    getTemplates()
+      .then((templates) => {
+        if (cancelled) return;
+        const options: TemplateOption[] = [
+          { value: "", label: "Blank site" },
+          ...templates.map((t) => ({ value: t.id, label: t.name })),
+        ];
+        setTemplateOptions(options);
+        // Keep the current selection if it's still valid; otherwise fall back
+        // to blank.
+        setTemplateId((current) =>
+          options.some((o) => o.value === current) ? current : ""
+        );
+      })
+      .catch(() => {
+        // Swallow — user can still create a blank site.
+      });
+    return () => {
+      cancelled = true;
+    };
+  }, [open]);
 
   const handleCreate = () => {
     if (!name.trim()) return;
-    onCreate(name.trim(), templateId);
+    onCreate(name.trim(), templateId || undefined);
     setName("My new site");
-    setTemplateId(templates[0]?.id ?? "blank");
+    setTemplateId("");
     onOpenChange(false);
   };
 
@@ -44,8 +73,8 @@ export function NewSiteDialog({
         <DialogHeader>
           <DialogTitle>Create a new site</DialogTitle>
           <DialogDescription>
-            Give it a name and pick a starting template. You can change anything
-            later.
+            Give it a name and pick a starting template. You can change
+            anything later.
           </DialogDescription>
         </DialogHeader>
         <div className="flex flex-col gap-4 py-2">
@@ -61,7 +90,7 @@ export function NewSiteDialog({
             label="Template"
             value={templateId}
             onChange={setTemplateId}
-            options={templates.map((t) => ({ value: t.id, label: t.name }))}
+            options={templateOptions}
           />
         </div>
         <DialogFooter>

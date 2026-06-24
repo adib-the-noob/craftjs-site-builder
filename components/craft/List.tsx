@@ -8,6 +8,7 @@ import { ColorField } from "@/components/craft/settings/ColorField";
 import { SliderField } from "@/components/craft/settings/SliderField";
 import { SelectField } from "@/components/craft/settings/SelectField";
 import { Input } from "@/components/ui/input";
+import { BoxModelField, boxToStyle } from "@/components/craft/settings/BoxModelField";
 
 type ListProps = {
   items?: string;
@@ -16,6 +17,8 @@ type ListProps = {
   color?: string;
   spacing?: number;
   customId?: string;
+  /** Tailwind-style box model. */
+  boxModel?: { margin?: any; padding?: any };
 };
 
 export function List({
@@ -25,6 +28,7 @@ export function List({
   color = "#374151",
   spacing = 8,
   customId = "",
+  boxModel,
 }: ListProps) {
   const {
     connectors: { connect, drag },
@@ -40,7 +44,7 @@ export function List({
   return (
     <Tag
       ref={(ref) => {
-        connect(drag(ref!));
+        if (ref) connect(drag(ref));
       }}
       id={customId || undefined}
       className={cn(
@@ -48,7 +52,12 @@ export function List({
         "ml-6 outline-none",
         selected && "ring-2 ring-primary/40 ring-offset-2"
       )}
-      style={{ fontSize, color }}
+      style={{
+        fontSize,
+        color,
+        ...boxToStyle(boxModel?.padding, "padding"),
+        ...boxToStyle(boxModel?.margin, "margin"),
+      }}
     >
       {list.map((item, idx) => (
         <li key={idx} style={{ marginBottom: spacing }}>
@@ -68,6 +77,7 @@ function ListSettings() {
     color,
     spacing,
     customId,
+    boxModel,
   } = useNode((node) => ({
     items: node.data.props.items as string,
     ordered: node.data.props.ordered as boolean,
@@ -75,6 +85,7 @@ function ListSettings() {
     color: node.data.props.color as string,
     spacing: node.data.props.spacing as number,
     customId: (node.data.props.customId as string) ?? "",
+    boxModel: node.data.props.boxModel as ListProps["boxModel"],
   })) as any;
 
   return (
@@ -145,6 +156,15 @@ function ListSettings() {
           })
         }
       />
+      <BoxModelField
+        label="Spacing (margin / padding)"
+        value={boxModel ?? {}}
+        onChange={(v) =>
+          setProp((props: ListProps) => {
+            props.boxModel = v;
+          })
+        }
+      />
     </div>
   );
 }
@@ -158,6 +178,7 @@ List.craft = {
     color: "#374151",
     spacing: 8,
     customId: "",
+    boxModel: undefined,
   },
   related: {
     settings: ListSettings,

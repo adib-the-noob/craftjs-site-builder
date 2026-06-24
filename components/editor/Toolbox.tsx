@@ -8,6 +8,7 @@ import {
   LayoutTemplateIcon,
   ListIcon,
   MailIcon,
+  MenuIcon,
   MousePointerClickIcon,
   Rows3Icon,
   SparklesIcon,
@@ -17,6 +18,8 @@ import {
   VideoIcon,
   MinusIcon,
 } from "lucide-react";
+import { useEffect, useRef } from "react";
+
 import {
   Container,
   CtaButton,
@@ -33,8 +36,8 @@ import {
   IconBox,
   Video,
   ContactForm,
+  Navbar,
 } from "@/components/craft";
-import { Card as UICard, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { ScrollArea } from "@/components/ui/scroll-area";
 
 type Item = {
@@ -45,6 +48,19 @@ type Item = {
 };
 
 const toolboxItems: Item[] = [
+  {
+    name: "Navbar",
+    icon: MenuIcon,
+    group: "Layout",
+    // Wrap in <Section> so the navbar lands as a top-level page row by
+    // default — pages always render Section > children, and a navbar
+    // dropping in unparented looks odd in the canvas.
+    element: (
+      <Element canvas is={Section} paddingY={0}>
+        <Element is={Navbar} />
+      </Element>
+    ),
+  },
   {
     name: "Section",
     icon: Rows3Icon,
@@ -137,51 +153,58 @@ const toolboxItems: Item[] = [
   },
 ];
 
-export function Toolbox() {
+function ToolboxItem({ item }: { item: Item }) {
   const { connectors } = useEditor();
+  const ref = useRef<HTMLButtonElement>(null);
 
+  useEffect(() => {
+    const el = ref.current;
+    if (!el) return;
+    // Bind the drag-source listeners. Craft.js's `connectors.create` returns
+    // `void` (no cleanup) on this build, so re-binding on remount is safe —
+    // the previous binding is replaced when the same DOM node is reused, and
+    // detached when the node unmounts.
+    connectors.create(el, item.element);
+  }, [connectors, item.element]);
+
+  return (
+    <button
+      ref={ref}
+      type="button"
+      draggable
+      className="flex items-center gap-3 rounded-md border border-border bg-card px-3 py-2 text-left text-sm transition-colors hover:bg-muted"
+    >
+      <item.icon className="h-4 w-4 text-muted-foreground" />
+      <span className="font-medium">{item.name}</span>
+    </button>
+  );
+}
+
+/**
+ * Components drawer rendered inside the left sidebar's "Components"
+ * tab. The outer tabs header / fold button live on `LeftSidebar`.
+ */
+export function Toolbox() {
   const groups: Item["group"][] = ["Layout", "Content", "Media", "Form"];
 
   return (
-    <UICard className="flex h-full min-h-0 flex-col rounded-none border-0 border-r shadow-none">
-      <CardHeader className="shrink-0 border-b pb-4">
-        <CardTitle className="flex items-center gap-2 text-sm">
-          <LayoutTemplateIcon />
-          Components
-        </CardTitle>
-      </CardHeader>
-      <CardContent className="min-h-0 flex-1 p-0">
-        <ScrollArea className="h-full">
-          <div className="flex flex-col gap-4 p-4">
-            {groups.map((group) => {
-              const items = toolboxItems.filter((it) => it.group === group);
-              if (items.length === 0) return null;
-              return (
-                <div key={group} className="flex flex-col gap-2">
-                  <p className="text-[10px] font-semibold uppercase tracking-wider text-muted-foreground">
-                    {group}
-                  </p>
-                  {items.map((item) => (
-                    <button
-                      key={item.name}
-                      ref={(ref) => {
-                        if (ref) {
-                          connectors.create(ref, item.element);
-                        }
-                      }}
-                      type="button"
-                      className="flex items-center gap-3 rounded-md border border-border bg-card px-3 py-2 text-left text-sm transition-colors hover:bg-muted"
-                    >
-                      <item.icon className="h-4 w-4 text-muted-foreground" />
-                      <span className="font-medium">{item.name}</span>
-                    </button>
-                  ))}
-                </div>
-              );
-            })}
-          </div>
-        </ScrollArea>
-      </CardContent>
-    </UICard>
+    <ScrollArea className="h-full">
+      <div className="flex flex-col gap-4 p-4">
+        {groups.map((group) => {
+          const items = toolboxItems.filter((it) => it.group === group);
+          if (items.length === 0) return null;
+          return (
+            <div key={group} className="flex flex-col gap-2">
+              <p className="text-[10px] font-semibold uppercase tracking-wider text-muted-foreground">
+                {group}
+              </p>
+              {items.map((item) => (
+                <ToolboxItem key={item.name} item={item} />
+              ))}
+            </div>
+          );
+        })}
+      </div>
+    </ScrollArea>
   );
 }

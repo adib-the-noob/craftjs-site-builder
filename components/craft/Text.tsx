@@ -3,6 +3,7 @@
 import { useNode } from "@craftjs/core";
 import { cn } from "@/lib/utils";
 import { FieldRow } from "@/components/craft/settings/FieldRow";
+import { FontField } from "@/components/craft/settings/FontField";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { ColorField } from "@/components/craft/settings/ColorField";
@@ -10,6 +11,7 @@ import { SliderField } from "@/components/craft/settings/SliderField";
 import { SelectField } from "@/components/craft/settings/SelectField";
 import { AlignField } from "@/components/craft/settings/AlignField";
 import { ToggleField } from "@/components/craft/settings/ToggleField";
+import { BoxModelField, boxToStyle } from "@/components/craft/settings/BoxModelField";
 
 type TextProps = {
   text?: string;
@@ -20,17 +22,23 @@ type TextProps = {
   align?: "left" | "center" | "right" | "justify";
   italic?: boolean;
   customId?: string;
+  /** CSS class name from the font registry (lib/fonts.ts). */
+  fontFamily?: string;
+  /** Tailwind-style box model. */
+  boxModel?: { margin?: any; padding?: any };
 };
 
 export function Text({
   text = "Edit this text",
-  fontSize = 16,
+  fontSize = 17,
   fontWeight = 400,
-  lineHeight = 1.6,
+  lineHeight = 1.7,
   color = "#374151",
   align = "left",
   italic = false,
   customId = "",
+  fontFamily = "",
+  boxModel,
 }: TextProps) {
   const {
     connectors: { connect, drag },
@@ -43,7 +51,7 @@ export function Text({
   return (
     <p
       ref={(ref) => {
-        connect(drag(ref!));
+        if (ref) connect(drag(ref));
       }}
       id={customId || undefined}
       contentEditable={selected}
@@ -55,6 +63,7 @@ export function Text({
       }
       className={cn(
         "max-w-none whitespace-pre-wrap outline-none",
+        fontFamily,
         selected && "ring-2 ring-primary/40 ring-offset-2",
         italic && "italic"
       )}
@@ -64,6 +73,8 @@ export function Text({
         lineHeight,
         color,
         textAlign: align,
+        ...boxToStyle(boxModel?.padding, "padding"),
+        ...boxToStyle(boxModel?.margin, "margin"),
       }}
     >
       {text}
@@ -82,6 +93,8 @@ function TextSettings() {
     align,
     italic,
     customId,
+    fontFamily,
+    boxModel,
   } = useNode((node) => ({
     text: node.data.props.text as string,
     fontSize: node.data.props.fontSize as number,
@@ -91,6 +104,8 @@ function TextSettings() {
     align: node.data.props.align as TextProps["align"],
     italic: (node.data.props.italic as boolean) ?? false,
     customId: (node.data.props.customId as string) ?? "",
+    fontFamily: (node.data.props.fontFamily as string) ?? "",
+    boxModel: node.data.props.boxModel as TextProps["boxModel"],
   })) as any;
 
   return (
@@ -117,6 +132,15 @@ function TextSettings() {
           }
         />
       </FieldRow>
+      <FontField
+        label="Font"
+        value={fontFamily}
+        onChange={(v) =>
+          setProp((props: TextProps) => {
+            props.fontFamily = v;
+          })
+        }
+      />
       <SliderField
         label="Font size"
         value={fontSize}
@@ -187,6 +211,15 @@ function TextSettings() {
           })
         }
       />
+      <BoxModelField
+        label="Spacing (margin / padding)"
+        value={boxModel ?? {}}
+        onChange={(v) =>
+          setProp((props: TextProps) => {
+            props.boxModel = v;
+          })
+        }
+      />
     </div>
   );
 }
@@ -195,13 +228,15 @@ Text.craft = {
   displayName: "Text",
   props: {
     text: "Edit this text",
-    fontSize: 16,
+    fontSize: 17,
     fontWeight: 400,
-    lineHeight: 1.6,
+    lineHeight: 1.7,
     color: "#374151",
     align: "left",
     italic: false,
     customId: "",
+    fontFamily: "",
+    boxModel: undefined,
   },
   related: {
     settings: TextSettings,

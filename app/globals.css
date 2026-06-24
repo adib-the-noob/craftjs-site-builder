@@ -7,9 +7,10 @@
 @theme inline {
   --color-background: var(--background);
   --color-foreground: var(--foreground);
-  --font-sans: var(--font-sans);
-  --font-mono: var(--font-geist-mono);
-  --font-heading: var(--font-sans);
+  --font-sans: var(--font-sans), var(--font-geist-sans), var(--font-inter), ui-sans-serif, system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+  --font-mono: var(--font-geist-mono), ui-monospace, SFMono-Regular, "SF Mono", Menlo, Consolas, monospace;
+  --font-heading: var(--font-geist-sans), var(--font-inter), ui-sans-serif, system-ui, sans-serif;
+  --font-inter: var(--font-inter);
   --color-sidebar-ring: var(--sidebar-ring);
   --color-sidebar-border: var(--sidebar-border);
   --color-sidebar-accent-foreground: var(--sidebar-accent-foreground);
@@ -55,6 +56,7 @@
   --card-foreground: oklch(0.145 0 0);
   --popover: oklch(1 0 0);
   --popover-foreground: oklch(0.145 0 0);
+  --font-sans: var(--font-geist-sans), var(--font-inter), ui-sans-serif, system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
   --primary: oklch(0.205 0 0);
   --primary-foreground: oklch(0.985 0 0);
   --secondary: oklch(0.97 0 0);
@@ -126,5 +128,59 @@
   }
   html {
     @apply font-sans;
+  }
+}
+
+/*
+ * Editor font picker — applied to text/heading craft nodes when the
+ * user picks a font family in the right-hand settings panel. The
+ * matching `next/font/google` calls live in
+ * components/editor/EditorFontsProvider.tsx.
+ */
+@layer components {
+  .ef-inter {
+    font-family: var(--ef-inter), var(--font-inter), ui-sans-serif, system-ui,
+      -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+  }
+  .ef-roboto {
+    font-family: var(--ef-roboto), var(--font-inter), ui-sans-serif, system-ui,
+      -apple-system, "Segoe UI", Roboto, Arial, sans-serif;
+  }
+  .ef-roboto-mono {
+    font-family: var(--ef-roboto-mono), var(--font-geist-mono), ui-monospace,
+      SFMono-Regular, Menlo, Consolas, monospace;
+  }
+  .ef-poppins {
+    font-family: var(--ef-poppins), var(--font-inter), ui-sans-serif, system-ui,
+      -apple-system, "Segoe UI", Roboto, Arial, sans-serif;
+  }
+  .ef-lora {
+    font-family: var(--ef-lora), Georgia, "Times New Roman", Times, serif;
+  }
+  .ef-playfair {
+    font-family: var(--ef-playfair), Georgia, "Times New Roman", Times, serif;
+  }
+  .ef-merriweather {
+    font-family: var(--ef-merriweather), Georgia, "Times New Roman", Times,
+      serif;
+  }
+  .ef-montserrat {
+    font-family: var(--ef-montserrat), var(--font-inter), ui-sans-serif,
+      system-ui, -apple-system, "Segoe UI", Roboto, Arial, sans-serif;
+  }
+  .ef-jetbrains-mono {
+    font-family: var(--ef-jetbrains-mono), var(--font-geist-mono), ui-monospace,
+      SFMono-Regular, Menlo, Consolas, monospace;
+  }
+  .ef-system-sans {
+    font-family: ui-sans-serif, system-ui, -apple-system, "Segoe UI", Roboto,
+      "Helvetica Neue", Arial, sans-serif;
+  }
+  .ef-system-serif {
+    font-family: ui-serif, Georgia, "Times New Roman", Times, serif;
+  }
+  .ef-system-mono {
+    font-family: ui-monospace, SFMono-Regular, "SF Mono", Menlo, Consolas,
+      monospace;
   }
 }

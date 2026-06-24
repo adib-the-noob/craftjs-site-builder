@@ -1,341 +1,265 @@
-[
-  {
+{
+  "blank": {
     "id": "blank",
-    "name": "Blank canvas",
-    "description": "Start from an empty page with a single section.",
+    "name": "Blank site",
+    "description": "Start from an empty canvas.",
     "data": {
       "ROOT": {
         "type": { "resolvedName": "Container" },
-        "isCanvas": true,
-        "props": { "background": "transparent", "padding": 0 },
-        "displayName": "Container",
-        "custom": {},
-        "hidden": false,
-        "nodes": ["section-root"],
-        "linkedNodes": {}
-      },
-      "section-root": {
-        "type": { "resolvedName": "Section" },
-        "isCanvas": true,
-        "props": { "background": "#ffffff", "paddingY": 64 },
-        "displayName": "Section",
-        "custom": {},
-        "hidden": false,
         "nodes": [],
-        "linkedNodes": {},
-        "parent": "ROOT"
+        "props": {
+          "background": "#ffffff",
+          "padding": 0,
+          "maxWidth": 1200,
+          "marginTop": 0,
+          "marginBottom": 0,
+          "customId": "",
+          "metaTitle": "",
+          "metaDescription": "",
+          "customCss": ""
+        },
+        "custom": {},
+        "hidden": false,
+        "isCanvas": true,
+        "displayName": "Container",
+        "linkedNodes": {}
       }
     }
   },
-  {
+  "landing": {
     "id": "landing",
     "name": "Landing page",
-    "description": "Hero section with heading, text, and call-to-action.",
+    "description": "Hero, features, call-to-action, and footer.",
     "data": {
       "ROOT": {
         "type": { "resolvedName": "Container" },
-        "isCanvas": true,
-        "props": { "background": "#f8fafc", "padding": 0 },
-        "displayName": "Container",
+        "nodes": ["a1Hero", "a2Features", "a3CTA", "a4Footer"],
+        "props": {
+          "background": "#ffffff",
+          "padding": 0,
+          "maxWidth": 1200,
+          "marginTop": 0,
+          "marginBottom": 0,
+          "customId": "",
+          "metaTitle": "Welcome",
+          "metaDescription": "A simple landing page built with Craft.js.",
+          "customCss": ""
+        },
         "custom": {},
         "hidden": false,
-        "nodes": ["hero-section"],
+        "isCanvas": true,
+        "displayName": "Container",
         "linkedNodes": {}
       },
-      "hero-section": {
+      "a1Hero": {
         "type": { "resolvedName": "Section" },
-        "isCanvas": true,
-        "props": { "background": "#ffffff", "paddingY": 80 },
-        "displayName": "Section",
+        "nodes": ["a1Heading", "a1Subtext", "a1Button"],
+        "props": {
+          "background": "#0f172a",
+          "paddingY": 96,
+          "maxWidth": 1100,
+          "customId": "hero"
+        },
         "custom": {},
         "hidden": false,
-        "nodes": ["hero-heading", "hero-text", "hero-button"],
-        "linkedNodes": {},
-        "parent": "ROOT"
+        "parent": "ROOT",
+        "isCanvas": true,
+        "displayName": "Section",
+        "linkedNodes": {}
       },
-      "hero-heading": {
+      "a1Heading": {
         "type": { "resolvedName": "Heading" },
-        "isCanvas": false,
+        "nodes": [],
         "props": {
-          "text": "Build beautiful sites visually",
+          "text": "Build beautiful pages\nin minutes",
           "level": "h1",
-          "color": "#0f172a",
-          "align": "center"
+          "color": "#ffffff",
+          "align": "center",
+          "fontWeight": 700,
+          "letterSpacing": -1,
+          "customId": ""
         },
-        "displayName": "Heading",
         "custom": {},
         "hidden": false,
-        "nodes": [],
-        "linkedNodes": {},
-        "parent": "hero-section"
-      },
-      "hero-text": {
-        "type": { "resolvedName": "Text" },
+        "parent": "a1Hero",
         "isCanvas": false,
+        "displayName": "Heading",
+        "linkedNodes": {}
+      },
+      "a1Subtext": {
+        "type": { "resolvedName": "Text" },
+        "nodes": [],
         "props": {
-          "text": "Drag and drop components to design your page. Save locally and preview anytime.",
+          "text": "Drag, drop, and design without writing a line of code. Your creativity is the only limit.",
           "fontSize": 18,
-          "color": "#64748b",
-          "align": "center"
+          "fontWeight": 400,
+          "lineHeight": 1.6,
+          "color": "#cbd5e1",
+          "align": "center",
+          "italic": false,
+          "customId": ""
         },
-        "displayName": "Text",
         "custom": {},
         "hidden": false,
-        "nodes": [],
-        "linkedNodes": {},
-        "parent": "hero-section"
-      },
-      "hero-button": {
-        "type": { "resolvedName": "CtaButton" },
+        "parent": "a1Hero",
         "isCanvas": false,
+        "displayName": "Text",
+        "linkedNodes": {}
+      },
+      "a1Button": {
+        "type": { "resolvedName": "CtaButton" },
+        "nodes": [],
         "props": {
-          "text": "Start building",
-          "href": "#",
+          "text": "Get started",
+          "href": "#cta",
           "variant": "primary",
-          "align": "center"
+          "size": "lg",
+          "align": "center",
+          "fullWidth": false,
+          "background": "#ffffff",
+          "textColor": "#0f172a",
+          "customId": ""
         },
-        "displayName": "Button",
         "custom": {},
         "hidden": false,
-        "nodes": [],
-        "linkedNodes": {},
-        "parent": "hero-section"
-      }
-    }
-  },
-  {
-    "id": "portfolio",
-    "name": "Portfolio",
-    "description": "Showcase work with image, bio, and contact button.",
-    "data": {
-      "ROOT": {
-        "type": { "resolvedName": "Container" },
-        "isCanvas": true,
-        "props": { "background": "#fafafa", "padding": 0 },
-        "displayName": "Container",
-        "custom": {},
-        "hidden": false,
-        "nodes": ["portfolio-section"],
+        "parent": "a1Hero",
+        "isCanvas": false,
+        "displayName": "CtaButton",
         "linkedNodes": {}
       },
-      "portfolio-section": {
+      "a2Features": {
         "type": { "resolvedName": "Section" },
+        "nodes": ["a2Heading", "a2Text", "a2List"],
+        "props": {
+          "background": "#ffffff",
+          "paddingY": 80,
+          "maxWidth": 1100,
+          "customId": "features"
+        },
+        "custom": {},
+        "hidden": false,
+        "parent": "ROOT",
         "isCanvas": true,
-        "props": { "background": "#ffffff", "paddingY": 72 },
         "displayName": "Section",
-        "custom": {},
-        "hidden": false,
-        "nodes": [
-          "portfolio-heading",
-          "portfolio-image",
-          "portfolio-text",
-          "portfolio-button"
-        ],
-        "linkedNodes": {},
-        "parent": "ROOT"
-      },
-      "portfolio-heading": {
-        "type": { "resolvedName": "Heading" },
-        "isCanvas": false,
-        "props": {
-          "text": "Hi, I'm Alex — Product Designer",
-          "level": "h2",
-          "color": "#18181b",
-          "align": "center"
-        },
-        "displayName": "Heading",
-        "custom": {},
-        "hidden": false,
-        "nodes": [],
-        "linkedNodes": {},
-        "parent": "portfolio-section"
-      },
-      "portfolio-image": {
-        "type": { "resolvedName": "ImageBlock" },
-        "isCanvas": false,
-        "props": {
-          "src": "https://images.unsplash.com/photo-1522071820081-009f0129c71c?w=800&q=80",
-          "alt": "Team collaboration",
-          "height": 280,
-          "rounded": true,
-          "align": "center"
-        },
-        "displayName": "Image",
-        "custom": {},
-        "hidden": false,
-        "nodes": [],
-        "linkedNodes": {},
-        "parent": "portfolio-section"
-      },
-      "portfolio-text": {
-        "type": { "resolvedName": "Text" },
-        "isCanvas": false,
-        "props": {
-          "text": "I craft intuitive digital experiences for startups and growing teams. Let's work together.",
-          "fontSize": 16,
-          "color": "#52525b",
-          "align": "center"
-        },
-        "displayName": "Text",
-        "custom": {},
-        "hidden": false,
-        "nodes": [],
-        "linkedNodes": {},
-        "parent": "portfolio-section"
-      },
-      "portfolio-button": {
-        "type": { "resolvedName": "CtaButton" },
-        "isCanvas": false,
-        "props": {
-          "text": "View my work",
-          "href": "#",
-          "variant": "outline",
-          "align": "center"
-        },
-        "displayName": "Button",
-        "custom": {},
-        "hidden": false,
-        "nodes": [],
-        "linkedNodes": {},
-        "parent": "portfolio-section"
-      }
-    }
-  },
-  {
-    "id": "features",
-    "name": "Features grid",
-    "description": "Three feature cards with icons, divider, and CTA.",
-    "data": {
-      "ROOT": {
-        "type": { "resolvedName": "Container" },
-        "isCanvas": true,
-        "props": { "background": "#f8fafc", "padding": 0, "maxWidth": 1200, "marginTop": 0, "marginBottom": 0, "customId": "" },
-        "displayName": "Container",
-        "custom": {},
-        "hidden": false,
-        "nodes": ["features-section"],
         "linkedNodes": {}
       },
-      "features-section": {
-        "type": { "resolvedName": "Section" },
-        "isCanvas": true,
-        "props": { "background": "#f8fafc", "paddingY": 80, "maxWidth": 1100, "customId": "features" },
-        "displayName": "Section",
-        "custom": {},
-        "hidden": false,
-        "nodes": ["features-heading", "features-grid", "features-divider", "features-cta"],
-        "linkedNodes": {},
-        "parent": "ROOT"
-      },
-      "features-heading": {
+      "a2Heading": {
         "type": { "resolvedName": "Heading" },
-        "isCanvas": false,
+        "nodes": [],
         "props": {
           "text": "Everything you need",
           "level": "h2",
           "color": "#0f172a",
           "align": "center",
-          "fontWeight": 700,
+          "fontWeight": 600,
           "letterSpacing": -0.5,
           "customId": ""
         },
+        "custom": {},
+        "hidden": false,
+        "parent": "a2Features",
+        "isCanvas": false,
         "displayName": "Heading",
+        "linkedNodes": {}
+      },
+      "a2Text": {
+        "type": { "resolvedName": "Text" },
+        "nodes": [],
+        "props": {
+          "text": "A focused set of primitives that compose into whatever you can imagine.",
+          "fontSize": 16,
+          "fontWeight": 400,
+          "lineHeight": 1.6,
+          "color": "#475569",
+          "align": "center",
+          "italic": false,
+          "customId": ""
+        },
         "custom": {},
         "hidden": false,
-        "nodes": [],
-        "linkedNodes": {},
-        "parent": "features-section"
+        "parent": "a2Features",
+        "isCanvas": false,
+        "displayName": "Text",
+        "linkedNodes": {}
       },
-      "features-grid": {
-        "type": { "resolvedName": "Grid" },
+      "a2List": {
+        "type": { "resolvedName": "List" },
+        "nodes": [],
+        "props": {
+          "items": "Drag-and-drop editing with full undo/redo\nInline content editing for text and headings\nPixel-perfect control over typography and colour\nSave and share with a single link",
+          "ordered": false,
+          "spacing": 8,
+          "fontSize": 16,
+          "color": "#0f172a",
+          "customId": ""
+        },
+        "custom": {},
+        "hidden": false,
+        "parent": "a2Features",
+        "isCanvas": false,
+        "displayName": "List",
+        "linkedNodes": {}
+      },
+      "a3CTA": {
+        "type": { "resolvedName": "Section" },
+        "nodes": ["a3Heading", "a3Text", "a3Button"],
+        "props": {
+          "background": "#f1f5f9",
+          "paddingY": 80,
+          "maxWidth": 1100,
+          "customId": "cta"
+        },
+        "custom": {},
+        "hidden": false,
+        "parent": "ROOT",
         "isCanvas": true,
-        "props": { "columns": 3, "gap": 24, "background": "transparent", "padding": 0, "customId": "" },
-        "displayName": "Grid",
-        "custom": {},
-        "hidden": false,
-        "nodes": ["feature-1", "feature-2", "feature-3"],
-        "linkedNodes": {},
-        "parent": "features-section"
+        "displayName": "Section",
+        "linkedNodes": {}
       },
-      "feature-1": {
-        "type": { "resolvedName": "IconBox" },
-        "isCanvas": false,
+      "a3Heading": {
+        "type": { "resolvedName": "Heading" },
+        "nodes": [],
         "props": {
-          "icon": "Zap",
-          "title": "Lightning fast",
-          "description": "Built for speed. Every interaction feels instant.",
-          "iconColor": "#0ea5e9",
-          "titleColor": "#0f172a",
-          "bodyColor": "#475569",
-          "iconSize": 36,
+          "text": "Ready to build something?",
+          "level": "h2",
+          "color": "#0f172a",
           "align": "center",
-          "customId": "feature-speed"
+          "fontWeight": 600,
+          "letterSpacing": -0.5,
+          "customId": ""
         },
-        "displayName": "Icon Feature",
         "custom": {},
         "hidden": false,
-        "nodes": [],
-        "linkedNodes": {},
-        "parent": "features-grid"
-      },
-      "feature-2": {
-        "type": { "resolvedName": "IconBox" },
+        "parent": "a3CTA",
         "isCanvas": false,
+        "displayName": "Heading",
+        "linkedNodes": {}
+      },
+      "a3Text": {
+        "type": { "resolvedName": "Text" },
+        "nodes": [],
         "props": {
-          "icon": "Shield",
-          "title": "Secure by default",
-          "description": "Your data is encrypted end-to-end and never shared.",
-          "iconColor": "#10b981",
-          "titleColor": "#0f172a",
-          "bodyColor": "#475569",
-          "iconSize": 36,
+          "text": "Open the editor, drop a few components, and you have a publishable site in minutes.",
+          "fontSize": 16,
+          "fontWeight": 400,
+          "lineHeight": 1.6,
+          "color": "#475569",
           "align": "center",
-          "customId": "feature-security"
+          "italic": false,
+          "customId": ""
         },
-        "displayName": "Icon Feature",
         "custom": {},
         "hidden": false,
-        "nodes": [],
-        "linkedNodes": {},
-        "parent": "features-grid"
-      },
-      "feature-3": {
-        "type": { "resolvedName": "IconBox" },
+        "parent": "a3CTA",
         "isCanvas": false,
-        "props": {
-          "icon": "Heart",
-          "title": "Made with care",
-          "description": "Designed by humans, refined by feedback.",
-          "iconColor": "#f43f5e",
-          "titleColor": "#0f172a",
-          "bodyColor": "#475569",
-          "iconSize": 36,
-          "align": "center",
-          "customId": "feature-care"
-        },
-        "displayName": "Icon Feature",
-        "custom": {},
-        "hidden": false,
-        "nodes": [],
-        "linkedNodes": {},
-        "parent": "features-grid"
+        "displayName": "Text",
+        "linkedNodes": {}
       },
-      "features-divider": {
-        "type": { "resolvedName": "Divider" },
-        "isCanvas": false,
-        "props": { "color": "#e5e7eb", "thickness": 1, "style": "solid", "width": 60, "customId": "" },
-        "displayName": "Divider",
-        "custom": {},
-        "hidden": false,
-        "nodes": [],
-        "linkedNodes": {},
-        "parent": "features-section"
-      },
-      "features-cta": {
+      "a3Button": {
         "type": { "resolvedName": "CtaButton" },
-        "isCanvas": false,
+        "nodes": [],
         "props": {
-          "text": "Get started",
+          "text": "Start editing",
           "href": "#",
           "variant": "primary",
           "size": "lg",
@@ -343,78 +267,135 @@
           "fullWidth": false,
           "background": "#0f172a",
           "textColor": "#ffffff",
-          "customId": "features-cta"
+          "customId": ""
         },
-        "displayName": "Button",
         "custom": {},
         "hidden": false,
+        "parent": "a3CTA",
+        "isCanvas": false,
+        "displayName": "CtaButton",
+        "linkedNodes": {}
+      },
+      "a4Footer": {
+        "type": { "resolvedName": "Section" },
+        "nodes": ["a4Text"],
+        "props": {
+          "background": "#0f172a",
+          "paddingY": 32,
+          "maxWidth": 1100,
+          "customId": "footer"
+        },
+        "custom": {},
+        "hidden": false,
+        "parent": "ROOT",
+        "isCanvas": true,
+        "displayName": "Section",
+        "linkedNodes": {}
+      },
+      "a4Text": {
+        "type": { "resolvedName": "Text" },
         "nodes": [],
-        "linkedNodes": {},
-        "parent": "features-section"
+        "props": {
+          "text": "© 2026 Craft.js Site Builder. All rights reserved.",
+          "fontSize": 14,
+          "fontWeight": 400,
+          "lineHeight": 1.6,
+          "color": "#94a3b8",
+          "align": "center",
+          "italic": false,
+          "customId": ""
+        },
+        "custom": {},
+        "hidden": false,
+        "parent": "a4Footer",
+        "isCanvas": false,
+        "displayName": "Text",
+        "linkedNodes": {}
       }
     }
   },
-  {
-    "id": "contact",
-    "name": "Contact page",
-    "description": "Hero with badge, contact form, and a video demo.",
+  "portfolio": {
+    "id": "portfolio",
+    "name": "Portfolio",
+    "description": "A personal portfolio with intro, projects, and contact.",
     "data": {
       "ROOT": {
         "type": { "resolvedName": "Container" },
-        "isCanvas": true,
-        "props": { "background": "#ffffff", "padding": 0, "maxWidth": 1200, "marginTop": 0, "marginBottom": 0, "customId": "" },
-        "displayName": "Container",
+        "nodes": ["b1Hero", "b2About", "b3Projects", "b4Contact", "b5Footer"],
+        "props": {
+          "background": "#ffffff",
+          "padding": 0,
+          "maxWidth": 1200,
+          "marginTop": 0,
+          "marginBottom": 0,
+          "customId": "",
+          "metaTitle": "Portfolio",
+          "metaDescription": "Selected work and contact details.",
+          "customCss": ""
+        },
         "custom": {},
         "hidden": false,
-        "nodes": ["contact-section"],
+        "isCanvas": true,
+        "displayName": "Container",
         "linkedNodes": {}
       },
-      "contact-section": {
+      "b1Hero": {
         "type": { "resolvedName": "Section" },
-        "isCanvas": true,
-        "props": { "background": "#ffffff", "paddingY": 80, "maxWidth": 1100, "customId": "contact" },
-        "displayName": "Section",
-        "custom": {},
-        "hidden": false,
-        "nodes": ["contact-badge", "contact-heading", "contact-text", "contact-form"],
-        "linkedNodes": {},
-        "parent": "ROOT"
-      },
-      "contact-badge": {
-        "type": { "resolvedName": "Badge" },
-        "isCanvas": false,
-        "props": { "text": "We're hiring", "background": "#0ea5e9", "textColor": "#ffffff", "size": "md", "customId": "" },
-        "displayName": "Badge",
-        "custom": {},
-        "hidden": false,
-        "nodes": [],
-        "linkedNodes": {},
-        "parent": "contact-section"
-      },
-      "contact-heading": {
-        "type": { "resolvedName": "Heading" },
-        "isCanvas": false,
+        "nodes": ["b1Badge", "b1Heading", "b1Text", "b1Button"],
         "props": {
-          "text": "Get in touch",
+          "background": "#fafafa",
+          "paddingY": 96,
+          "maxWidth": 1100,
+          "customId": "intro"
+        },
+        "custom": {},
+        "hidden": false,
+        "parent": "ROOT",
+        "isCanvas": true,
+        "displayName": "Section",
+        "linkedNodes": {}
+      },
+      "b1Badge": {
+        "type": { "resolvedName": "Badge" },
+        "nodes": [],
+        "props": {
+          "text": "Available for hire",
+          "textColor": "#16a34a",
+          "background": "#dcfce7",
+          "size": "sm",
+          "customId": ""
+        },
+        "custom": {},
+        "hidden": false,
+        "parent": "b1Hero",
+        "isCanvas": false,
+        "displayName": "Badge",
+        "linkedNodes": {}
+      },
+      "b1Heading": {
+        "type": { "resolvedName": "Heading" },
+        "nodes": [],
+        "props": {
+          "text": "Hi, I'm Alex.\nI build web things.",
           "level": "h1",
           "color": "#0f172a",
           "align": "left",
           "fontWeight": 700,
-          "letterSpacing": -0.5,
+          "letterSpacing": -1,
           "customId": ""
         },
-        "displayName": "Heading",
         "custom": {},
         "hidden": false,
-        "nodes": [],
-        "linkedNodes": {},
-        "parent": "contact-section"
-      },
-      "contact-text": {
-        "type": { "resolvedName": "Text" },
+        "parent": "b1Hero",
         "isCanvas": false,
+        "displayName": "Heading",
+        "linkedNodes": {}
+      },
+      "b1Text": {
+        "type": { "resolvedName": "Text" },
+        "nodes": [],
         "props": {
-          "text": "Have a question or want to work together? Drop us a message.",
+          "text": "Full-stack developer focused on product UI, design systems, and the occasional CLI tool.",
           "fontSize": 18,
           "fontWeight": 400,
           "lineHeight": 1.6,
@@ -423,33 +404,546 @@
           "italic": false,
           "customId": ""
         },
-        "displayName": "Text",
         "custom": {},
         "hidden": false,
-        "nodes": [],
-        "linkedNodes": {},
-        "parent": "contact-section"
-      },
-      "contact-form": {
-        "type": { "resolvedName": "ContactForm" },
+        "parent": "b1Hero",
         "isCanvas": false,
+        "displayName": "Text",
+        "linkedNodes": {}
+      },
+      "b1Button": {
+        "type": { "resolvedName": "CtaButton" },
+        "nodes": [],
         "props": {
-          "title": "Send us a message",
-          "nameLabel": "Name",
-          "emailLabel": "Email",
-          "messageLabel": "Message",
-          "submitText": "Send",
-          "background": "#f1f5f9",
-          "accent": "#0f172a",
-          "customId": "contact-form"
+          "text": "See my work",
+          "href": "#projects",
+          "variant": "primary",
+          "size": "md",
+          "align": "left",
+          "fullWidth": false,
+          "background": "#0f172a",
+          "textColor": "#ffffff",
+          "customId": ""
         },
-        "displayName": "Contact Form",
         "custom": {},
         "hidden": false,
+        "parent": "b1Hero",
+        "isCanvas": false,
+        "displayName": "CtaButton",
+        "linkedNodes": {}
+      },
+      "b2About": {
+        "type": { "resolvedName": "Section" },
+        "nodes": ["b2Heading", "b2Text", "b2Divider"],
+        "props": {
+          "background": "#ffffff",
+          "paddingY": 64,
+          "maxWidth": 1100,
+          "customId": "about"
+        },
+        "custom": {},
+        "hidden": false,
+        "parent": "ROOT",
+        "isCanvas": true,
+        "displayName": "Section",
+        "linkedNodes": {}
+      },
+      "b2Heading": {
+        "type": { "resolvedName": "Heading" },
         "nodes": [],
-        "linkedNodes": {},
-        "parent": "contact-section"
+        "props": {
+          "text": "About",
+          "level": "h2",
+          "color": "#0f172a",
+          "align": "left",
+          "fontWeight": 600,
+          "letterSpacing": -0.5,
+          "customId": ""
+        },
+        "custom": {},
+        "hidden": false,
+        "parent": "b2About",
+        "isCanvas": false,
+        "displayName": "Heading",
+        "linkedNodes": {}
+      },
+      "b2Text": {
+        "type": { "resolvedName": "Text" },
+        "nodes": [],
+        "props": {
+          "text": "I work with TypeScript, React, and a little bit of Python. I like systems that feel calm — small surfaces, clear types, and UI that doesn't fight you. Outside of work I sketch, lift heavy things, and read more than I should.",
+          "fontSize": 16,
+          "fontWeight": 400,
+          "lineHeight": 1.7,
+          "color": "#334155",
+          "align": "left",
+          "italic": false,
+          "customId": ""
+        },
+        "custom": {},
+        "hidden": false,
+        "parent": "b2About",
+        "isCanvas": false,
+        "displayName": "Text",
+        "linkedNodes": {}
+      },
+      "b2Divider": {
+        "type": { "resolvedName": "Divider" },
+        "nodes": [],
+        "props": {
+          "color": "#e2e8f0",
+          "thickness": 1,
+          "customId": ""
+        },
+        "custom": {},
+        "hidden": false,
+        "parent": "b2About",
+        "isCanvas": false,
+        "displayName": "Divider",
+        "linkedNodes": {}
+      },
+      "b3Projects": {
+        "type": { "resolvedName": "Section" },
+        "nodes": ["b3Heading", "b3List"],
+        "props": {
+          "background": "#f8fafc",
+          "paddingY": 64,
+          "maxWidth": 1100,
+          "customId": "projects"
+        },
+        "custom": {},
+        "hidden": false,
+        "parent": "ROOT",
+        "isCanvas": true,
+        "displayName": "Section",
+        "linkedNodes": {}
+      },
+      "b3Heading": {
+        "type": { "resolvedName": "Heading" },
+        "nodes": [],
+        "props": {
+          "text": "Selected projects",
+          "level": "h2",
+          "color": "#0f172a",
+          "align": "left",
+          "fontWeight": 600,
+          "letterSpacing": -0.5,
+          "customId": ""
+        },
+        "custom": {},
+        "hidden": false,
+        "parent": "b3Projects",
+        "isCanvas": false,
+        "displayName": "Heading",
+        "linkedNodes": {}
+      },
+      "b3List": {
+        "type": { "resolvedName": "List" },
+        "nodes": [],
+        "props": {
+          "items": "Sketchpad — a no-account whiteboard for quick diagrams\nPulse — a tiny self-hosted uptime monitor\nLumen — a documentation theme for fast-moving teams\nForge — a CLI for scaffolding typed APIs",
+          "ordered": true,
+          "spacing": 12,
+          "fontSize": 16,
+          "color": "#0f172a",
+          "customId": ""
+        },
+        "custom": {},
+        "hidden": false,
+        "parent": "b3Projects",
+        "isCanvas": false,
+        "displayName": "List",
+        "linkedNodes": {}
+      },
+      "b4Contact": {
+        "type": { "resolvedName": "Section" },
+        "nodes": ["b4Heading", "b4Text", "b4Form"],
+        "props": {
+          "background": "#ffffff",
+          "paddingY": 64,
+          "maxWidth": 1100,
+          "customId": "contact"
+        },
+        "custom": {},
+        "hidden": false,
+        "parent": "ROOT",
+        "isCanvas": true,
+        "displayName": "Section",
+        "linkedNodes": {}
+      },
+      "b4Heading": {
+        "type": { "resolvedName": "Heading" },
+        "nodes": [],
+        "props": {
+          "text": "Get in touch",
+          "level": "h2",
+          "color": "#0f172a",
+          "align": "left",
+          "fontWeight": 600,
+          "letterSpacing": -0.5,
+          "customId": ""
+        },
+        "custom": {},
+        "hidden": false,
+        "parent": "b4Contact",
+        "isCanvas": false,
+        "displayName": "Heading",
+        "linkedNodes": {}
+      },
+      "b4Text": {
+        "type": { "resolvedName": "Text" },
+        "nodes": [],
+        "props": {
+          "text": "Drop a few lines about what you're working on. I read everything.",
+          "fontSize": 16,
+          "fontWeight": 400,
+          "lineHeight": 1.6,
+          "color": "#475569",
+          "align": "left",
+          "italic": false,
+          "customId": ""
+        },
+        "custom": {},
+        "hidden": false,
+        "parent": "b4Contact",
+        "isCanvas": false,
+        "displayName": "Text",
+        "linkedNodes": {}
+      },
+      "b4Form": {
+        "type": { "resolvedName": "ContactForm" },
+        "nodes": [],
+        "props": {
+          "submitText": "Send message",
+          "accent": "#0f172a",
+          "background": "#f8fafc",
+          "customId": ""
+        },
+        "custom": {},
+        "hidden": false,
+        "parent": "b4Contact",
+        "isCanvas": false,
+        "displayName": "ContactForm",
+        "linkedNodes": {}
+      },
+      "b5Footer": {
+        "type": { "resolvedName": "Section" },
+        "nodes": ["b5Text"],
+        "props": {
+          "background": "#0f172a",
+          "paddingY": 32,
+          "maxWidth": 1100,
+          "customId": "footer"
+        },
+        "custom": {},
+        "hidden": false,
+        "parent": "ROOT",
+        "isCanvas": true,
+        "displayName": "Section",
+        "linkedNodes": {}
+      },
+      "b5Text": {
+        "type": { "resolvedName": "Text" },
+        "nodes": [],
+        "props": {
+          "text": "© 2026 Alex. Built with Craft.js.",
+          "fontSize": 14,
+          "fontWeight": 400,
+          "lineHeight": 1.6,
+          "color": "#94a3b8",
+          "align": "center",
+          "italic": false,
+          "customId": ""
+        },
+        "custom": {},
+        "hidden": false,
+        "parent": "b5Footer",
+        "isCanvas": false,
+        "displayName": "Text",
+        "linkedNodes": {}
+      }
+    }
+  },
+  "blog": {
+    "id": "blog",
+    "name": "Blog post",
+    "description": "Long-form writing layout with title, body, and tags.",
+    "data": {
+      "ROOT": {
+        "type": { "resolvedName": "Container" },
+        "nodes": ["c1Hero", "c1Body", "c1Footer"],
+        "props": {
+          "background": "#ffffff",
+          "padding": 0,
+          "maxWidth": 1200,
+          "marginTop": 0,
+          "marginBottom": 0,
+          "customId": "",
+          "metaTitle": "Post title",
+          "metaDescription": "A short description of this post.",
+          "customCss": ""
+        },
+        "custom": {},
+        "hidden": false,
+        "isCanvas": true,
+        "displayName": "Container",
+        "linkedNodes": {}
+      },
+      "c1Hero": {
+        "type": { "resolvedName": "Section" },
+        "nodes": ["c1Badge", "c1Heading", "c1Meta"],
+        "props": {
+          "background": "#fafafa",
+          "paddingY": 80,
+          "maxWidth": 800,
+          "customId": "post-header"
+        },
+        "custom": {},
+        "hidden": false,
+        "parent": "ROOT",
+        "isCanvas": true,
+        "displayName": "Section",
+        "linkedNodes": {}
+      },
+      "c1Badge": {
+        "type": { "resolvedName": "Badge" },
+        "nodes": [],
+        "props": {
+          "text": "Essay",
+          "textColor": "#1d4ed8",
+          "background": "#dbeafe",
+          "size": "sm",
+          "customId": ""
+        },
+        "custom": {},
+        "hidden": false,
+        "parent": "c1Hero",
+        "isCanvas": false,
+        "displayName": "Badge",
+        "linkedNodes": {}
+      },
+      "c1Heading": {
+        "type": { "resolvedName": "Heading" },
+        "nodes": [],
+        "props": {
+          "text": "Notes on building calm software",
+          "level": "h1",
+          "color": "#0f172a",
+          "align": "left",
+          "fontWeight": 700,
+          "letterSpacing": -1,
+          "customId": ""
+        },
+        "custom": {},
+        "hidden": false,
+        "parent": "c1Hero",
+        "isCanvas": false,
+        "displayName": "Heading",
+        "linkedNodes": {}
+      },
+      "c1Meta": {
+        "type": { "resolvedName": "Text" },
+        "nodes": [],
+        "props": {
+          "text": "8 min read · June 23, 2026",
+          "fontSize": 14,
+          "fontWeight": 400,
+          "lineHeight": 1.6,
+          "color": "#64748b",
+          "align": "left",
+          "italic": true,
+          "customId": ""
+        },
+        "custom": {},
+        "hidden": false,
+        "parent": "c1Hero",
+        "isCanvas": false,
+        "displayName": "Text",
+        "linkedNodes": {}
+      },
+      "c1Body": {
+        "type": { "resolvedName": "Section" },
+        "nodes": ["c1Intro", "c1Heading2", "c1Para1", "c1Quote", "c1Para2"],
+        "props": {
+          "background": "#ffffff",
+          "paddingY": 64,
+          "maxWidth": 720,
+          "customId": "post-body"
+        },
+        "custom": {},
+        "hidden": false,
+        "parent": "ROOT",
+        "isCanvas": true,
+        "displayName": "Section",
+        "linkedNodes": {}
+      },
+      "c1Intro": {
+        "type": { "resolvedName": "Text" },
+        "nodes": [],
+        "props": {
+          "text": "Calm software is software that asks for your attention only when it has something to say. The rest of the time it stays out of the way.",
+          "fontSize": 20,
+          "fontWeight": 400,
+          "lineHeight": 1.6,
+          "color": "#1e293b",
+          "align": "left",
+          "italic": false,
+          "customId": ""
+        },
+        "custom": {},
+        "hidden": false,
+        "parent": "c1Body",
+        "isCanvas": false,
+        "displayName": "Text",
+        "linkedNodes": {}
+      },
+      "c1Heading2": {
+        "type": { "resolvedName": "Heading" },
+        "nodes": [],
+        "props": {
+          "text": "Three small rules",
+          "level": "h2",
+          "color": "#0f172a",
+          "align": "left",
+          "fontWeight": 600,
+          "letterSpacing": -0.5,
+          "customId": ""
+        },
+        "custom": {},
+        "hidden": false,
+        "parent": "c1Body",
+        "isCanvas": false,
+        "displayName": "Heading",
+        "linkedNodes": {}
+      },
+      "c1Para1": {
+        "type": { "resolvedName": "Text" },
+        "nodes": [],
+        "props": {
+          "text": "One: make defaults that work for most people. Two: surface a single primary action per view. Three: respect the user's time — every animation, every modal, every confirmation is a place to lose trust.",
+          "fontSize": 16,
+          "fontWeight": 400,
+          "lineHeight": 1.7,
+          "color": "#334155",
+          "align": "left",
+          "italic": false,
+          "customId": ""
+        },
+        "custom": {},
+        "hidden": false,
+        "parent": "c1Body",
+        "isCanvas": false,
+        "displayName": "Text",
+        "linkedNodes": {}
+      },
+      "c1Quote": {
+        "type": { "resolvedName": "Text" },
+        "nodes": [],
+        "props": {
+          "text": "“A notification is a debt. Spend them only on things worth interrupting for.”",
+          "fontSize": 18,
+          "fontWeight": 500,
+          "lineHeight": 1.6,
+          "color": "#0f172a",
+          "align": "left",
+          "italic": true,
+          "customId": ""
+        },
+        "custom": {},
+        "hidden": false,
+        "parent": "c1Body",
+        "isCanvas": false,
+        "displayName": "Text",
+        "linkedNodes": {}
+      },
+      "c1Para2": {
+        "type": { "resolvedName": "Text" },
+        "nodes": [],
+        "props": {
+          "text": "None of this is novel. The interesting part is doing it consistently, in the small, when the deadline is Friday and the dropdown already works.",
+          "fontSize": 16,
+          "fontWeight": 400,
+          "lineHeight": 1.7,
+          "color": "#334155",
+          "align": "left",
+          "italic": false,
+          "customId": ""
+        },
+        "custom": {},
+        "hidden": false,
+        "parent": "c1Body",
+        "isCanvas": false,
+        "displayName": "Text",
+        "linkedNodes": {}
+      },
+      "c1Footer": {
+        "type": { "resolvedName": "Section" },
+        "nodes": ["c1Divider", "c1Tags", "c1Signoff"],
+        "props": {
+          "background": "#fafafa",
+          "paddingY": 40,
+          "maxWidth": 720,
+          "customId": "post-footer"
+        },
+        "custom": {},
+        "hidden": false,
+        "parent": "ROOT",
+        "isCanvas": true,
+        "displayName": "Section",
+        "linkedNodes": {}
+      },
+      "c1Divider": {
+        "type": { "resolvedName": "Divider" },
+        "nodes": [],
+        "props": {
+          "color": "#e2e8f0",
+          "thickness": 1,
+          "customId": ""
+        },
+        "custom": {},
+        "hidden": false,
+        "parent": "c1Footer",
+        "isCanvas": false,
+        "displayName": "Divider",
+        "linkedNodes": {}
+      },
+      "c1Tags": {
+        "type": { "resolvedName": "Badge" },
+        "nodes": [],
+        "props": {
+          "text": "design · product · notes",
+          "textColor": "#475569",
+          "background": "#e2e8f0",
+          "size": "sm",
+          "customId": ""
+        },
+        "custom": {},
+        "hidden": false,
+        "parent": "c1Footer",
+        "isCanvas": false,
+        "displayName": "Badge",
+        "linkedNodes": {}
+      },
+      "c1Signoff": {
+        "type": { "resolvedName": "Text" },
+        "nodes": [],
+        "props": {
+          "text": "Thanks for reading.",
+          "fontSize": 14,
+          "fontWeight": 400,
+          "lineHeight": 1.6,
+          "color": "#64748b",
+          "align": "left",
+          "italic": true,
+          "customId": ""
+        },
+        "custom": {},
+        "hidden": false,
+        "parent": "c1Footer",
+        "isCanvas": false,
+        "displayName": "Text",
+        "linkedNodes": {}
       }
     }
   }
-]
+}

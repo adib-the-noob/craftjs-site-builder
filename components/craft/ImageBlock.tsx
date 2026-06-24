@@ -8,6 +8,7 @@ import { SliderField } from "@/components/craft/settings/SliderField";
 import { SelectField } from "@/components/craft/settings/SelectField";
 import { AlignField } from "@/components/craft/settings/AlignField";
 import { ToggleField } from "@/components/craft/settings/ToggleField";
+import { BoxModelField, boxToStyle } from "@/components/craft/settings/BoxModelField";
 
 type ImageBlockProps = {
   src?: string;
@@ -15,9 +16,12 @@ type ImageBlockProps = {
   height?: number;
   width?: number;
   rounded?: boolean;
+  borderRadius?: number;
   objectFit?: "cover" | "contain" | "fill" | "none";
   align?: "left" | "center" | "right";
   customId?: string;
+  /** Tailwind-style box model. */
+  boxModel?: { margin?: any; padding?: any };
 };
 
 export function ImageBlock({
@@ -26,9 +30,11 @@ export function ImageBlock({
   height = 240,
   width = 100,
   rounded = true,
+  borderRadius = 12,
   objectFit = "cover",
   align = "center",
   customId = "",
+  boxModel,
 }: ImageBlockProps) {
   const {
     connectors: { connect, drag },
@@ -38,26 +44,29 @@ export function ImageBlock({
   })) as any;
 
   return (
-    <div style={{ textAlign: align }} id={customId || undefined}>
-      {/* eslint-disable-next-line @next/next/no-img-element */}
-      <img
-        ref={(ref) => {
-          connect(drag(ref!));
-        }}
-        src={src}
-        alt={alt}
-        className={cn(
-          "object-cover",
-          rounded && "rounded-xl",
-          selected && "ring-2 ring-primary/40 ring-offset-2"
-        )}
-        style={{
-          height,
-          width: `${width}%`,
-          objectFit,
-        }}
-      />
-    </div>
+    // eslint-disable-next-line @next/next/no-img-element
+    <img
+      ref={(ref) => {
+        if (ref) connect(drag(ref));
+      }}
+      src={src}
+      alt={alt}
+      id={customId || undefined}
+      className={cn(
+        "object-cover",
+        rounded && "rounded-xl",
+        selected && "ring-2 ring-primary/40 ring-offset-2"
+      )}
+      style={{
+        height,
+        width: `${width}%`,
+        objectFit,
+        borderRadius: rounded ? borderRadius : 0,
+        textAlign: align,
+        ...boxToStyle(boxModel?.padding, "padding"),
+        ...boxToStyle(boxModel?.margin, "margin"),
+      }}
+    />
   );
 }
 
@@ -69,18 +78,22 @@ function ImageBlockSettings() {
     height,
     width,
     rounded,
+    borderRadius,
     objectFit,
     align,
     customId,
+    boxModel,
   } = useNode((node) => ({
     src: node.data.props.src as string,
     alt: node.data.props.alt as string,
     height: node.data.props.height as number,
     width: (node.data.props.width as number) ?? 100,
     rounded: node.data.props.rounded as boolean,
+    borderRadius: (node.data.props.borderRadius as number) ?? 12,
     objectFit: node.data.props.objectFit as ImageBlockProps["objectFit"],
     align: node.data.props.align as ImageBlockProps["align"],
     customId: (node.data.props.customId as string) ?? "",
+    boxModel: node.data.props.boxModel as ImageBlockProps["boxModel"],
   })) as any;
 
   return (
@@ -141,6 +154,17 @@ function ImageBlockSettings() {
           })
         }
       />
+      <SliderField
+        label="Border radius"
+        value={borderRadius}
+        min={0}
+        max={64}
+        onChange={(v) =>
+          setProp((props: ImageBlockProps) => {
+            props.borderRadius = v;
+          })
+        }
+      />
       <SelectField
         label="Object fit"
         value={objectFit}
@@ -174,6 +198,15 @@ function ImageBlockSettings() {
           })
         }
       />
+      <BoxModelField
+        label="Spacing (margin / padding)"
+        value={boxModel ?? {}}
+        onChange={(v) =>
+          setProp((props: ImageBlockProps) => {
+            props.boxModel = v;
+          })
+        }
+      />
     </div>
   );
 }
@@ -186,9 +219,11 @@ ImageBlock.craft = {
     height: 240,
     width: 100,
     rounded: true,
+    borderRadius: 12,
     objectFit: "cover",
     align: "center",
     customId: "",
+    boxModel: undefined,
   },
   related: {
     settings: ImageBlockSettings,

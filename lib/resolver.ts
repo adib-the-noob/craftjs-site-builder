@@ -14,6 +14,7 @@ import {
   IconBox,
   Video,
   ContactForm,
+  Navbar,
 } from "@/components/craft";
 
 export const resolver = {
@@ -32,4 +33,5 @@ export const resolver = {
   IconBox,
   Video,
   ContactForm,
+  Navbar,
 };

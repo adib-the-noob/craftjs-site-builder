@@ -5,6 +5,7 @@ import { FieldRow } from "@/components/craft/settings/FieldRow";
 import { Input } from "@/components/ui/input";
 import { ColorField } from "@/components/craft/settings/ColorField";
 import { SliderField } from "@/components/craft/settings/SliderField";
+import { BoxModelField, boxToStyle } from "@/components/craft/settings/BoxModelField";
 
 type SectionProps = {
   background?: string;
@@ -12,32 +13,47 @@ type SectionProps = {
   maxWidth?: number;
   customId?: string;
   children?: React.ReactNode;
+  /** Tailwind-style box model. */
+  boxModel?: { margin?: any; padding?: any };
+  borderRadius?: number;
 };
 
 export function Section({
   background = "#ffffff",
-  paddingY = 64,
+  paddingY = 96,
   maxWidth = 1100,
   customId = "",
   children,
+  boxModel,
+  borderRadius = 0,
 }: SectionProps) {
   const {
     connectors: { connect, drag },
-  } = useNode();
+    selected,
+  } = useNode((node) => ({
+    selected: node.events.selected,
+  })) as any;
+
+  const effectiveBox = boxModel ?? {
+    padding: typeof paddingY === "number" ? { top: paddingY, bottom: paddingY } : undefined,
+  };
 
   return (
     <section
       ref={(ref) => {
-        connect(drag(ref!));
+        if (ref) connect(drag(ref));
       }}
       id={customId || undefined}
       className="w-full"
-      style={{ background, paddingTop: paddingY, paddingBottom: paddingY }}
+      style={{
+        background,
+        ...boxToStyle(effectiveBox.padding, "padding"),
+        ...boxToStyle(effectiveBox.margin, "margin"),
+        borderRadius,
+        ...(selected ? { outline: "2px dashed var(--ring)" } : {}),
+      }}
     >
-      <div
-        className="mx-auto w-full px-6"
-        style={{ maxWidth }}
-      >
+      <div className="mx-auto w-full px-6" style={{ maxWidth }}>
         {children}
       </div>
     </section>
@@ -51,12 +67,20 @@ function SectionSettings() {
     paddingY,
     maxWidth,
     customId,
+    boxModel,
+    borderRadius,
   } = useNode((node) => ({
     background: node.data.props.background as string,
     paddingY: node.data.props.paddingY as number,
     maxWidth: node.data.props.maxWidth as number,
     customId: (node.data.props.customId as string) ?? "",
+    boxModel: node.data.props.boxModel as SectionProps["boxModel"],
+    borderRadius: (node.data.props.borderRadius as number) ?? 0,
   })) as any;
+
+  const currentBox = boxModel ?? {
+    padding: { top: paddingY ?? 0, bottom: paddingY ?? 0 },
+  };
 
   return (
     <div className="flex flex-col gap-4">
@@ -77,6 +101,33 @@ function SectionSettings() {
         onChange={(v) =>
           setProp((props: SectionProps) => {
             props.background = v;
+          })
+        }
+      />
+      <BoxModelField
+        label="Spacing (margin / padding)"
+        value={currentBox}
+        onChange={(v) =>
+          setProp((props: SectionProps) => {
+            props.boxModel = v;
+            if (v.padding && typeof v.padding === "object") {
+              props.paddingY = v.padding.top ?? v.padding.bottom ?? 0;
+            } else if (typeof v.padding === "number") {
+              props.paddingY = v.padding;
+            } else {
+              props.paddingY = 0;
+            }
+          })
+        }
+      />
+      <SliderField
+        label="Border radius"
+        value={borderRadius}
+        min={0}
+        max={64}
+        onChange={(v) =>
+          setProp((props: SectionProps) => {
+            props.borderRadius = v;
           })
         }
       />
@@ -111,9 +162,11 @@ Section.craft = {
   displayName: "Section",
   props: {
     background: "#ffffff",
-    paddingY: 64,
+    paddingY: 96,
     maxWidth: 1100,
     customId: "",
+    boxModel: undefined,
+    borderRadius: 0,
   },
   rules: {
     canDrag: () => true,

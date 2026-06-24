@@ -9,6 +9,7 @@ import { SelectField } from "@/components/craft/settings/SelectField";
 import { AlignField } from "@/components/craft/settings/AlignField";
 import { ToggleField } from "@/components/craft/settings/ToggleField";
 import { SliderField } from "@/components/craft/settings/SliderField";
+import { BoxModelField, boxToStyle } from "@/components/craft/settings/BoxModelField";
 
 type CtaButtonProps = {
   text?: string;
@@ -20,6 +21,10 @@ type CtaButtonProps = {
   background?: string;
   textColor?: string;
   customId?: string;
+  /** Tailwind-style box model — applied to the outer wrapper so the
+   * button can be nudged without breaking the centred alignment. */
+  boxModel?: { margin?: any; padding?: any };
+  borderRadius?: number;
 };
 
 export function CtaButton({
@@ -32,6 +37,8 @@ export function CtaButton({
   background = "#0f172a",
   textColor = "#ffffff",
   customId = "",
+  boxModel,
+  borderRadius = 8,
 }: CtaButtonProps) {
   const {
     connectors: { connect, drag },
@@ -64,22 +71,26 @@ export function CtaButton({
 
   return (
     <div
-      style={{ textAlign: align }}
-      className={cn(fullWidth && "w-full")}
+      ref={(ref) => {
+        if (ref) connect(drag(ref));
+      }}
       id={customId || undefined}
+      className={cn(fullWidth && "w-full")}
+      style={{
+        textAlign: align,
+        ...boxToStyle(boxModel?.padding, "padding"),
+        ...boxToStyle(boxModel?.margin, "margin"),
+      }}
     >
       <a
-        ref={(ref) => {
-          connect(drag(ref!));
-        }}
         href={href}
         className={cn(
-          "inline-flex items-center justify-center rounded-lg font-medium transition-colors",
+          "inline-flex items-center justify-center font-medium transition-colors",
           sizeClass,
           fullWidth && "w-full",
           selected && "ring-2 ring-primary/40 ring-offset-2"
         )}
-        style={variantStyle}
+        style={{ ...variantStyle, borderRadius }}
         onClick={(e) => e.preventDefault()}
       >
         {text}
@@ -100,6 +111,8 @@ function CtaButtonSettings() {
     background,
     textColor,
     customId,
+    boxModel,
+    borderRadius,
   } = useNode((node) => ({
     text: node.data.props.text as string,
     href: node.data.props.href as string,
@@ -110,6 +123,8 @@ function CtaButtonSettings() {
     background: (node.data.props.background as string) ?? "#0f172a",
     textColor: (node.data.props.textColor as string) ?? "#ffffff",
     customId: (node.data.props.customId as string) ?? "",
+    boxModel: node.data.props.boxModel as CtaButtonProps["boxModel"],
+    borderRadius: (node.data.props.borderRadius as number) ?? 8,
   })) as any;
 
   return (
@@ -209,16 +224,25 @@ function CtaButtonSettings() {
           })
         }
       />
+      <BoxModelField
+        label="Spacing (margin / padding)"
+        value={boxModel ?? {}}
+        onChange={(v) =>
+          setProp((props: CtaButtonProps) => {
+            props.boxModel = v;
+          })
+        }
+      />
       <SliderField
-        label="Padding X"
-        value={parseInt(size === "lg" ? "32" : size === "sm" ? "16" : "24", 10)}
-        min={8}
-        max={64}
-        step={2}
-        unit="px"
-        onChange={() => {
-          /* visual padding is driven by size; this is reserved for future */
-        }}
+        label="Border radius"
+        value={borderRadius}
+        min={0}
+        max={48}
+        onChange={(v) =>
+          setProp((props: CtaButtonProps) => {
+            props.borderRadius = v;
+          })
+        }
       />
     </div>
   );
@@ -236,6 +260,8 @@ CtaButton.craft = {
     background: "#0f172a",
     textColor: "#ffffff",
     customId: "",
+    boxModel: undefined,
+    borderRadius: 8,
   },
   related: {
     settings: CtaButtonSettings,

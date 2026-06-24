@@ -3,9 +3,8 @@
 import { useEditor } from "@craftjs/core";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import {
-  CopyIcon,
   EyeIcon,
   HomeIcon,
   LayoutTemplateIcon,
@@ -29,69 +28,154 @@ import {
 import { Separator } from "@/components/ui/separator";
 import { Badge } from "@/components/ui/badge";
 import { getTemplates } from "@/lib/templates";
-import { getSite } from "@/lib/sites";
-import { updateSite, deleteSite } from "@/lib/sites";
+import { deleteSite, publishSite, unpublishSite, type Site } from "@/lib/sites";
+import type { SiteTemplate } from "@/lib/constants";
+
+/**
+ * Accessible toggle styled to match the rest of the toolbar. Built inline
+ * (no shadcn switch primitive installed) — uses `role="switch"` and
+ * `aria-checked` per WAI-ARIA. Disabled state is forwarded.
+ */
+function StatusSwitch({
+  checked,
+  disabled,
+  onClick,
+}: {
+  checked: boolean;
+  disabled?: boolean;
+  onClick: () => void;
+}) {
+  return (
+    <button
+      type="button"
+      role="switch"
+      aria-checked={checked}
+      aria-label={checked ? "Unpublish site" : "Publish site"}
+      disabled={disabled}
+      onClick={onClick}
+      className={[
+        "relative inline-flex h-5 w-9 shrink-0 cursor-pointer items-center rounded-full",
+        "border border-transparent transition-colors",
+        "focus-visible:border-ring focus-visible:ring-[3px] focus-visible:ring-ring/50 focus-visible:outline-none",
+        "disabled:pointer-events-none disabled:opacity-50",
+        checked ? "bg-emerald-500" : "bg-zinc-300 dark:bg-zinc-700",
+      ].join(" ")}
+    >
+      <span
+        aria-hidden
+        className={[
+          "pointer-events-none inline-block size-4 rounded-full bg-white shadow-sm transition-transform",
+          checked ? "translate-x-4" : "translate-x-0.5",
+        ].join(" ")}
+      />
+    </button>
+  );
+}
 
 type EditorToolbarProps = {
-  siteId: string;
-  siteName: string;
+  site: Site;
+  onSave: () => void;
   onLoadTemplate: (templateId: string) => void;
   onSiteChanged: () => void;
 };
 
 export function EditorToolbar({
-  siteId,
-  siteName,
+  site,
+  onSave,
   onLoadTemplate,
   onSiteChanged,
 }: EditorToolbarProps) {
+  const { id: siteId, slug, name: siteName } = site;
   const router = useRouter();
-  const { actions, canUndo, canRedo, query } = useEditor((_, q) => ({
+  const { actions, canUndo, canRedo } = useEditor((_, q) => ({
     canUndo: q.history.canUndo(),
     canRedo: q.history.canRedo(),
   }));
   const [editingName, setEditingName] = useState(false);
   const [nameDraft, setNameDraft] = useState(siteName);
+  const [templates, setTemplates] = useState<SiteTemplate[]>([]);
+  const [togglingStatus, setTogglingStatus] = useState(false);
 
-  const handleSave = () => {
-    const serialized = query.serialize();
-    const current = getSite(siteId);
-    if (!current) return;
-    updateSite(siteId, { data: JSON.parse(serialized) });
-    toast.success("Site saved");
-  };
+  // Status derived from props so it stays in sync when the parent
+  // re-fetches the site after a save/load-template/etc.
+  const status = site.status;
+  const isPublished = status === "published";
 
-  const handleCommitName = () => {
+  useEffect(() => {
+    let cancelled = false;
+    getTemplates()
+      .then((items) => {
+        if (!cancelled) setTemplates(items);
+      })
+      .catch(() => {
+        if (!cancelled) setTemplates([]);
+      });
+    return () => {
+      cancelled = true;
+    };
+  }, []);
+
+  const handleCommitName = async () => {
     const trimmed = nameDraft.trim();
     if (!trimmed || trimmed === siteName) {
       setNameDraft(siteName);
       setEditingName(false);
       return;
     }
-    updateSite(siteId, { name: trimmed });
+    // Backend doesn't expose a rename endpoint — locally update and refresh.
+    // For now, surface a clear message; a PATCH /sites/{id} can be added
+    // server-side later.
+    setNameDraft(trimmed);
     setEditingName(false);
     onSiteChanged();
-    toast.success("Site renamed");
+    toast.info("Renaming sites isn't supported by the backend yet");
   };
 
-  const handleDelete = () => {
+  const handleDelete = async () => {
     if (!confirm(`Delete "${siteName}"? This cannot be undone.`)) return;
-    deleteSite(siteId);
-    toast.info(`Deleted "${siteName}"`);
-    router.push("/sites");
+    try {
+      await deleteSite(siteId);
+      toast.info(`Deleted "${siteName}"`);
+      router.push("/sites");
+    } catch (err) {
+      const message = err instanceof Error ? err.message : "Delete failed";
+      toast.error(message);
+    }
   };
 
-  const handleDuplicate = () => {
-    // Refresh name first then go back to dashboard where duplicate happens.
-    router.push(`/sites`);
+  const handleToggleStatus = async () => {
+    if (togglingStatus) return;
+    const next = !isPublished;
+    setTogglingStatus(true);
+    try {
+      const updated = next
+        ? await publishSite(siteId)
+        : await unpublishSite(siteId);
+      toast.success(
+        next ? `Published "${siteName}"` : `Reverted "${siteName}" to draft`
+      );
+      // Keep the toolbar's in-memory copy of the site in sync so the
+      // Switch + badge reflect the new state immediately without a
+      // full router refresh.
+      onSiteChanged();
+      // Discard the return — parent will refetch.
+      void updated;
+    } catch (err) {
+      const message =
+        err instanceof Error ? err.message : "Could not change status";
+      toast.error(message);
+    } finally {
+      setTogglingStatus(false);
+    }
   };
-
-  const templates = getTemplates();
 
   return (
     <header className="flex h-14 items-center justify-between border-b bg-background px-4">
       <div className="flex items-center gap-3">
-        <Link href="/sites" className="text-muted-foreground hover:text-foreground">
+        <Link
+          href="/sites"
+          className="text-muted-foreground hover:text-foreground"
+        >
           <HomeIcon className="h-4 w-4" />
         </Link>
         <Separator orientation="vertical" className="h-6" />
@@ -124,10 +208,11 @@ export function EditorToolbar({
             </button>
           )}
           <Badge variant="secondary" className="font-mono text-[10px]">
-            {siteId}
+            {slug}
           </Badge>
         </div>
         <Separator orientation="vertical" className="h-6" />
+
         <DropdownMenu>
           <DropdownMenuTrigger render={<Button variant="outline" size="sm" />}>
             <LayoutTemplateIcon data-icon="inline-start" />
@@ -135,32 +220,63 @@ export function EditorToolbar({
           </DropdownMenuTrigger>
           <DropdownMenuContent align="start" className="w-72">
             <DropdownMenuGroup>
-              <DropdownMenuLabel>Replace canvas with…</DropdownMenuLabel>
+              <DropdownMenuLabel>Replace page with…</DropdownMenuLabel>
               <DropdownMenuSeparator />
-              {templates.map((template) => (
-                <DropdownMenuItem
-                  key={template.id}
-                  onClick={() => {
-                    if (
-                      confirm(
-                        `Replace the current canvas with "${template.name}"? Unsaved changes will be lost.`
-                      )
-                    ) {
-                      onLoadTemplate(template.id);
-                    }
-                  }}
-                >
-                  <div className="flex flex-col gap-0.5">
-                    <span className="font-medium">{template.name}</span>
-                    <span className="text-xs text-muted-foreground">
-                      {template.description}
-                    </span>
-                  </div>
-                </DropdownMenuItem>
-              ))}
+              {templates.length === 0 ? (
+                <div className="px-2 py-1.5 text-xs text-muted-foreground">
+                  No templates available
+                </div>
+              ) : (
+                templates.map((template) => (
+                  <DropdownMenuItem
+                    key={template.id}
+                    onClick={() => {
+                      if (
+                        confirm(
+                          `Replace "${siteName}" with the "${template.name}" template?`
+                        )
+                      ) {
+                        onLoadTemplate(template.id);
+                      }
+                    }}
+                  >
+                    <div className="flex flex-col gap-0.5">
+                      <span className="font-medium">{template.name}</span>
+                      <span className="text-xs text-muted-foreground">
+                        {template.description}
+                      </span>
+                    </div>
+                  </DropdownMenuItem>
+                ))
+              )}
             </DropdownMenuGroup>
           </DropdownMenuContent>
         </DropdownMenu>
+
+        <Separator orientation="vertical" className="h-6" />
+
+        <div className="flex items-center gap-2">
+          <StatusSwitch
+            checked={isPublished}
+            disabled={togglingStatus}
+            onClick={handleToggleStatus}
+          />
+          <Badge
+            variant={isPublished ? "default" : "secondary"}
+            className="font-mono text-[10px] capitalize"
+            title={
+              isPublished
+                ? "Visible to the public — click the switch to revert to draft"
+                : "Only you can see this site — click the switch to publish"
+            }
+          >
+            {togglingStatus
+              ? isPublished
+                ? "Unpublishing…"
+                : "Publishing…"
+              : status}
+          </Badge>
+        </div>
       </div>
 
       <div className="flex items-center gap-1">
@@ -183,12 +299,17 @@ export function EditorToolbar({
           <Redo2Icon />
         </Button>
         <Separator orientation="vertical" className="mx-1 h-6" />
-        <Button variant="outline" size="sm" onClick={handleSave} title="Save">
+        <Button
+          variant="outline"
+          size="sm"
+          onClick={onSave}
+          title="Save"
+        >
           <SaveIcon data-icon="inline-start" />
           Save
         </Button>
         <Link
-          href={`/preview/${siteId}`}
+          href={`/preview/${slug}`}
           target="_blank"
           className={buttonVariants({ variant: "outline", size: "sm" })}
           title="Open preview in new tab"
@@ -196,14 +317,6 @@ export function EditorToolbar({
           <EyeIcon data-icon="inline-start" />
           Preview
         </Link>
-        <Button
-          variant="ghost"
-          size="icon-sm"
-          onClick={handleDuplicate}
-          title="Duplicate site"
-        >
-          <CopyIcon />
-        </Button>
         <Button
           variant="ghost"
           size="icon-sm"

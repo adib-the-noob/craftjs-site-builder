@@ -12,25 +12,27 @@ import {
 import React from "react";
 import { Container } from "@/components/craft";
 import { EditorToolbar } from "@/components/editor/EditorToolbar";
-import { LayersPanel } from "@/components/editor/LayersPanel";
+import { EDITOR_FONT_CLASSNAMES } from "@/components/editor/EditorFontsProvider";
+import { LeftSidebar } from "@/components/editor/LeftSidebar";
 import { RenderNode } from "@/components/editor/RenderNode";
 import { SelectionActions } from "@/components/editor/SelectionActions";
 import { SettingsPanel } from "@/components/editor/SettingsPanel";
-import { Toolbox } from "@/components/editor/Toolbox";
-import {
-  ResizableHandle,
-  ResizablePanel,
-  ResizablePanelGroup,
-} from "@/components/ui/resizable";
 import { resolver } from "@/lib/resolver";
-import { getSite, updateSite } from "@/lib/sites";
+import {
+  emptyPageData,
+  getHomePageTree,
+  getSite,
+  updateSite,
+  type Site,
+} from "@/lib/sites";
 import { getTemplateById } from "@/lib/templates";
 import { setClipboard, getClipboard } from "@/lib/clipboard";
+import { AuthGuard } from "@/components/auth/AuthGuard";
 import { toast } from "sonner";
 
 function KeyboardShortcuts() {
   const router = useRouter();
-  const { actions, query } = useEditor((state, q) => ({}));
+  const { actions, query } = useEditor();
 
   useEffect(() => {
     const handler = (e: KeyboardEvent) => {
@@ -133,145 +135,313 @@ function KeyboardShortcuts() {
   return null;
 }
 
-type SiteEditorProps = {
-  siteId: string;
-};
-
-export function SiteEditor({ siteId }: SiteEditorProps) {
-  const router = useRouter();
-  const [initialData, setInitialData] = useState<string | null>(null);
-  const [siteName, setSiteName] = useState<string>("");
-  const saveTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+/**
+ * Hydrates the Craft.js editor with the saved tree after mount.
+ *
+ * Why not use <Frame data={saved}> directly? `Frame.deserialize` runs
+ * the saved tree through `query.parseSerializedNode(...).toNode()`,
+ * which calls a strict destructure (`{ type, props, ... } = node`).
+ * If the saved tree contains an entry the resolver can't recognize
+ * (a stale component, a half-finished save, or a plain `{}` from a
+ * brand-new site), the destructure throws and the whole editor
+ * tree crashes. Doing it ourselves inside `useEditor` lets us wrap
+ * the call in try/catch and keep the default canvas drop target
+ * alive when the saved data is bad.
+ */
+function HydrateOnMount({ data }: { data: string | null }) {
+  const { actions } = useEditor();
+  const ran = useRef(false);
 
   useEffect(() => {
-    // We must read from localStorage in an effect because it's not available
-    // during SSR. Calling setState synchronously here is intentional.
-    // eslint-disable-next-line react-hooks/set-state-in-effect
-    const site = getSite(siteId);
-    if (!site) {
-      toast.error("Site not found");
-      router.replace("/sites");
-      return;
+    if (ran.current) return;
+    ran.current = true;
+    if (!data) return; // No saved tree — keep the JSX default canvas.
+
+    let parsed: unknown;
+    try {
+      parsed = JSON.parse(data);
+    } catch {
+      return; // Corrupt JSON — ignore, keep default canvas.
     }
-    setSiteName(site.name);
-    setInitialData(JSON.stringify(site.data));
-  }, [siteId, router]);
+    if (!parsed || typeof parsed !== "object") return;
+    if (Object.keys(parsed as object).length === 0) return;
+
+    try {
+      const tree = JSON.parse(JSON.stringify(parsed));
+      actions.history.ignore().deserialize(tree);
+    } catch (err) {
+      // Bad saved tree (unrecognized component, missing type, etc.) —
+      // log and keep the default canvas so dragging still works.
+      console.warn("Failed to restore saved editor tree:", err);
+    }
+  }, [data, actions]);
+
+  return null;
+}
+
+/**
+ * Mirrors the editor's serialised tree onto `window.__craftEditorTree`
+ * every 1.5s so the toolbar's Save button (which sits outside the
+ * <Editor> provider) can grab the latest snapshot without dragging
+ * `useEditor` into its component tree.
+ */
+function TreeMirror() {
+  const { query } = useEditor();
+  useEffect(() => {
+    const w = window as unknown as {
+      __craftEditorTree?: Record<string, unknown>;
+    };
+    const tick = () => {
+      try {
+        w.__craftEditorTree = JSON.parse(query.serialize());
+      } catch {
+        // editor not ready — ignore
+      }
+    };
+    tick();
+    const id = window.setInterval(tick, 1500);
+    return () => window.clearInterval(id);
+  }, [query]);
+  return null;
+}
+
+const LEFT_COLLAPSED_KEY = "craftjs:left-sidebar-collapsed";
+const SETTINGS_COLLAPSED_KEY = "craftjs:settings-collapsed";
+
+function readStoredFlag(key: string): boolean {
+  if (typeof window === "undefined") return false;
+  try {
+    return window.localStorage.getItem(key) === "1";
+  } catch {
+    return false;
+  }
+}
+
+function writeStoredFlag(key: string, value: boolean) {
+  try {
+    window.localStorage.setItem(key, value ? "1" : "0");
+  } catch {
+    // localStorage unavailable — ignore.
+  }
+}
+
+function EditorInner({ siteSlug }: { siteSlug: string }) {
+  const router = useRouter();
+  const [site, setSite] = useState<Site | null>(null);
+  const [initialTree, setInitialTree] = useState<Record<string, unknown> | null>(
+    null
+  );
+  const [loadFailed, setLoadFailed] = useState(false);
+
+  // Both side columns are fixed-width with their own fold buttons.
+  // State lives here (not inside the panels) so the canvas can grow
+  // to fill the rest of the row.
+  const [leftCollapsed, setLeftCollapsed] = useState(false);
+  const [settingsCollapsed, setSettingsCollapsed] = useState(false);
+
+  useEffect(() => {
+    setLeftCollapsed(readStoredFlag(LEFT_COLLAPSED_KEY));
+    setSettingsCollapsed(readStoredFlag(SETTINGS_COLLAPSED_KEY));
+  }, []);
+
+  const toggleLeft = useCallback(() => {
+    setLeftCollapsed((prev) => {
+      const next = !prev;
+      writeStoredFlag(LEFT_COLLAPSED_KEY, next);
+      return next;
+    });
+  }, []);
+
+  const toggleSettings = useCallback(() => {
+    setSettingsCollapsed((prev) => {
+      const next = !prev;
+      writeStoredFlag(SETTINGS_COLLAPSED_KEY, next);
+      return next;
+    });
+  }, []);
+
+  // Load site + tree.
+  useEffect(() => {
+    let cancelled = false;
+    getSite(siteSlug)
+      .then((s) => {
+        if (cancelled) return;
+        if (!s) {
+          toast.error("Site not found");
+          setLoadFailed(true);
+          router.replace("/sites");
+          return;
+        }
+        // Single-page model: `site_data` IS the tree. Route through
+        // `getHomePageTree` so the root Container is normalised to
+        // full width (maxWidth = 0) on every load.
+        const tree = getHomePageTree(s);
+        if (!tree || Object.keys(tree).length === 0) {
+          setInitialTree(emptyPageData());
+        } else {
+          setInitialTree(tree);
+        }
+        setSite(s);
+      })
+      .catch((err) => {
+        if (cancelled) return;
+        const message =
+          err instanceof Error ? err.message : "Could not load site";
+        toast.error(message);
+        setLoadFailed(true);
+        router.replace("/sites");
+      });
+    return () => {
+      cancelled = true;
+    };
+  }, [siteSlug, router]);
+
+  const initialData = useMemo<string | null>(() => {
+    if (!initialTree) return null;
+    if (Object.keys(initialTree).length === 0) return null;
+    return JSON.stringify(initialTree);
+  }, [initialTree]);
+
+  /**
+   * Pull the freshest tree out of Craft.js (which lives inside the
+   * <Editor> provider). Falls back to the cached `initialTree`
+   * if the mirror hasn't ticked yet.
+   */
+  const readLatestTree = useCallback((): Record<string, unknown> => {
+    const w = window as unknown as {
+      __craftEditorTree?: Record<string, unknown>;
+    };
+    return w.__craftEditorTree ?? initialTree ?? emptyPageData();
+  }, [initialTree]);
+
+  const handleSave = useCallback(async () => {
+    if (!site) return;
+    const tree = readLatestTree();
+    try {
+      await updateSite(site.id, { data: tree });
+      toast.success("Saved");
+    } catch (err) {
+      const message = err instanceof Error ? err.message : "Save failed";
+      toast.error(message);
+    }
+  }, [site, readLatestTree]);
 
   const handleLoadTemplate = useCallback(
-    (templateId: string) => {
-      const template = getTemplateById(templateId);
+    async (templateId: string) => {
+      if (!site) return;
+      const template = await getTemplateById(templateId);
       if (!template) return;
-      const data = JSON.parse(JSON.stringify(template.data));
-      setInitialData(JSON.stringify(data));
-      updateSite(siteId, { data });
+      const tree = JSON.parse(JSON.stringify(template.data));
+      try {
+        await updateSite(site.id, { data: tree });
+        toast.success(`Loaded template "${template.name}"`);
+        // Reload so the editor re-hydrates with the new tree.
+        router.refresh();
+      } catch (err) {
+        const message =
+          err instanceof Error ? err.message : "Could not load template";
+        toast.error(message);
+      }
     },
-    [siteId]
+    [site, router]
   );
 
-  const refreshSiteName = useCallback(() => {
-    const site = getSite(siteId);
-    if (site) setSiteName(site.name);
-  }, [siteId]);
+  const handleSiteChanged = useCallback(() => {
+    // Refresh from backend so name edits reflect.
+    if (!site) return;
+    getSite(site.slug).then((s) => {
+      if (s) setSite(s);
+    });
+  }, [site]);
 
-  const editorKey = useMemo(() => initialData ?? "loading", [initialData]);
-
-  if (!initialData) {
+  if (loadFailed || !site || !initialTree) {
     return (
       <div className="flex h-screen items-center justify-center text-sm text-muted-foreground">
-        Loading editor...
+        Loading editor…
       </div>
     );
   }
 
   return (
-    <Editor
-      key={editorKey}
-      resolver={resolver}
-      onRender={RenderNode}
-      onNodesChange={(query) => {
-        if (saveTimeoutRef.current) {
-          clearTimeout(saveTimeoutRef.current);
-        }
-        saveTimeoutRef.current = setTimeout(() => {
-          const site = getSite(siteId);
-          if (!site) return;
-          updateSite(siteId, { data: JSON.parse(query.serialize()) });
-        }, 500);
-      }}
-    >
+    <Editor resolver={resolver} onRender={RenderNode}>
       <KeyboardShortcuts />
-      <div className="flex h-screen flex-col overflow-hidden bg-background">
+      <TreeMirror />
+      <HydrateOnMount data={initialData} />
+      <div
+        className={`flex h-screen flex-col overflow-hidden bg-background ${EDITOR_FONT_CLASSNAMES}`}
+      >
         <EditorToolbar
-          siteId={siteId}
-          siteName={siteName}
+          site={site}
+          onSave={handleSave}
           onLoadTemplate={handleLoadTemplate}
-          onSiteChanged={refreshSiteName}
+          onSiteChanged={handleSiteChanged}
         />
-        <ResizablePanelGroup
-          id="site-editor-layout"
-          orientation="horizontal"
-          className="min-h-0 flex-1"
-          defaultLayout={{ layers: 15, toolbox: 18, canvas: 45, settings: 22 }}
-        >
-          <ResizablePanel
-            id="layers"
-            defaultSize="15%"
-            minSize="10%"
-            maxSize="25%"
-            className="min-w-0"
+        {/*
+          Three-column layout. Both side columns are fixed-width and
+          foldable; only the canvas stretches to fill the rest of the
+          row. No resizable handles anywhere.
+        */}
+        <div className="flex min-h-0 flex-1">
+          {/* Left: Layers + Components tabs (combined). */}
+          <div
+            className={
+              leftCollapsed
+                ? "w-[48px] shrink-0 border-r"
+                : "w-[260px] shrink-0 border-r"
+            }
           >
-            <LayersPanel />
-          </ResizablePanel>
-          <ResizableHandle withHandle />
-          <ResizablePanel
-            id="toolbox"
-            defaultSize="18%"
-            minSize="14%"
-            maxSize="26%"
-            className="min-w-0"
-          >
-            <Toolbox />
-          </ResizablePanel>
-          <ResizableHandle withHandle />
-          <ResizablePanel
-            id="canvas"
-            defaultSize="45%"
-            minSize="30%"
-            className="min-w-0"
-          >
-            <div className="flex h-full flex-col bg-muted/30">
-              <div className="flex items-center justify-between border-b bg-background/80 px-4 py-2 backdrop-blur">
-                <p className="text-xs text-muted-foreground">
-                  Click an element to select it. Drag from the left to add new components.
-                </p>
-                <SelectionActions />
-              </div>
-              <div className="flex-1 overflow-auto p-6">
-                <div className="mx-auto min-h-full w-full max-w-4xl rounded-xl border bg-background shadow-sm">
-                  <Frame data={initialData}>
-                    <Element
-                      canvas
-                      is={Container}
-                      padding={0}
-                      background="#ffffff"
-                    />
-                  </Frame>
-                </div>
+            <LeftSidebar
+              collapsed={leftCollapsed}
+              onToggleCollapsed={toggleLeft}
+            />
+          </div>
+
+          {/* Middle: canvas. Takes the remaining space. */}
+          <div className="flex min-w-0 flex-1 flex-col bg-muted/30">
+            <div className="flex items-center justify-between border-b bg-background/80 px-4 py-2 backdrop-blur">
+              <p className="text-xs text-muted-foreground">
+                Click an element to select it. Drag from the left to add new
+                components.
+              </p>
+              <SelectionActions />
+            </div>
+            <div className="flex-1 overflow-auto bg-muted/30">
+              <div className="min-h-full w-full bg-background">
+                <Frame>
+                  <Element
+                    canvas
+                    is={Container}
+                    padding={0}
+                    background="#ffffff"
+                  />
+                </Frame>
               </div>
             </div>
-          </ResizablePanel>
-          <ResizableHandle withHandle />
-          <ResizablePanel
-            id="settings"
-            defaultSize="22%"
-            minSize="18%"
-            maxSize="35%"
-            className="min-w-0"
+          </div>
+
+          {/* Right: Settings. */}
+          <div
+            className={
+              settingsCollapsed
+                ? "w-[48px] shrink-0 border-l"
+                : "w-[300px] shrink-0 border-l"
+            }
           >
-            <SettingsPanel />
-          </ResizablePanel>
-        </ResizablePanelGroup>
+            <SettingsPanel
+              collapsed={settingsCollapsed}
+              onToggleCollapsed={toggleSettings}
+            />
+          </div>
+        </div>
       </div>
     </Editor>
+  );
+}
+
+export function SiteEditor({ siteSlug }: { siteSlug: string }) {
+  return (
+    <AuthGuard>
+      <EditorInner siteSlug={siteSlug} />
+    </AuthGuard>
   );
 }

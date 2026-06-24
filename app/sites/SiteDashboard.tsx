@@ -4,9 +4,9 @@ import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useCallback, useEffect, useState } from "react";
 import {
-  CopyIcon,
   EyeIcon,
   LayoutGridIcon,
+  LogOutIcon,
   PencilIcon,
   PlusIcon,
   Trash2Icon,
@@ -25,15 +25,14 @@ import { NewSiteDialog } from "./NewSiteDialog";
 import {
   createSite,
   deleteSite,
-  duplicateSite,
   listSites,
-  migrateLegacyState,
-  updateSite,
   type Site,
 } from "@/lib/sites";
+import { getCurrentUser as getMe, logout as logoutToken } from "@/lib/auth";
+import { AuthGuard } from "@/components/auth/AuthGuard";
 
-function formatDate(ts: number): string {
-  return new Date(ts).toLocaleString(undefined, {
+function formatDate(iso: string): string {
+  return new Date(iso).toLocaleString(undefined, {
     month: "short",
     day: "numeric",
     hour: "2-digit",
@@ -41,69 +40,71 @@ function formatDate(ts: number): string {
   });
 }
 
-export function SiteDashboard() {
+function DashboardInner() {
   const router = useRouter();
   const [sites, setSites] = useState<Site[]>([]);
   const [dialogOpen, setDialogOpen] = useState(false);
-  const [hydrated, setHydrated] = useState(false);
+  const [loading, setLoading] = useState(true);
+  const [userEmail, setUserEmail] = useState<string | null>(null);
 
-  const refresh = useCallback(() => {
-    setSites(listSites());
+  const refresh = useCallback(async () => {
+    try {
+      const data = await listSites();
+      // Newest first — backend returns insertion order, not sorted.
+      data.sort(
+        (a, b) =>
+          new Date(b.updated_at).getTime() - new Date(a.updated_at).getTime()
+      );
+      setSites(data);
+    } catch (err) {
+      const message = err instanceof Error ? err.message : "Failed to load sites";
+      toast.error(message);
+    } finally {
+      setLoading(false);
+    }
   }, []);
 
   useEffect(() => {
-    migrateLegacyState();
     refresh();
-    setHydrated(true);
+    getMe()
+      .then((u) => setUserEmail(u?.email ?? null))
+      .catch(() => setUserEmail(null));
   }, [refresh]);
 
   const handleCreate = useCallback(
-    (name: string, templateId?: string) => {
-      const site = createSite(name, templateId);
-      toast.success(`Created "${site.name}"`);
-      router.push(`/editor/${site.id}`);
+    async (name: string, templateId?: string) => {
+      try {
+        const site = await createSite(name, templateId ?? null);
+        toast.success(`Created "${site.name}"`);
+        router.push(`/editor/${site.slug}`);
+      } catch (err) {
+        const message = err instanceof Error ? err.message : "Could not create site";
+        toast.error(message);
+      }
     },
     [router]
   );
 
   const handleDelete = useCallback(
-    (site: Site) => {
+    async (site: Site) => {
       if (!confirm(`Delete "${site.name}"? This cannot be undone.`)) return;
-      deleteSite(site.id);
-      toast.info(`Deleted "${site.name}"`);
-      refresh();
-    },
-    [refresh]
-  );
-
-  const handleDuplicate = useCallback(
-    (site: Site) => {
-      const copy = duplicateSite(site.id);
-      if (copy) {
-        toast.success(`Duplicated as "${copy.name}"`);
-        refresh();
+      try {
+        await deleteSite(site.id);
+        toast.info(`Deleted "${site.name}"`);
+        await refresh();
+      } catch (err) {
+        const message = err instanceof Error ? err.message : "Delete failed";
+        toast.error(message);
       }
     },
     [refresh]
   );
 
-  const handleRename = useCallback(
-    (site: Site) => {
-      const name = prompt("Rename site", site.name);
-      if (!name || name.trim() === site.name) return;
-      updateSite(site.id, { name: name.trim() });
-      refresh();
-    },
-    [refresh]
-  );
-
-  if (!hydrated) {
-    return (
-      <div className="flex h-screen items-center justify-center text-sm text-muted-foreground">
-        Loading sites...
-      </div>
-    );
-  }
+  const handleLogout = useCallback(() => {
+    logoutToken();
+    toast.info("Signed out");
+    router.replace("/login");
+  }, [router]);
 
   return (
     <div className="min-h-screen bg-background">
@@ -114,25 +115,34 @@ export function SiteDashboard() {
             <span className="text-sm font-semibold tracking-tight">
               My Sites
             </span>
+            {userEmail && (
+              <span className="text-xs text-muted-foreground">
+                · {userEmail}
+              </span>
+            )}
           </div>
           <div className="flex items-center gap-2">
-            <Link
-              href="/editor"
-              className={buttonVariants({ variant: "outline", size: "sm" })}
-            >
-              <PencilIcon data-icon="inline-start" />
-              Open editor
-            </Link>
             <Button size="sm" onClick={() => setDialogOpen(true)}>
               <PlusIcon data-icon="inline-start" />
               New site
+            </Button>
+            <Button
+              size="sm"
+              variant="ghost"
+              onClick={handleLogout}
+              title="Sign out"
+            >
+              <LogOutIcon data-icon="inline-start" />
+              Sign out
             </Button>
           </div>
         </div>
       </header>
 
       <main className="mx-auto max-w-6xl px-6 py-10">
-        {sites.length === 0 ? (
+        {loading ? (
+          <div className="text-sm text-muted-foreground">Loading sites…</div>
+        ) : sites.length === 0 ? (
           <Card className="border-dashed">
             <CardHeader>
               <CardTitle>No sites yet</CardTitle>
@@ -161,23 +171,23 @@ export function SiteDashboard() {
                       variant="secondary"
                       className="shrink-0 font-mono text-[10px]"
                     >
-                      {site.id}
+                      {site.status}
                     </Badge>
                   </div>
                   <CardDescription>
-                    Updated {formatDate(site.updatedAt)}
+                    Updated {formatDate(site.updated_at)}
                   </CardDescription>
                 </CardHeader>
                 <CardContent className="mt-auto flex flex-wrap gap-2">
                   <Link
-                    href={`/editor/${site.id}`}
+                    href={`/editor/${site.slug}`}
                     className={buttonVariants({ size: "sm" })}
                   >
                     <PencilIcon data-icon="inline-start" />
                     Edit
                   </Link>
                   <Link
-                    href={`/preview/${site.id}`}
+                    href={`/preview/${site.slug}`}
                     target="_blank"
                     className={buttonVariants({
                       size: "sm",
@@ -190,22 +200,8 @@ export function SiteDashboard() {
                   <Button
                     size="sm"
                     variant="ghost"
-                    onClick={() => handleDuplicate(site)}
-                  >
-                    <CopyIcon />
-                  </Button>
-                  <Button
-                    size="sm"
-                    variant="ghost"
-                    onClick={() => handleRename(site)}
-                  >
-                    Rename
-                  </Button>
-                  <Button
-                    size="sm"
-                    variant="ghost"
                     onClick={() => handleDelete(site)}
-                    className="text-destructive hover:text-destructive"
+                    className="ml-auto text-destructive hover:text-destructive"
                   >
                     <Trash2Icon />
                   </Button>
@@ -222,5 +218,13 @@ export function SiteDashboard() {
         onCreate={handleCreate}
       />
     </div>
+  );
+}
+
+export function SiteDashboard() {
+  return (
+    <AuthGuard>
+      <DashboardInner />
+    </AuthGuard>
   );
 }

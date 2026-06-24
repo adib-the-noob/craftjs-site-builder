@@ -6,6 +6,7 @@ import { FieldRow } from "@/components/craft/settings/FieldRow";
 import { Input } from "@/components/ui/input";
 import { ColorField } from "@/components/craft/settings/ColorField";
 import { SelectField } from "@/components/craft/settings/SelectField";
+import { BoxModelField, boxToStyle } from "@/components/craft/settings/BoxModelField";
 
 type BadgeProps = {
   text?: string;
@@ -13,6 +14,8 @@ type BadgeProps = {
   textColor?: string;
   size?: "sm" | "md" | "lg";
   customId?: string;
+  /** Tailwind-style box model. */
+  boxModel?: { margin?: any; padding?: any };
 };
 
 export function Badge({
@@ -21,6 +24,7 @@ export function Badge({
   textColor = "#ffffff",
   size = "md",
   customId = "",
+  boxModel,
 }: BadgeProps) {
   const {
     connectors: { connect, drag },
@@ -39,7 +43,7 @@ export function Badge({
   return (
     <span
       ref={(ref) => {
-        connect(drag(ref!));
+        if (ref) connect(drag(ref));
       }}
       id={customId || undefined}
       className={cn(
@@ -47,7 +51,12 @@ export function Badge({
         sizeClass,
         selected && "ring-2 ring-primary/40 ring-offset-2"
       )}
-      style={{ backgroundColor: background, color: textColor }}
+      style={{
+        backgroundColor: background,
+        color: textColor,
+        ...boxToStyle(boxModel?.padding, "padding"),
+        ...boxToStyle(boxModel?.margin, "margin"),
+      }}
     >
       {text}
     </span>
@@ -62,12 +71,14 @@ function BadgeSettings() {
     textColor,
     size,
     customId,
+    boxModel,
   } = useNode((node) => ({
     text: node.data.props.text as string,
     background: node.data.props.background as string,
     textColor: node.data.props.textColor as string,
     size: node.data.props.size as BadgeProps["size"],
     customId: (node.data.props.customId as string) ?? "",
+    boxModel: node.data.props.boxModel as BadgeProps["boxModel"],
   })) as any;
 
   return (
@@ -125,6 +136,15 @@ function BadgeSettings() {
           })
         }
       />
+      <BoxModelField
+        label="Spacing (margin / padding)"
+        value={boxModel ?? {}}
+        onChange={(v) =>
+          setProp((props: BadgeProps) => {
+            props.boxModel = v;
+          })
+        }
+      />
     </div>
   );
 }
@@ -137,6 +157,7 @@ Badge.craft = {
     textColor: "#ffffff",
     size: "md",
     customId: "",
+    boxModel: undefined,
   },
   related: {
     settings: BadgeSettings,

@@ -1,8 +1,7 @@
 "use client";
 
 import { useEditor } from "@craftjs/core";
-import { ChevronRightIcon, LayersIcon } from "lucide-react";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { ChevronRightIcon } from "lucide-react";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { cn } from "@/lib/utils";
 
@@ -28,6 +27,11 @@ function flattenTree(
   return out;
 }
 
+/**
+ * Layers list rendered inside the left sidebar's "Layers" tab. The
+ * outer header / fold button live on `LeftSidebar` — this component
+ * just owns the scrollable list of nodes.
+ */
 export function LayersPanel() {
   // Pull `actions` out of useEditor so the click handler below has a stable
   // reference. We can't grab `actions.selectNode` from inside the selector
@@ -46,42 +50,30 @@ export function LayersPanel() {
   const select = (id: string) => actions.selectNode(id);
 
   return (
-    <Card className="flex h-full min-h-0 flex-col rounded-none border-0 border-r shadow-none">
-      <CardHeader className="shrink-0 border-b pb-4">
-        <CardTitle className="flex items-center gap-2 text-sm">
-          <LayersIcon />
-          Layers
-        </CardTitle>
-      </CardHeader>
-      <CardContent className="min-h-0 flex-1 p-0">
-        <ScrollArea className="h-full">
-          <div className="flex flex-col p-2">
-            {layers.length === 0 ? (
-              <p className="px-2 py-3 text-sm text-muted-foreground">
-                No layers
-              </p>
-            ) : (
-              layers.map((layer) => (
-                <button
-                  key={layer.id}
-                  type="button"
-                  onClick={() => select(layer.id)}
-                  className={cn(
-                    "flex items-center gap-1 rounded-sm px-2 py-1.5 text-left text-xs transition-colors hover:bg-muted",
-                    selectedId === layer.id && "bg-muted font-medium"
-                  )}
-                  style={{ paddingLeft: 8 + layer.depth * 12 }}
-                >
-                  {layer.depth > 0 && (
-                    <ChevronRightIcon className="h-3 w-3 text-muted-foreground" />
-                  )}
-                  <span className="truncate">{layer.name}</span>
-                </button>
-              ))
-            )}
-          </div>
-        </ScrollArea>
-      </CardContent>
-    </Card>
+    <ScrollArea className="h-full">
+      <div className="flex flex-col p-2">
+        {layers.length === 0 ? (
+          <p className="px-2 py-3 text-sm text-muted-foreground">No layers</p>
+        ) : (
+          layers.map((layer) => (
+            <button
+              key={layer.id}
+              type="button"
+              onClick={() => select(layer.id)}
+              className={cn(
+                "flex items-center gap-1 rounded-sm px-2 py-1.5 text-left text-xs transition-colors hover:bg-muted",
+                selectedId === layer.id && "bg-muted font-medium"
+              )}
+              style={{ paddingLeft: 8 + layer.depth * 12 }}
+            >
+              {layer.depth > 0 && (
+                <ChevronRightIcon className="h-3 w-3 text-muted-foreground" />
+              )}
+              <span className="truncate">{layer.name}</span>
+            </button>
+          ))
+        )}
+      </div>
+    </ScrollArea>
   );
 }

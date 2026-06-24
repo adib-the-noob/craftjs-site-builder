@@ -3,11 +3,13 @@
 import { useNode } from "@craftjs/core";
 import { cn } from "@/lib/utils";
 import { FieldRow } from "@/components/craft/settings/FieldRow";
+import { FontField } from "@/components/craft/settings/FontField";
 import { Input } from "@/components/ui/input";
 import { ColorField } from "@/components/craft/settings/ColorField";
 import { SelectField } from "@/components/craft/settings/SelectField";
 import { AlignField } from "@/components/craft/settings/AlignField";
 import { SliderField } from "@/components/craft/settings/SliderField";
+import { BoxModelField, boxToStyle } from "@/components/craft/settings/BoxModelField";
 
 type HeadingProps = {
   text?: string;
@@ -17,23 +19,29 @@ type HeadingProps = {
   fontWeight?: number;
   letterSpacing?: number;
   customId?: string;
+  /** CSS class name from the font registry (lib/fonts.ts). */
+  fontFamily?: string;
+  /** Tailwind-style box model. */
+  boxModel?: { margin?: any; padding?: any };
 };
 
 const headingStyles: Record<NonNullable<HeadingProps["level"]>, string> = {
-  h1: "text-5xl font-bold tracking-tight",
+  h1: "text-6xl font-bold tracking-tight",
   h2: "text-4xl font-semibold tracking-tight",
-  h3: "text-3xl font-semibold",
+  h3: "text-3xl font-semibold tracking-tight",
   h4: "text-2xl font-medium",
 };
 
 export function Heading({
   text = "Your heading",
   level = "h2",
-  color = "#111827",
+  color = "#0f172a",
   align = "left",
   fontWeight = 600,
-  letterSpacing = -0.5,
+  letterSpacing = -1,
   customId = "",
+  fontFamily = "",
+  boxModel,
 }: HeadingProps) {
   const {
     connectors: { connect, drag },
@@ -48,7 +56,7 @@ export function Heading({
   return (
     <Tag
       ref={(ref) => {
-        connect(drag(ref!));
+        if (ref) connect(drag(ref));
       }}
       id={customId || undefined}
       contentEditable={selected}
@@ -61,13 +69,16 @@ export function Heading({
       className={cn(
         headingStyles[level],
         "outline-none",
+        fontFamily,
         selected && "ring-2 ring-primary/40 ring-offset-2"
       )}
       style={{
         color,
-        textAlign: align,
         fontWeight,
         letterSpacing,
+        textAlign: align,
+        ...boxToStyle(boxModel?.padding, "padding"),
+        ...boxToStyle(boxModel?.margin, "margin"),
       }}
     >
       {text}
@@ -85,6 +96,8 @@ function HeadingSettings() {
     fontWeight,
     letterSpacing,
     customId,
+    fontFamily,
+    boxModel,
   } = useNode((node) => ({
     text: node.data.props.text as string,
     level: node.data.props.level as HeadingProps["level"],
@@ -93,6 +106,8 @@ function HeadingSettings() {
     fontWeight: (node.data.props.fontWeight as number) ?? 600,
     letterSpacing: (node.data.props.letterSpacing as number) ?? -0.5,
     customId: (node.data.props.customId as string) ?? "",
+    fontFamily: (node.data.props.fontFamily as string) ?? "",
+    boxModel: node.data.props.boxModel as HeadingProps["boxModel"],
   })) as any;
 
   return (
@@ -132,6 +147,15 @@ function HeadingSettings() {
           { value: "h3", label: "Heading 3" },
           { value: "h4", label: "Heading 4" },
         ]}
+      />
+      <FontField
+        label="Font"
+        value={fontFamily}
+        onChange={(v) =>
+          setProp((props: HeadingProps) => {
+            props.fontFamily = v;
+          })
+        }
       />
       <ColorField
         label="Color"
@@ -176,6 +200,15 @@ function HeadingSettings() {
           })
         }
       />
+      <BoxModelField
+        label="Spacing (margin / padding)"
+        value={boxModel ?? {}}
+        onChange={(v) =>
+          setProp((props: HeadingProps) => {
+            props.boxModel = v;
+          })
+        }
+      />
     </div>
   );
 }
@@ -185,11 +218,13 @@ Heading.craft = {
   props: {
     text: "Your heading",
     level: "h2",
-    color: "#111827",
+    color: "#0f172a",
     align: "left",
     fontWeight: 600,
-    letterSpacing: -0.5,
+    letterSpacing: -1,
     customId: "",
+    fontFamily: "",
+    boxModel: undefined,
   },
   related: {
     settings: HeadingSettings,
