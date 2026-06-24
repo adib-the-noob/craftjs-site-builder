@@ -60,7 +60,7 @@ export function SitePreview({ site, page }: Props) {
   return (
     <div className="min-h-screen flex flex-col bg-background">
       <header className="border-b bg-muted/40">
-        <div className="mx-auto flex max-w-5xl items-center justify-between gap-3 px-4 py-2 text-xs">
+        <div className="flex items-center justify-between gap-3 px-4 py-2 text-xs">
           <div className="flex items-center gap-2 text-muted-foreground">
             <span className="font-mono text-foreground/80">{site.slug}</span>
             <span aria-hidden>·</span>
@@ -73,11 +73,7 @@ export function SitePreview({ site, page }: Props) {
             )}
           </div>
           <Link
-            href={
-              resolvedPage
-                ? `/editor/${site.slug}/${resolvedPage.slug}`
-                : `/editor/${site.slug}`
-            }
+            href={`/editor/${site.slug}`}
             className="text-foreground underline-offset-4 hover:underline"
           >
             Open in editor →

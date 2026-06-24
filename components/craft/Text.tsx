@@ -24,9 +24,9 @@ type TextProps = {
 
 export function Text({
   text = "Edit this text",
-  fontSize = 16,
+  fontSize = 17,
   fontWeight = 400,
-  lineHeight = 1.6,
+  lineHeight = 1.7,
   color = "#374151",
   align = "left",
   italic = false,
@@ -195,9 +195,9 @@ Text.craft = {
   displayName: "Text",
   props: {
     text: "Edit this text",
-    fontSize: 16,
+    fontSize: 17,
     fontWeight: 400,
-    lineHeight: 1.6,
+    lineHeight: 1.7,
     color: "#374151",
     align: "left",
     italic: false,

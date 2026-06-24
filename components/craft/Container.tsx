@@ -19,7 +19,7 @@ type ContainerProps = {
 
 export function Container({
   background = "transparent",
-  padding = 16,
+  padding = 24,
   maxWidth = 1200,
   marginTop = 0,
   marginBottom = 0,
@@ -136,7 +136,7 @@ Container.craft = {
   displayName: "Container",
   props: {
     background: "transparent",
-    padding: 16,
+    padding: 24,
     maxWidth: 1200,
     marginTop: 0,
     marginBottom: 0,

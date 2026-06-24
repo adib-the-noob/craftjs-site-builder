@@ -6,7 +6,6 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { Separator } from "@/components/ui/separator";
 import { Settings2Icon } from "lucide-react";
-import { PageSettings } from "./PageSettings";
 
 export function SettingsPanel() {
   const { selected } = useEditor((_, query) => {
@@ -43,7 +42,11 @@ export function SettingsPanel() {
                 Select an element on the canvas to edit its properties.
               </p>
             ) : selected.isRoot ? (
-              <PageSettings />
+              <p className="text-sm text-muted-foreground">
+                Container settings are inline with the canvas — select an inner
+                element to edit it, or use the Layers panel on the left to
+                reorder sections.
+              </p>
             ) : (
               <div className="flex flex-col gap-4">
                 <div>

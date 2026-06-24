@@ -160,6 +160,24 @@ export async function deleteSite(id: number): Promise<void> {
   await apiDelete<unknown>(`/sites/${id}`);
 }
 
+/**
+ * Flip a site to `published` on the backend. Returns the updated `Site`
+ * so callers can refresh their local copy in one round-trip. The backend
+ * typically exposes this as `PUT /sites/{id}/publish`; if the endpoint
+ * isn't implemented the helper throws an `ApiError` from `request`.
+ */
+export async function publishSite(id: number): Promise<Site> {
+  return apiPut<Site>(`/sites/${id}/publish`);
+}
+
+/**
+ * Flip a site back to `draft`. Endpoint: `PUT /sites/{id}/unpublish`.
+ * Same error semantics as `publishSite`.
+ */
+export async function unpublishSite(id: number): Promise<Site> {
+  return apiPut<Site>(`/sites/${id}/unpublish`);
+}
+
 // --- Page helpers -----------------------------------------------------------
 
 /** Default Craft.js tree for a brand-new page. */

@@ -5,16 +5,12 @@ import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
 import {
-  CheckIcon,
-  ChevronsUpDownIcon,
   EyeIcon,
-  FileIcon,
   HomeIcon,
   LayoutTemplateIcon,
   PencilIcon,
   Redo2Icon,
   SaveIcon,
-  SettingsIcon,
   Trash2Icon,
   Undo2Icon,
 } from "lucide-react";
@@ -32,30 +28,62 @@ import {
 import { Separator } from "@/components/ui/separator";
 import { Badge } from "@/components/ui/badge";
 import { getTemplates } from "@/lib/templates";
-import { deleteSite, type Site, type SitePage } from "@/lib/sites";
+import { deleteSite, publishSite, unpublishSite, type Site } from "@/lib/sites";
 import type { SiteTemplate } from "@/lib/constants";
-import { ManagePagesDialog } from "./ManagePagesDialog";
+
+/**
+ * Accessible toggle styled to match the rest of the toolbar. Built inline
+ * (no shadcn switch primitive installed) — uses `role="switch"` and
+ * `aria-checked` per WAI-ARIA. Disabled state is forwarded.
+ */
+function StatusSwitch({
+  checked,
+  disabled,
+  onClick,
+}: {
+  checked: boolean;
+  disabled?: boolean;
+  onClick: () => void;
+}) {
+  return (
+    <button
+      type="button"
+      role="switch"
+      aria-checked={checked}
+      aria-label={checked ? "Unpublish site" : "Publish site"}
+      disabled={disabled}
+      onClick={onClick}
+      className={[
+        "relative inline-flex h-5 w-9 shrink-0 cursor-pointer items-center rounded-full",
+        "border border-transparent transition-colors",
+        "focus-visible:border-ring focus-visible:ring-[3px] focus-visible:ring-ring/50 focus-visible:outline-none",
+        "disabled:pointer-events-none disabled:opacity-50",
+        checked ? "bg-emerald-500" : "bg-zinc-300 dark:bg-zinc-700",
+      ].join(" ")}
+    >
+      <span
+        aria-hidden
+        className={[
+          "pointer-events-none inline-block size-4 rounded-full bg-white shadow-sm transition-transform",
+          checked ? "translate-x-4" : "translate-x-0.5",
+        ].join(" ")}
+      />
+    </button>
+  );
+}
 
 type EditorToolbarProps = {
   site: Site;
-  pages: SitePage[];
-  currentPageId: string;
   onSave: () => void;
   onLoadTemplate: (templateId: string) => void;
   onSiteChanged: () => void;
-  onPagesChanged: (pages: SitePage[]) => void;
-  onRequestSwitchPage: (pageId: string) => void;
 };
 
 export function EditorToolbar({
   site,
-  pages,
-  currentPageId,
   onSave,
   onLoadTemplate,
   onSiteChanged,
-  onPagesChanged,
-  onRequestSwitchPage,
 }: EditorToolbarProps) {
   const { id: siteId, slug, name: siteName } = site;
   const router = useRouter();
@@ -66,7 +94,12 @@ export function EditorToolbar({
   const [editingName, setEditingName] = useState(false);
   const [nameDraft, setNameDraft] = useState(siteName);
   const [templates, setTemplates] = useState<SiteTemplate[]>([]);
-  const [pagesDialogOpen, setPagesDialogOpen] = useState(false);
+  const [togglingStatus, setTogglingStatus] = useState(false);
+
+  // Status derived from props so it stays in sync when the parent
+  // re-fetches the site after a save/load-template/etc.
+  const status = site.status;
+  const isPublished = status === "published";
 
   useEffect(() => {
     let cancelled = false;
@@ -81,8 +114,6 @@ export function EditorToolbar({
       cancelled = true;
     };
   }, []);
-
-  const currentPage = pages.find((p) => p.id === currentPageId) ?? pages[0];
 
   const handleCommitName = async () => {
     const trimmed = nameDraft.trim();
@@ -112,12 +143,30 @@ export function EditorToolbar({
     }
   };
 
-  const handleSwitchPage = (pageId: string) => {
-    const target = pages.find((p) => p.id === pageId);
-    if (!target || target.id === currentPageId) return;
-    // Defer to the parent: it has the router and can await the save
-    // before navigating, so the next mount reads the freshest tree.
-    onRequestSwitchPage(target.id);
+  const handleToggleStatus = async () => {
+    if (togglingStatus) return;
+    const next = !isPublished;
+    setTogglingStatus(true);
+    try {
+      const updated = next
+        ? await publishSite(siteId)
+        : await unpublishSite(siteId);
+      toast.success(
+        next ? `Published "${siteName}"` : `Reverted "${siteName}" to draft`
+      );
+      // Keep the toolbar's in-memory copy of the site in sync so the
+      // Switch + badge reflect the new state immediately without a
+      // full router refresh.
+      onSiteChanged();
+      // Discard the return — parent will refetch.
+      void updated;
+    } catch (err) {
+      const message =
+        err instanceof Error ? err.message : "Could not change status";
+      toast.error(message);
+    } finally {
+      setTogglingStatus(false);
+    }
   };
 
   return (
@@ -164,69 +213,6 @@ export function EditorToolbar({
         </div>
         <Separator orientation="vertical" className="h-6" />
 
-        {/* Page switcher */}
-        <DropdownMenu>
-          <DropdownMenuTrigger
-            render={
-              <Button
-                variant="outline"
-                size="sm"
-                className="min-w-40 justify-between"
-                title="Switch page"
-              />
-            }
-          >
-            {currentPage ? (
-              <span className="flex min-w-0 items-center gap-1.5">
-                {currentPage.isHome ? (
-                  <HomeIcon className="size-3.5 text-amber-500" />
-                ) : (
-                  <FileIcon className="size-3.5 text-muted-foreground" />
-                )}
-                <span className="truncate">{currentPage.title}</span>
-              </span>
-            ) : (
-              <span>No page</span>
-            )}
-            <ChevronsUpDownIcon data-icon="inline-end" className="text-muted-foreground" />
-          </DropdownMenuTrigger>
-          <DropdownMenuContent align="start" className="w-64">
-            <DropdownMenuGroup>
-              <DropdownMenuLabel>Pages</DropdownMenuLabel>
-              <DropdownMenuSeparator />
-              {pages.map((p) => (
-                <DropdownMenuItem
-                  key={p.id}
-                  onClick={() => handleSwitchPage(p.id)}
-                  className="flex items-center justify-between"
-                >
-                  <span className="flex min-w-0 items-center gap-1.5">
-                    {p.isHome ? (
-                      <HomeIcon className="size-3.5 shrink-0 text-amber-500" />
-                    ) : (
-                      <FileIcon className="size-3.5 shrink-0 text-muted-foreground" />
-                    )}
-                    <span className="flex flex-col">
-                      <span className="truncate font-medium">{p.title}</span>
-                      <span className="font-mono text-[10px] text-muted-foreground">
-                        /{p.slug}
-                      </span>
-                    </span>
-                  </span>
-                  {p.id === currentPageId && (
-                    <CheckIcon className="size-3.5 text-primary" />
-                  )}
-                </DropdownMenuItem>
-              ))}
-              <DropdownMenuSeparator />
-              <DropdownMenuItem onClick={() => setPagesDialogOpen(true)}>
-                <SettingsIcon />
-                Manage pages…
-              </DropdownMenuItem>
-            </DropdownMenuGroup>
-          </DropdownMenuContent>
-        </DropdownMenu>
-
         <DropdownMenu>
           <DropdownMenuTrigger render={<Button variant="outline" size="sm" />}>
             <LayoutTemplateIcon data-icon="inline-start" />
@@ -234,7 +220,7 @@ export function EditorToolbar({
           </DropdownMenuTrigger>
           <DropdownMenuContent align="start" className="w-72">
             <DropdownMenuGroup>
-              <DropdownMenuLabel>Replace this page with…</DropdownMenuLabel>
+              <DropdownMenuLabel>Replace page with…</DropdownMenuLabel>
               <DropdownMenuSeparator />
               {templates.length === 0 ? (
                 <div className="px-2 py-1.5 text-xs text-muted-foreground">
@@ -247,7 +233,7 @@ export function EditorToolbar({
                     onClick={() => {
                       if (
                         confirm(
-                          `Replace "${currentPage?.title ?? "this page"}" with the "${template.name}" template? Other pages are kept.`
+                          `Replace "${siteName}" with the "${template.name}" template?`
                         )
                       ) {
                         onLoadTemplate(template.id);
@@ -266,6 +252,31 @@ export function EditorToolbar({
             </DropdownMenuGroup>
           </DropdownMenuContent>
         </DropdownMenu>
+
+        <Separator orientation="vertical" className="h-6" />
+
+        <div className="flex items-center gap-2">
+          <StatusSwitch
+            checked={isPublished}
+            disabled={togglingStatus}
+            onClick={handleToggleStatus}
+          />
+          <Badge
+            variant={isPublished ? "default" : "secondary"}
+            className="font-mono text-[10px] capitalize"
+            title={
+              isPublished
+                ? "Visible to the public — click the switch to revert to draft"
+                : "Only you can see this site — click the switch to publish"
+            }
+          >
+            {togglingStatus
+              ? isPublished
+                ? "Unpublishing…"
+                : "Publishing…"
+              : status}
+          </Badge>
+        </div>
       </div>
 
       <div className="flex items-center gap-1">
@@ -292,7 +303,7 @@ export function EditorToolbar({
           variant="outline"
           size="sm"
           onClick={onSave}
-          title="Save this page"
+          title="Save"
         >
           <SaveIcon data-icon="inline-start" />
           Save
@@ -316,17 +327,6 @@ export function EditorToolbar({
           <Trash2Icon />
         </Button>
       </div>
-
-      {pagesDialogOpen && (
-        <ManagePagesDialog
-          open={pagesDialogOpen}
-          onOpenChange={setPagesDialogOpen}
-          site={site}
-          pages={pages}
-          currentPageId={currentPageId}
-          onPagesChanged={onPagesChanged}
-        />
-      )}
     </header>
   );
 }

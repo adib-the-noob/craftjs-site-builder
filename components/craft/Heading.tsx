@@ -20,19 +20,19 @@ type HeadingProps = {
 };
 
 const headingStyles: Record<NonNullable<HeadingProps["level"]>, string> = {
-  h1: "text-5xl font-bold tracking-tight",
+  h1: "text-6xl font-bold tracking-tight",
   h2: "text-4xl font-semibold tracking-tight",
-  h3: "text-3xl font-semibold",
+  h3: "text-3xl font-semibold tracking-tight",
   h4: "text-2xl font-medium",
 };
 
 export function Heading({
   text = "Your heading",
   level = "h2",
-  color = "#111827",
+  color = "#0f172a",
   align = "left",
   fontWeight = 600,
-  letterSpacing = -0.5,
+  letterSpacing = -1,
   customId = "",
 }: HeadingProps) {
   const {
@@ -185,10 +185,10 @@ Heading.craft = {
   props: {
     text: "Your heading",
     level: "h2",
-    color: "#111827",
+    color: "#0f172a",
     align: "left",
     fontWeight: 600,
-    letterSpacing: -0.5,
+    letterSpacing: -1,
     customId: "",
   },
   related: {

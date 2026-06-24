@@ -16,7 +16,7 @@ type SectionProps = {
 
 export function Section({
   background = "#ffffff",
-  paddingY = 64,
+  paddingY = 96,
   maxWidth = 1100,
   customId = "",
   children,
@@ -111,7 +111,7 @@ Section.craft = {
   displayName: "Section",
   props: {
     background: "#ffffff",
-    paddingY: 64,
+    paddingY: 96,
     maxWidth: 1100,
     customId: "",
   },

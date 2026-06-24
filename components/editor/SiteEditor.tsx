@@ -23,16 +23,7 @@ import {
   ResizablePanelGroup,
 } from "@/components/ui/resizable";
 import { resolver } from "@/lib/resolver";
-import {
-  findPageBySlug,
-  getSite,
-  normalisePages,
-  readSitePages,
-  updateSite,
-  writeSitePages,
-  type Site,
-  type SitePage,
-} from "@/lib/sites";
+import { emptyPageData, getSite, updateSite, type Site } from "@/lib/sites";
 import { getTemplateById } from "@/lib/templates";
 import { setClipboard, getClipboard } from "@/lib/clipboard";
 import { AuthGuard } from "@/components/auth/AuthGuard";
@@ -144,7 +135,7 @@ function KeyboardShortcuts() {
 }
 
 /**
- * Hydrates the Craft.js editor with the current page's tree after mount.
+ * Hydrates the Craft.js editor with the saved tree after mount.
  *
  * Why not use <Frame data={saved}> directly? `Frame.deserialize` runs
  * the saved tree through `query.parseSerializedNode(...).toNode()`,
@@ -213,19 +204,15 @@ function TreeMirror() {
   return null;
 }
 
-function EditorInner({
-  siteSlug,
-  pageSlug,
-}: {
-  siteSlug: string;
-  pageSlug: string;
-}) {
+function EditorInner({ siteSlug }: { siteSlug: string }) {
   const router = useRouter();
   const [site, setSite] = useState<Site | null>(null);
-  const [pages, setPages] = useState<SitePage[] | null>(null);
+  const [initialTree, setInitialTree] = useState<Record<string, unknown> | null>(
+    null
+  );
   const [loadFailed, setLoadFailed] = useState(false);
 
-  // Load site + pages.
+  // Load site + tree.
   useEffect(() => {
     let cancelled = false;
     getSite(siteSlug)
@@ -237,8 +224,16 @@ function EditorInner({
           router.replace("/sites");
           return;
         }
+        // Single-page model: `site_data` IS the tree.
+        const tree = s.site_data && typeof s.site_data === "object"
+          ? (s.site_data as Record<string, unknown>)
+          : emptyPageData();
+        if (!tree || Object.keys(tree).length === 0) {
+          setInitialTree(emptyPageData());
+        } else {
+          setInitialTree(tree);
+        }
         setSite(s);
-        setPages(normalisePages(readSitePages(s)));
       })
       .catch((err) => {
         if (cancelled) return;
@@ -253,97 +248,54 @@ function EditorInner({
     };
   }, [siteSlug, router]);
 
-  // The currently active page — derived from `pages` + URL `pageSlug`.
-  // Falls back to the home page if the URL slug doesn't match (e.g.
-  // the page was just deleted or renamed).
-  const currentPage = useMemo<SitePage | null>(() => {
-    if (!pages) return null;
-    return (
-      findPageBySlug(pages, pageSlug) ??
-      pages.find((p) => p.isHome) ??
-      pages[0] ??
-      null
-    );
-  }, [pages, pageSlug]);
-
-  // Used to remount the Craft.js <Editor> when switching pages. Without
-  // this, the canvas would keep showing the previous page's tree because
-  // Craft.js state is keyed by mount, not by props.
-  const editorKey = useMemo(
-    () => (currentPage ? currentPage.id : "loading"),
-    [currentPage]
-  );
-
   const initialData = useMemo<string | null>(() => {
-    if (!currentPage) return null;
-    const tree = currentPage.data;
-    if (!tree || typeof tree !== "object") return null;
-    if (Object.keys(tree).length === 0) return null;
-    return JSON.stringify(tree);
-  }, [currentPage]);
+    if (!initialTree) return null;
+    if (Object.keys(initialTree).length === 0) return null;
+    return JSON.stringify(initialTree);
+  }, [initialTree]);
 
   /**
    * Pull the freshest tree out of Craft.js (which lives inside the
-   * <Editor> provider). Falls back to the cached `currentPage.data`
+   * <Editor> provider). Falls back to the cached `initialTree`
    * if the mirror hasn't ticked yet.
    */
   const readLatestTree = useCallback((): Record<string, unknown> => {
     const w = window as unknown as {
       __craftEditorTree?: Record<string, unknown>;
     };
-    return w.__craftEditorTree ?? currentPage?.data ?? {};
-  }, [currentPage]);
+    return w.__craftEditorTree ?? initialTree ?? emptyPageData();
+  }, [initialTree]);
 
   const handleSave = useCallback(async () => {
-    if (!site || !currentPage || !pages) return;
+    if (!site) return;
     const tree = readLatestTree();
-    const nextPages = normalisePages(
-      pages.map((p) => (p.id === currentPage.id ? { ...p, data: tree } : p))
-    );
     try {
-      await updateSite(site.id, {
-        data: writeSitePages(nextPages) as unknown as Record<string, unknown>,
-      });
-      setPages(nextPages);
-      toast.success(`Saved "${currentPage.title}"`);
+      await updateSite(site.id, { data: tree });
+      toast.success("Saved");
     } catch (err) {
       const message = err instanceof Error ? err.message : "Save failed";
       toast.error(message);
     }
-  }, [site, currentPage, pages, readLatestTree]);
+  }, [site, readLatestTree]);
 
   const handleLoadTemplate = useCallback(
     async (templateId: string) => {
-      if (!site || !currentPage || !pages) return;
+      if (!site) return;
       const template = await getTemplateById(templateId);
       if (!template) return;
-      // Templates are single-page starters — they replace the *current*
-      // page only, preserving the rest of the site's pages.
-      const nextPages = normalisePages(
-        pages.map((p) =>
-          p.id === currentPage.id
-            ? { ...p, data: JSON.parse(JSON.stringify(template.data)) }
-            : p
-        )
-      );
+      const tree = JSON.parse(JSON.stringify(template.data));
       try {
-        await updateSite(site.id, {
-          data: writeSitePages(nextPages) as unknown as Record<
-            string,
-            unknown
-          >,
-        });
-        setPages(nextPages);
-        toast.success(
-          `Loaded template "${template.name}" into "${currentPage.title}"`
-        );
+        await updateSite(site.id, { data: tree });
+        toast.success(`Loaded template "${template.name}"`);
+        // Reload so the editor re-hydrates with the new tree.
+        router.refresh();
       } catch (err) {
         const message =
           err instanceof Error ? err.message : "Could not load template";
         toast.error(message);
       }
     },
-    [site, currentPage, pages]
+    [site, router]
   );
 
   const handleSiteChanged = useCallback(() => {
@@ -354,23 +306,7 @@ function EditorInner({
     });
   }, [site]);
 
-  /**
-   * Switch the active page. We save the outgoing page *first* and
-   * then navigate, so the new mount reads the just-persisted tree
-   * instead of racing against the in-flight PUT.
-   */
-  const handleSwitchPage = useCallback(
-    async (pageId: string) => {
-      if (!site || !pages) return;
-      const target = pages.find((p) => p.id === pageId);
-      if (!target || target.id === currentPage?.id) return;
-      await handleSave();
-      router.push(`/editor/${site.slug}/${target.slug}`);
-    },
-    [site, pages, currentPage, handleSave, router]
-  );
-
-  if (loadFailed || !site || !pages || !currentPage) {
+  if (loadFailed || !site || !initialTree) {
     return (
       <div className="flex h-screen items-center justify-center text-sm text-muted-foreground">
         Loading editor…
@@ -379,24 +315,16 @@ function EditorInner({
   }
 
   return (
-    <Editor
-      key={editorKey}
-      resolver={resolver}
-      onRender={RenderNode}
-    >
+    <Editor resolver={resolver} onRender={RenderNode}>
       <KeyboardShortcuts />
       <TreeMirror />
       <HydrateOnMount data={initialData} />
       <div className="flex h-screen flex-col overflow-hidden bg-background">
         <EditorToolbar
           site={site}
-          pages={pages}
-          currentPageId={currentPage.id}
           onSave={handleSave}
           onLoadTemplate={handleLoadTemplate}
           onSiteChanged={handleSiteChanged}
-          onPagesChanged={setPages}
-          onRequestSwitchPage={handleSwitchPage}
         />
         <ResizablePanelGroup
           id="site-editor-layout"
@@ -437,8 +365,8 @@ function EditorInner({
                 </p>
                 <SelectionActions />
               </div>
-              <div className="flex-1 overflow-auto p-6">
-                <div className="mx-auto min-h-full w-full max-w-4xl rounded-xl border bg-background shadow-sm">
+              <div className="flex-1 overflow-auto bg-muted/30">
+                <div className="min-h-full w-full bg-background">
                   <Frame>
                     <Element
                       canvas
@@ -467,16 +395,10 @@ function EditorInner({
   );
 }
 
-export function SiteEditor({
-  siteSlug,
-  pageSlug,
-}: {
-  siteSlug: string;
-  pageSlug: string;
-}) {
+export function SiteEditor({ siteSlug }: { siteSlug: string }) {
   return (
     <AuthGuard>
-      <EditorInner siteSlug={siteSlug} pageSlug={pageSlug} />
+      <EditorInner siteSlug={siteSlug} />
     </AuthGuard>
   );
 }
