@@ -945,5 +945,2645 @@
         "linkedNodes": {}
       }
     }
+  },
+  "folio-tailwind": {
+    "id": "folio-tailwind",
+    "name": "Folio (Freelance portfolio)",
+    "description": "Single-page freelance portfolio: navbar, hero, services, work, about, reviews, blog, contact and footer — based on the Eliott Tailwind template.",
+    "data": {
+      "ROOT": {
+        "type": { "resolvedName": "Container" },
+        "nodes": [
+          "fNav",
+          "f1HeroSection",
+          "f2ServicesSection",
+          "f3WorkSection",
+          "f4AboutSection",
+          "f5ReviewsSection",
+          "f6BlogSection",
+          "f7ContactSection",
+          "fFooter"
+        ],
+        "props": {
+          "background": "#ffffff",
+          "padding": 0,
+          "maxWidth": 0,
+          "marginTop": 0,
+          "marginBottom": 0,
+          "customId": ""
+        },
+        "custom": {},
+        "hidden": false,
+        "isCanvas": true,
+        "displayName": "Container",
+        "linkedNodes": {}
+      },
+      "fNav": {
+        "type": { "resolvedName": "Navbar" },
+        "nodes": [],
+        "props": {
+          "brand": "eliott",
+          "brandIcon": "",
+          "navItems": "Services | #services\nWork | #work\nAbout | #about\nReviews | #reviews\nBlog | #blog\nContact | #contact",
+          "ctaLabel": "Hire me",
+          "ctaHref": "#contact",
+          "layout": "brand-left-links-right",
+          "variant": "solid",
+          "sticky": true,
+          "background": "#ffffff",
+          "textColor": "#0f172a",
+          "borderColor": "#e4e4e7",
+          "height": 64,
+          "maxWidth": 1152,
+          "customId": "",
+          "boxModel": { "padding": { "top": 0, "bottom": 0, "left": 0, "right": 0 } }
+        },
+        "custom": {},
+        "hidden": false,
+        "parent": "ROOT",
+        "isCanvas": false,
+        "displayName": "Navbar",
+        "linkedNodes": {}
+      },
+      "f1HeroSection": {
+        "type": { "resolvedName": "Section" },
+        "nodes": ["f1HeroGrid"],
+        "props": {
+          "background": "#ffffff",
+          "paddingY": 96,
+          "maxWidth": 1152,
+          "customId": "hero"
+        },
+        "custom": {},
+        "hidden": false,
+        "parent": "ROOT",
+        "isCanvas": true,
+        "displayName": "Section",
+        "linkedNodes": {}
+      },
+      "f1HeroGrid": {
+        "type": { "resolvedName": "Grid" },
+        "nodes": [],
+        "props": {
+          "columns": 2,
+          "gap": 48,
+          "background": "transparent",
+          "padding": 0,
+          "borderRadius": 0,
+          "customId": ""
+        },
+        "custom": {},
+        "hidden": false,
+        "parent": "f1HeroSection",
+        "isCanvas": true,
+        "displayName": "Grid",
+        "linkedNodes": {
+          "col-0": "f1HeroLeft",
+          "col-1": "f1HeroRight"
+        }
+      },
+      "f1HeroLeft": {
+        "type": { "resolvedName": "Container" },
+        "nodes": ["f1Badge", "f1Heading", "f1Lead", "f1Buttons", "f1Stats"],
+        "props": {
+          "background": "transparent",
+          "padding": 0,
+          "maxWidth": 0,
+          "marginTop": 0,
+          "marginBottom": 0,
+          "customId": "",
+          "boxModel": { "padding": { "top": 0, "right": 0, "bottom": 0, "left": 0 } }
+        },
+        "custom": { "displayName": "Column 1" },
+        "hidden": false,
+        "parent": "f1HeroGrid",
+        "isCanvas": true,
+        "displayName": "Container",
+        "linkedNodes": {}
+      },
+      "f1HeroRight": {
+        "type": { "resolvedName": "Container" },
+        "nodes": ["f1Photo"],
+        "props": {
+          "background": "transparent",
+          "padding": 0,
+          "maxWidth": 0,
+          "marginTop": 0,
+          "marginBottom": 0,
+          "customId": "",
+          "boxModel": { "padding": { "top": 0, "right": 0, "bottom": 0, "left": 0 } }
+        },
+        "custom": { "displayName": "Column 2" },
+        "hidden": false,
+        "parent": "f1HeroGrid",
+        "isCanvas": true,
+        "displayName": "Container",
+        "linkedNodes": {}
+      },
+      "f1Badge": {
+        "type": { "resolvedName": "Badge" },
+        "nodes": [],
+        "props": {
+          "text": "AVAILABLE FOR WORK",
+          "background": "#fff1e8",
+          "textColor": "#FF6B2B",
+          "size": "sm",
+          "customId": ""
+        },
+        "custom": {},
+        "hidden": false,
+        "parent": "f1HeroLeft",
+        "isCanvas": false,
+        "displayName": "Badge",
+        "linkedNodes": {}
+      },
+      "f1Heading": {
+        "type": { "resolvedName": "Heading" },
+        "nodes": [],
+        "props": {
+          "text": "Hi, I'm Eliott.",
+          "level": "h1",
+          "color": "#0f172a",
+          "align": "left",
+          "fontWeight": 700,
+          "letterSpacing": -1,
+          "customId": ""
+        },
+        "custom": {},
+        "hidden": false,
+        "parent": "f1HeroLeft",
+        "isCanvas": false,
+        "displayName": "Heading",
+        "linkedNodes": {}
+      },
+      "f1Lead": {
+        "type": { "resolvedName": "Text" },
+        "nodes": [],
+        "props": {
+          "text": "Freelance UI/UX Designer & Frontend Developer. I design and build digital products that people love to use — fast, clean, and accessible.",
+          "fontSize": 18,
+          "fontWeight": 400,
+          "lineHeight": 1.6,
+          "color": "#52525b",
+          "align": "left",
+          "italic": false,
+          "customId": ""
+        },
+        "custom": {},
+        "hidden": false,
+        "parent": "f1HeroLeft",
+        "isCanvas": false,
+        "displayName": "Text",
+        "linkedNodes": {}
+      },
+      "f1Buttons": {
+        "type": { "resolvedName": "Container" },
+        "nodes": ["f1BtnPrimary", "f1BtnOutline"],
+        "props": {
+          "background": "transparent",
+          "padding": 0,
+          "maxWidth": 0,
+          "marginTop": 0,
+          "marginBottom": 0,
+          "customId": "",
+          "boxModel": { "padding": { "top": 0, "right": 0, "bottom": 0, "left": 0 } }
+        },
+        "custom": { "displayName": "Hero buttons" },
+        "hidden": false,
+        "parent": "f1HeroLeft",
+        "isCanvas": true,
+        "displayName": "Container",
+        "linkedNodes": {}
+      },
+      "f1BtnPrimary": {
+        "type": { "resolvedName": "CtaButton" },
+        "nodes": [],
+        "props": {
+          "text": "View my work",
+          "href": "#work",
+          "variant": "primary",
+          "size": "md",
+          "align": "left",
+          "fullWidth": false,
+          "background": "#0f172a",
+          "textColor": "#ffffff",
+          "borderRadius": 999,
+          "customId": ""
+        },
+        "custom": {},
+        "hidden": false,
+        "parent": "f1Buttons",
+        "isCanvas": false,
+        "displayName": "CtaButton",
+        "linkedNodes": {}
+      },
+      "f1BtnOutline": {
+        "type": { "resolvedName": "CtaButton" },
+        "nodes": [],
+        "props": {
+          "text": "Get in touch",
+          "href": "#contact",
+          "variant": "outline",
+          "size": "md",
+          "align": "left",
+          "fullWidth": false,
+          "background": "#0f172a",
+          "textColor": "#ffffff",
+          "borderRadius": 999,
+          "customId": ""
+        },
+        "custom": {},
+        "hidden": false,
+        "parent": "f1Buttons",
+        "isCanvas": false,
+        "displayName": "CtaButton",
+        "linkedNodes": {}
+      },
+      "f1Stats": {
+        "type": { "resolvedName": "Container" },
+        "nodes": ["f1Stat1", "f1Stat2", "f1Stat3"],
+        "props": {
+          "background": "transparent",
+          "padding": 24,
+          "maxWidth": 0,
+          "marginTop": 24,
+          "marginBottom": 0,
+          "customId": "",
+          "boxModel": { "padding": { "top": 32, "right": 0, "bottom": 0, "left": 0 } }
+        },
+        "custom": { "displayName": "Stats row" },
+        "hidden": false,
+        "parent": "f1HeroLeft",
+        "isCanvas": true,
+        "displayName": "Container",
+        "linkedNodes": {}
+      },
+      "f1Stat1": {
+        "type": { "resolvedName": "Container" },
+        "nodes": ["f1Stat1N", "f1Stat1L"],
+        "props": {
+          "background": "transparent",
+          "padding": 0,
+          "maxWidth": 0,
+          "marginTop": 0,
+          "marginBottom": 0,
+          "customId": "",
+          "boxModel": { "padding": { "top": 0, "right": 16, "bottom": 0, "left": 0 } }
+        },
+        "custom": { "displayName": "Stat — 34+ projects" },
+        "hidden": false,
+        "parent": "f1Stats",
+        "isCanvas": true,
+        "displayName": "Container",
+        "linkedNodes": {}
+      },
+      "f1Stat1N": {
+        "type": { "resolvedName": "Heading" },
+        "nodes": [],
+        "props": {
+          "text": "34+",
+          "level": "h3",
+          "color": "#0f172a",
+          "align": "left",
+          "fontWeight": 700,
+          "letterSpacing": -0.5,
+          "customId": ""
+        },
+        "custom": {},
+        "hidden": false,
+        "parent": "f1Stat1",
+        "isCanvas": false,
+        "displayName": "Heading",
+        "linkedNodes": {}
+      },
+      "f1Stat1L": {
+        "type": { "resolvedName": "Text" },
+        "nodes": [],
+        "props": {
+          "text": "Projects done",
+          "fontSize": 12,
+          "fontWeight": 400,
+          "lineHeight": 1.5,
+          "color": "#71717a",
+          "align": "left",
+          "italic": false,
+          "customId": ""
+        },
+        "custom": {},
+        "hidden": false,
+        "parent": "f1Stat1",
+        "isCanvas": false,
+        "displayName": "Text",
+        "linkedNodes": {}
+      },
+      "f1Stat2": {
+        "type": { "resolvedName": "Container" },
+        "nodes": ["f1Stat2N", "f1Stat2L"],
+        "props": {
+          "background": "transparent",
+          "padding": 0,
+          "maxWidth": 0,
+          "marginTop": 0,
+          "marginBottom": 0,
+          "customId": "",
+          "boxModel": { "padding": { "top": 0, "right": 16, "bottom": 0, "left": 0 } }
+        },
+        "custom": { "displayName": "Stat — 21+ clients" },
+        "hidden": false,
+        "parent": "f1Stats",
+        "isCanvas": true,
+        "displayName": "Container",
+        "linkedNodes": {}
+      },
+      "f1Stat2N": {
+        "type": { "resolvedName": "Heading" },
+        "nodes": [],
+        "props": {
+          "text": "21+",
+          "level": "h3",
+          "color": "#0f172a",
+          "align": "left",
+          "fontWeight": 700,
+          "letterSpacing": -0.5,
+          "customId": ""
+        },
+        "custom": {},
+        "hidden": false,
+        "parent": "f1Stat2",
+        "isCanvas": false,
+        "displayName": "Heading",
+        "linkedNodes": {}
+      },
+      "f1Stat2L": {
+        "type": { "resolvedName": "Text" },
+        "nodes": [],
+        "props": {
+          "text": "Happy clients",
+          "fontSize": 12,
+          "fontWeight": 400,
+          "lineHeight": 1.5,
+          "color": "#71717a",
+          "align": "left",
+          "italic": false,
+          "customId": ""
+        },
+        "custom": {},
+        "hidden": false,
+        "parent": "f1Stat2",
+        "isCanvas": false,
+        "displayName": "Text",
+        "linkedNodes": {}
+      },
+      "f1Stat3": {
+        "type": { "resolvedName": "Container" },
+        "nodes": ["f1Stat3N", "f1Stat3L"],
+        "props": {
+          "background": "transparent",
+          "padding": 0,
+          "maxWidth": 0,
+          "marginTop": 0,
+          "marginBottom": 0,
+          "customId": "",
+          "boxModel": { "padding": { "top": 0, "right": 16, "bottom": 0, "left": 0 } }
+        },
+        "custom": { "displayName": "Stat — 5y experience" },
+        "hidden": false,
+        "parent": "f1Stats",
+        "isCanvas": true,
+        "displayName": "Container",
+        "linkedNodes": {}
+      },
+      "f1Stat3N": {
+        "type": { "resolvedName": "Heading" },
+        "nodes": [],
+        "props": {
+          "text": "5y",
+          "level": "h3",
+          "color": "#0f172a",
+          "align": "left",
+          "fontWeight": 700,
+          "letterSpacing": -0.5,
+          "customId": ""
+        },
+        "custom": {},
+        "hidden": false,
+        "parent": "f1Stat3",
+        "isCanvas": false,
+        "displayName": "Heading",
+        "linkedNodes": {}
+      },
+      "f1Stat3L": {
+        "type": { "resolvedName": "Text" },
+        "nodes": [],
+        "props": {
+          "text": "Experience",
+          "fontSize": 12,
+          "fontWeight": 400,
+          "lineHeight": 1.5,
+          "color": "#71717a",
+          "align": "left",
+          "italic": false,
+          "customId": ""
+        },
+        "custom": {},
+        "hidden": false,
+        "parent": "f1Stat3",
+        "isCanvas": false,
+        "displayName": "Text",
+        "linkedNodes": {}
+      },
+      "f1Photo": {
+        "type": { "resolvedName": "ImageBlock" },
+        "nodes": [],
+        "props": {
+          "src": "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=800&q=80",
+          "alt": "Eliott — Freelance UI/UX Designer",
+          "height": 420,
+          "width": 100,
+          "rounded": true,
+          "borderRadius": 24,
+          "objectFit": "cover",
+          "align": "right",
+          "customId": ""
+        },
+        "custom": {},
+        "hidden": false,
+        "parent": "f1HeroRight",
+        "isCanvas": false,
+        "displayName": "ImageBlock",
+        "linkedNodes": {}
+      },
+      "f2ServicesSection": {
+        "type": { "resolvedName": "Section" },
+        "nodes": ["f2Heading", "f2Grid"],
+        "props": {
+          "background": "#fafafa",
+          "paddingY": 96,
+          "maxWidth": 1152,
+          "customId": "services"
+        },
+        "custom": {},
+        "hidden": false,
+        "parent": "ROOT",
+        "isCanvas": true,
+        "displayName": "Section",
+        "linkedNodes": {}
+      },
+      "f2Heading": {
+        "type": { "resolvedName": "Heading" },
+        "nodes": [],
+        "props": {
+          "text": "Services",
+          "level": "h2",
+          "color": "#0f172a",
+          "align": "left",
+          "fontWeight": 700,
+          "letterSpacing": -1,
+          "customId": ""
+        },
+        "custom": {},
+        "hidden": false,
+        "parent": "f2ServicesSection",
+        "isCanvas": false,
+        "displayName": "Heading",
+        "linkedNodes": {}
+      },
+      "f2Grid": {
+        "type": { "resolvedName": "Grid" },
+        "nodes": [],
+        "props": {
+          "columns": 3,
+          "gap": 24,
+          "background": "transparent",
+          "padding": 0,
+          "borderRadius": 0,
+          "customId": ""
+        },
+        "custom": {},
+        "hidden": false,
+        "parent": "f2ServicesSection",
+        "isCanvas": true,
+        "displayName": "Grid",
+        "linkedNodes": {
+          "col-0": "f2Service1",
+          "col-1": "f2Service2",
+          "col-2": "f2Service3"
+        }
+      },
+      "f2Service1": {
+        "type": { "resolvedName": "Card" },
+        "nodes": ["f2Service1Box"],
+        "props": {
+          "title": "UI/UX Design",
+          "body": "From wireframes to polished Figma prototypes. Intuitive, visually compelling interfaces that convert visitors into users and put usability first.",
+          "background": "#ffffff",
+          "padding": 28,
+          "shadow": false,
+          "borderRadius": 16,
+          "customId": ""
+        },
+        "custom": {},
+        "hidden": false,
+        "parent": "f2Grid",
+        "isCanvas": true,
+        "displayName": "Card",
+        "linkedNodes": {}
+      },
+      "f2Service1Box": {
+        "type": { "resolvedName": "IconBox" },
+        "nodes": [],
+        "props": {
+          "icon": "Sparkles",
+          "title": "UI/UX Design",
+          "description": "From wireframes to polished Figma prototypes. Intuitive, visually compelling interfaces that convert visitors into users and put usability first.",
+          "iconColor": "#FF6B2B",
+          "titleColor": "#0f172a",
+          "bodyColor": "#52525b",
+          "iconSize": 28,
+          "align": "left",
+          "customId": ""
+        },
+        "custom": {},
+        "hidden": false,
+        "parent": "f2Service1",
+        "isCanvas": false,
+        "displayName": "IconBox",
+        "linkedNodes": {}
+      },
+      "f2Service2": {
+        "type": { "resolvedName": "Card" },
+        "nodes": ["f2Service2Box"],
+        "props": {
+          "title": "Frontend Dev",
+          "body": "Production-grade code with Tailwind CSS and Alpine.js. Pixel-perfect, fully responsive, SEO-friendly and blazing fast — no bloat, no heavy frameworks.",
+          "background": "#0f172a",
+          "padding": 28,
+          "shadow": false,
+          "borderRadius": 16,
+          "customId": ""
+        },
+        "custom": {},
+        "hidden": false,
+        "parent": "f2Grid",
+        "isCanvas": true,
+        "displayName": "Card",
+        "linkedNodes": {}
+      },
+      "f2Service2Box": {
+        "type": { "resolvedName": "IconBox" },
+        "nodes": [],
+        "props": {
+          "icon": "Code",
+          "title": "Frontend Dev",
+          "description": "Production-grade code with Tailwind CSS and Alpine.js. Pixel-perfect, fully responsive, SEO-friendly and blazing fast — no bloat, no heavy frameworks.",
+          "iconColor": "#FF6B2B",
+          "titleColor": "#ffffff",
+          "bodyColor": "#a1a1aa",
+          "iconSize": 28,
+          "align": "left",
+          "customId": ""
+        },
+        "custom": {},
+        "hidden": false,
+        "parent": "f2Service2",
+        "isCanvas": false,
+        "displayName": "IconBox",
+        "linkedNodes": {}
+      },
+      "f2Service3": {
+        "type": { "resolvedName": "Card" },
+        "nodes": ["f2Service3Box"],
+        "props": {
+          "title": "Landing Pages",
+          "body": "High-converting pages for SaaS, apps and personal brands. Designed to communicate value instantly and drive action from the first scroll.",
+          "background": "#ffffff",
+          "padding": 28,
+          "shadow": false,
+          "borderRadius": 16,
+          "customId": ""
+        },
+        "custom": {},
+        "hidden": false,
+        "parent": "f2Grid",
+        "isCanvas": true,
+        "displayName": "Card",
+        "linkedNodes": {}
+      },
+      "f2Service3Box": {
+        "type": { "resolvedName": "IconBox" },
+        "nodes": [],
+        "props": {
+          "icon": "Target",
+          "title": "Landing Pages",
+          "description": "High-converting pages for SaaS, apps and personal brands. Designed to communicate value instantly and drive action from the first scroll.",
+          "iconColor": "#FF6B2B",
+          "titleColor": "#0f172a",
+          "bodyColor": "#52525b",
+          "iconSize": 28,
+          "align": "left",
+          "customId": ""
+        },
+        "custom": {},
+        "hidden": false,
+        "parent": "f2Service3",
+        "isCanvas": false,
+        "displayName": "IconBox",
+        "linkedNodes": {}
+      },
+      "f3WorkSection": {
+        "type": { "resolvedName": "Section" },
+        "nodes": ["f3Header", "f3Grid"],
+        "props": {
+          "background": "#ffffff",
+          "paddingY": 96,
+          "maxWidth": 1152,
+          "customId": "work"
+        },
+        "custom": {},
+        "hidden": false,
+        "parent": "ROOT",
+        "isCanvas": true,
+        "displayName": "Section",
+        "linkedNodes": {}
+      },
+      "f3Header": {
+        "type": { "resolvedName": "Container" },
+        "nodes": ["f3Heading", "f3AllLink"],
+        "props": {
+          "background": "transparent",
+          "padding": 0,
+          "maxWidth": 0,
+          "marginTop": 0,
+          "marginBottom": 24,
+          "customId": "",
+          "boxModel": { "padding": { "top": 0, "right": 0, "bottom": 32, "left": 0 } }
+        },
+        "custom": { "displayName": "Work header" },
+        "hidden": false,
+        "parent": "f3WorkSection",
+        "isCanvas": true,
+        "displayName": "Container",
+        "linkedNodes": {}
+      },
+      "f3Heading": {
+        "type": { "resolvedName": "Heading" },
+        "nodes": [],
+        "props": {
+          "text": "Selected work",
+          "level": "h2",
+          "color": "#0f172a",
+          "align": "left",
+          "fontWeight": 700,
+          "letterSpacing": -1,
+          "customId": ""
+        },
+        "custom": {},
+        "hidden": false,
+        "parent": "f3Header",
+        "isCanvas": false,
+        "displayName": "Heading",
+        "linkedNodes": {}
+      },
+      "f3AllLink": {
+        "type": { "resolvedName": "Text" },
+        "nodes": [],
+        "props": {
+          "text": "All projects →",
+          "fontSize": 14,
+          "fontWeight": 500,
+          "lineHeight": 1.5,
+          "color": "#FF6B2B",
+          "align": "left",
+          "italic": false,
+          "customId": ""
+        },
+        "custom": {},
+        "hidden": false,
+        "parent": "f3Header",
+        "isCanvas": false,
+        "displayName": "Text",
+        "linkedNodes": {}
+      },
+      "f3Grid": {
+        "type": { "resolvedName": "Grid" },
+        "nodes": [],
+        "props": {
+          "columns": 3,
+          "gap": 24,
+          "background": "transparent",
+          "padding": 0,
+          "borderRadius": 0,
+          "customId": ""
+        },
+        "custom": {},
+        "hidden": false,
+        "parent": "f3WorkSection",
+        "isCanvas": true,
+        "displayName": "Grid",
+        "linkedNodes": {
+          "col-0": "f3Project1",
+          "col-1": "f3Project2",
+          "col-2": "f3Project3"
+        }
+      },
+      "f3Project1": {
+        "type": { "resolvedName": "Card" },
+        "nodes": ["f3Project1Img", "f3Project1Tags", "f3Project1Title", "f3Project1Desc", "f3Project1Link"],
+        "props": {
+          "title": "",
+          "body": "",
+          "background": "#ffffff",
+          "padding": 0,
+          "shadow": false,
+          "borderRadius": 16,
+          "customId": ""
+        },
+        "custom": {},
+        "hidden": false,
+        "parent": "f3Grid",
+        "isCanvas": true,
+        "displayName": "Card",
+        "linkedNodes": {}
+      },
+      "f3Project1Img": {
+        "type": { "resolvedName": "ImageBlock" },
+        "nodes": [],
+        "props": {
+          "src": "https://images.unsplash.com/photo-1551650975-87deedd944c3?w=900&q=80",
+          "alt": "Novu — SaaS Dashboard",
+          "height": 220,
+          "width": 100,
+          "rounded": false,
+          "borderRadius": 0,
+          "objectFit": "cover",
+          "align": "center",
+          "customId": ""
+        },
+        "custom": {},
+        "hidden": false,
+        "parent": "f3Project1",
+        "isCanvas": false,
+        "displayName": "ImageBlock",
+        "linkedNodes": {}
+      },
+      "f3Project1Tags": {
+        "type": { "resolvedName": "Container" },
+        "nodes": ["f3Project1TagA", "f3Project1TagB", "f3Project1TagC"],
+        "props": {
+          "background": "transparent",
+          "padding": 0,
+          "maxWidth": 0,
+          "marginTop": 0,
+          "marginBottom": 0,
+          "customId": "",
+          "boxModel": { "padding": { "top": 16, "right": 24, "bottom": 8, "left": 24 } }
+        },
+        "custom": { "displayName": "Project 1 tags" },
+        "hidden": false,
+        "parent": "f3Project1",
+        "isCanvas": true,
+        "displayName": "Container",
+        "linkedNodes": {}
+      },
+      "f3Project1TagA": {
+        "type": { "resolvedName": "Badge" },
+        "nodes": [],
+        "props": {
+          "text": "SaaS",
+          "background": "#fff1e8",
+          "textColor": "#FF6B2B",
+          "size": "sm",
+          "customId": ""
+        },
+        "custom": {},
+        "hidden": false,
+        "parent": "f3Project1Tags",
+        "isCanvas": false,
+        "displayName": "Badge",
+        "linkedNodes": {}
+      },
+      "f3Project1TagB": {
+        "type": { "resolvedName": "Badge" },
+        "nodes": [],
+        "props": {
+          "text": "Figma",
+          "background": "#f4f4f5",
+          "textColor": "#52525b",
+          "size": "sm",
+          "customId": ""
+        },
+        "custom": {},
+        "hidden": false,
+        "parent": "f3Project1Tags",
+        "isCanvas": false,
+        "displayName": "Badge",
+        "linkedNodes": {}
+      },
+      "f3Project1TagC": {
+        "type": { "resolvedName": "Badge" },
+        "nodes": [],
+        "props": {
+          "text": "Tailwind",
+          "background": "#f4f4f5",
+          "textColor": "#52525b",
+          "size": "sm",
+          "customId": ""
+        },
+        "custom": {},
+        "hidden": false,
+        "parent": "f3Project1Tags",
+        "isCanvas": false,
+        "displayName": "Badge",
+        "linkedNodes": {}
+      },
+      "f3Project1Title": {
+        "type": { "resolvedName": "Heading" },
+        "nodes": [],
+        "props": {
+          "text": "Novu — SaaS Dashboard",
+          "level": "h3",
+          "color": "#0f172a",
+          "align": "left",
+          "fontWeight": 700,
+          "letterSpacing": -0.5,
+          "customId": ""
+        },
+        "custom": {},
+        "hidden": false,
+        "parent": "f3Project1",
+        "isCanvas": false,
+        "displayName": "Heading",
+        "linkedNodes": {}
+      },
+      "f3Project1Desc": {
+        "type": { "resolvedName": "Text" },
+        "nodes": [],
+        "props": {
+          "text": "Complete redesign of a B2B notification platform. Reduced cognitive load by 40% and improved trial-to-paid conversion.",
+          "fontSize": 14,
+          "fontWeight": 400,
+          "lineHeight": 1.6,
+          "color": "#52525b",
+          "align": "left",
+          "italic": false,
+          "customId": ""
+        },
+        "custom": {},
+        "hidden": false,
+        "parent": "f3Project1",
+        "isCanvas": false,
+        "displayName": "Text",
+        "linkedNodes": {}
+      },
+      "f3Project1Link": {
+        "type": { "resolvedName": "CtaButton" },
+        "nodes": [],
+        "props": {
+          "text": "View case study →",
+          "href": "#",
+          "variant": "ghost",
+          "size": "sm",
+          "align": "left",
+          "fullWidth": false,
+          "background": "#0f172a",
+          "textColor": "#ffffff",
+          "borderRadius": 8,
+          "customId": ""
+        },
+        "custom": {},
+        "hidden": false,
+        "parent": "f3Project1",
+        "isCanvas": false,
+        "displayName": "CtaButton",
+        "linkedNodes": {}
+      },
+      "f3Project2": {
+        "type": { "resolvedName": "Card" },
+        "nodes": ["f3Project2Img", "f3Project2Tags", "f3Project2Title", "f3Project2Desc", "f3Project2Link"],
+        "props": {
+          "title": "",
+          "body": "",
+          "background": "#ffffff",
+          "padding": 0,
+          "shadow": false,
+          "borderRadius": 16,
+          "customId": ""
+        },
+        "custom": {},
+        "hidden": false,
+        "parent": "f3Grid",
+        "isCanvas": true,
+        "displayName": "Card",
+        "linkedNodes": {}
+      },
+      "f3Project2Img": {
+        "type": { "resolvedName": "ImageBlock" },
+        "nodes": [],
+        "props": {
+          "src": "https://images.unsplash.com/photo-1460925895917-afdab827c52f?w=800&q=80",
+          "alt": "Finlo — Fintech App",
+          "height": 220,
+          "width": 100,
+          "rounded": false,
+          "borderRadius": 0,
+          "objectFit": "cover",
+          "align": "center",
+          "customId": ""
+        },
+        "custom": {},
+        "hidden": false,
+        "parent": "f3Project2",
+        "isCanvas": false,
+        "displayName": "ImageBlock",
+        "linkedNodes": {}
+      },
+      "f3Project2Tags": {
+        "type": { "resolvedName": "Container" },
+        "nodes": ["f3Project2TagA", "f3Project2TagB"],
+        "props": {
+          "background": "transparent",
+          "padding": 0,
+          "maxWidth": 0,
+          "marginTop": 0,
+          "marginBottom": 0,
+          "customId": "",
+          "boxModel": { "padding": { "top": 16, "right": 24, "bottom": 8, "left": 24 } }
+        },
+        "custom": { "displayName": "Project 2 tags" },
+        "hidden": false,
+        "parent": "f3Project2",
+        "isCanvas": true,
+        "displayName": "Container",
+        "linkedNodes": {}
+      },
+      "f3Project2TagA": {
+        "type": { "resolvedName": "Badge" },
+        "nodes": [],
+        "props": {
+          "text": "Fintech",
+          "background": "#fff1e8",
+          "textColor": "#FF6B2B",
+          "size": "sm",
+          "customId": ""
+        },
+        "custom": {},
+        "hidden": false,
+        "parent": "f3Project2Tags",
+        "isCanvas": false,
+        "displayName": "Badge",
+        "linkedNodes": {}
+      },
+      "f3Project2TagB": {
+        "type": { "resolvedName": "Badge" },
+        "nodes": [],
+        "props": {
+          "text": "Landing page",
+          "background": "#f4f4f5",
+          "textColor": "#52525b",
+          "size": "sm",
+          "customId": ""
+        },
+        "custom": {},
+        "hidden": false,
+        "parent": "f3Project2Tags",
+        "isCanvas": false,
+        "displayName": "Badge",
+        "linkedNodes": {}
+      },
+      "f3Project2Title": {
+        "type": { "resolvedName": "Heading" },
+        "nodes": [],
+        "props": {
+          "text": "Finlo — Fintech App",
+          "level": "h3",
+          "color": "#0f172a",
+          "align": "left",
+          "fontWeight": 700,
+          "letterSpacing": -0.5,
+          "customId": ""
+        },
+        "custom": {},
+        "hidden": false,
+        "parent": "f3Project2",
+        "isCanvas": false,
+        "displayName": "Heading",
+        "linkedNodes": {}
+      },
+      "f3Project2Desc": {
+        "type": { "resolvedName": "Text" },
+        "nodes": [],
+        "props": {
+          "text": "Marketing site and onboarding flow for a personal finance app targeting young professionals. Tailwind CSS + Alpine.js.",
+          "fontSize": 14,
+          "fontWeight": 400,
+          "lineHeight": 1.6,
+          "color": "#52525b",
+          "align": "left",
+          "italic": false,
+          "customId": ""
+        },
+        "custom": {},
+        "hidden": false,
+        "parent": "f3Project2",
+        "isCanvas": false,
+        "displayName": "Text",
+        "linkedNodes": {}
+      },
+      "f3Project2Link": {
+        "type": { "resolvedName": "CtaButton" },
+        "nodes": [],
+        "props": {
+          "text": "View case study →",
+          "href": "#",
+          "variant": "ghost",
+          "size": "sm",
+          "align": "left",
+          "fullWidth": false,
+          "background": "#0f172a",
+          "textColor": "#ffffff",
+          "borderRadius": 8,
+          "customId": ""
+        },
+        "custom": {},
+        "hidden": false,
+        "parent": "f3Project2",
+        "isCanvas": false,
+        "displayName": "CtaButton",
+        "linkedNodes": {}
+      },
+      "f3Project3": {
+        "type": { "resolvedName": "Card" },
+        "nodes": ["f3Project3Img", "f3Project3Tags", "f3Project3Title", "f3Project3Desc", "f3Project3Link"],
+        "props": {
+          "title": "",
+          "body": "",
+          "background": "#ffffff",
+          "padding": 0,
+          "shadow": false,
+          "borderRadius": 16,
+          "customId": ""
+        },
+        "custom": {},
+        "hidden": false,
+        "parent": "f3Grid",
+        "isCanvas": true,
+        "displayName": "Card",
+        "linkedNodes": {}
+      },
+      "f3Project3Img": {
+        "type": { "resolvedName": "ImageBlock" },
+        "nodes": [],
+        "props": {
+          "src": "https://images.unsplash.com/photo-1618005182384-a83a8bd57fbe?w=800&q=80",
+          "alt": "Orea — Creative Agency",
+          "height": 220,
+          "width": 100,
+          "rounded": false,
+          "borderRadius": 0,
+          "objectFit": "cover",
+          "align": "center",
+          "customId": ""
+        },
+        "custom": {},
+        "hidden": false,
+        "parent": "f3Project3",
+        "isCanvas": false,
+        "displayName": "ImageBlock",
+        "linkedNodes": {}
+      },
+      "f3Project3Tags": {
+        "type": { "resolvedName": "Container" },
+        "nodes": ["f3Project3TagA", "f3Project3TagB"],
+        "props": {
+          "background": "transparent",
+          "padding": 0,
+          "maxWidth": 0,
+          "marginTop": 0,
+          "marginBottom": 0,
+          "customId": "",
+          "boxModel": { "padding": { "top": 16, "right": 24, "bottom": 8, "left": 24 } }
+        },
+        "custom": { "displayName": "Project 3 tags" },
+        "hidden": false,
+        "parent": "f3Project3",
+        "isCanvas": true,
+        "displayName": "Container",
+        "linkedNodes": {}
+      },
+      "f3Project3TagA": {
+        "type": { "resolvedName": "Badge" },
+        "nodes": [],
+        "props": {
+          "text": "Agency",
+          "background": "#fff1e8",
+          "textColor": "#FF6B2B",
+          "size": "sm",
+          "customId": ""
+        },
+        "custom": {},
+        "hidden": false,
+        "parent": "f3Project3Tags",
+        "isCanvas": false,
+        "displayName": "Badge",
+        "linkedNodes": {}
+      },
+      "f3Project3TagB": {
+        "type": { "resolvedName": "Badge" },
+        "nodes": [],
+        "props": {
+          "text": "Animation",
+          "background": "#f4f4f5",
+          "textColor": "#52525b",
+          "size": "sm",
+          "customId": ""
+        },
+        "custom": {},
+        "hidden": false,
+        "parent": "f3Project3Tags",
+        "isCanvas": false,
+        "displayName": "Badge",
+        "linkedNodes": {}
+      },
+      "f3Project3Title": {
+        "type": { "resolvedName": "Heading" },
+        "nodes": [],
+        "props": {
+          "text": "Orea — Creative Agency",
+          "level": "h3",
+          "color": "#0f172a",
+          "align": "left",
+          "fontWeight": 700,
+          "letterSpacing": -0.5,
+          "customId": ""
+        },
+        "custom": {},
+        "hidden": false,
+        "parent": "f3Project3",
+        "isCanvas": false,
+        "displayName": "Heading",
+        "linkedNodes": {}
+      },
+      "f3Project3Desc": {
+        "type": { "resolvedName": "Text" },
+        "nodes": [],
+        "props": {
+          "text": "Bold editorial site for a Paris-based branding studio. Scroll-driven animations and custom cursor to match their premium positioning.",
+          "fontSize": 14,
+          "fontWeight": 400,
+          "lineHeight": 1.6,
+          "color": "#52525b",
+          "align": "left",
+          "italic": false,
+          "customId": ""
+        },
+        "custom": {},
+        "hidden": false,
+        "parent": "f3Project3",
+        "isCanvas": false,
+        "displayName": "Text",
+        "linkedNodes": {}
+      },
+      "f3Project3Link": {
+        "type": { "resolvedName": "CtaButton" },
+        "nodes": [],
+        "props": {
+          "text": "View case study →",
+          "href": "#",
+          "variant": "ghost",
+          "size": "sm",
+          "align": "left",
+          "fullWidth": false,
+          "background": "#0f172a",
+          "textColor": "#ffffff",
+          "borderRadius": 8,
+          "customId": ""
+        },
+        "custom": {},
+        "hidden": false,
+        "parent": "f3Project3",
+        "isCanvas": false,
+        "displayName": "CtaButton",
+        "linkedNodes": {}
+      },
+      "f4AboutSection": {
+        "type": { "resolvedName": "Section" },
+        "nodes": ["f4Grid"],
+        "props": {
+          "background": "#fafafa",
+          "paddingY": 96,
+          "maxWidth": 1152,
+          "customId": "about"
+        },
+        "custom": {},
+        "hidden": false,
+        "parent": "ROOT",
+        "isCanvas": true,
+        "displayName": "Section",
+        "linkedNodes": {}
+      },
+      "f4Grid": {
+        "type": { "resolvedName": "Grid" },
+        "nodes": [],
+        "props": {
+          "columns": 2,
+          "gap": 48,
+          "background": "transparent",
+          "padding": 0,
+          "borderRadius": 0,
+          "customId": ""
+        },
+        "custom": {},
+        "hidden": false,
+        "parent": "f4AboutSection",
+        "isCanvas": true,
+        "displayName": "Grid",
+        "linkedNodes": {
+          "col-0": "f4PhotoCol",
+          "col-1": "f4BioCol"
+        }
+      },
+      "f4PhotoCol": {
+        "type": { "resolvedName": "Container" },
+        "nodes": ["f4Photo"],
+        "props": {
+          "background": "transparent",
+          "padding": 0,
+          "maxWidth": 0,
+          "marginTop": 0,
+          "marginBottom": 0,
+          "customId": "",
+          "boxModel": { "padding": { "top": 0, "right": 0, "bottom": 0, "left": 0 } }
+        },
+        "custom": { "displayName": "About photo column" },
+        "hidden": false,
+        "parent": "f4Grid",
+        "isCanvas": true,
+        "displayName": "Container",
+        "linkedNodes": {}
+      },
+      "f4Photo": {
+        "type": { "resolvedName": "ImageBlock" },
+        "nodes": [],
+        "props": {
+          "src": "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=700&q=80",
+          "alt": "Eliott",
+          "height": 460,
+          "width": 90,
+          "rounded": true,
+          "borderRadius": 24,
+          "objectFit": "cover",
+          "align": "left",
+          "customId": ""
+        },
+        "custom": {},
+        "hidden": false,
+        "parent": "f4PhotoCol",
+        "isCanvas": false,
+        "displayName": "ImageBlock",
+        "linkedNodes": {}
+      },
+      "f4BioCol": {
+        "type": { "resolvedName": "Container" },
+        "nodes": ["f4BioLabel", "f4BioHeading", "f4BioPara1", "f4BioPara2", "f4SkillsLabel", "f4Skills"],
+        "props": {
+          "background": "transparent",
+          "padding": 0,
+          "maxWidth": 0,
+          "marginTop": 0,
+          "marginBottom": 0,
+          "customId": "",
+          "boxModel": { "padding": { "top": 0, "right": 0, "bottom": 0, "left": 0 } }
+        },
+        "custom": { "displayName": "About bio column" },
+        "hidden": false,
+        "parent": "f4Grid",
+        "isCanvas": true,
+        "displayName": "Container",
+        "linkedNodes": {}
+      },
+      "f4BioLabel": {
+        "type": { "resolvedName": "Text" },
+        "nodes": [],
+        "props": {
+          "text": "ABOUT ME",
+          "fontSize": 12,
+          "fontWeight": 500,
+          "lineHeight": 1.4,
+          "color": "#FF6B2B",
+          "align": "left",
+          "italic": false,
+          "customId": ""
+        },
+        "custom": {},
+        "hidden": false,
+        "parent": "f4BioCol",
+        "isCanvas": false,
+        "displayName": "Text",
+        "linkedNodes": {}
+      },
+      "f4BioHeading": {
+        "type": { "resolvedName": "Heading" },
+        "nodes": [],
+        "props": {
+          "text": "A bit about who I am",
+          "level": "h2",
+          "color": "#0f172a",
+          "align": "left",
+          "fontWeight": 700,
+          "letterSpacing": -1,
+          "customId": ""
+        },
+        "custom": {},
+        "hidden": false,
+        "parent": "f4BioCol",
+        "isCanvas": false,
+        "displayName": "Heading",
+        "linkedNodes": {}
+      },
+      "f4BioPara1": {
+        "type": { "resolvedName": "Text" },
+        "nodes": [],
+        "props": {
+          "text": "I'm Eliott, a freelance designer and frontend developer based in Paris with 5 years of experience shipping digital products for startups, agencies, and scale-ups across Europe. I thrive at the intersection of great design and clean code.",
+          "fontSize": 16,
+          "fontWeight": 400,
+          "lineHeight": 1.7,
+          "color": "#52525b",
+          "align": "left",
+          "italic": false,
+          "customId": ""
+        },
+        "custom": {},
+        "hidden": false,
+        "parent": "f4BioCol",
+        "isCanvas": false,
+        "displayName": "Text",
+        "linkedNodes": {}
+      },
+      "f4BioPara2": {
+        "type": { "resolvedName": "Text" },
+        "nodes": [],
+        "props": {
+          "text": "I believe great interfaces are invisible — they get out of the user's way. My work is fast, accessible and built to last. When I'm not coding, you'll find me hiking or hunting for a good espresso.",
+          "fontSize": 16,
+          "fontWeight": 400,
+          "lineHeight": 1.7,
+          "color": "#52525b",
+          "align": "left",
+          "italic": false,
+          "customId": ""
+        },
+        "custom": {},
+        "hidden": false,
+        "parent": "f4BioCol",
+        "isCanvas": false,
+        "displayName": "Text",
+        "linkedNodes": {}
+      },
+      "f4SkillsLabel": {
+        "type": { "resolvedName": "Text" },
+        "nodes": [],
+        "props": {
+          "text": "STACK & TOOLS",
+          "fontSize": 12,
+          "fontWeight": 500,
+          "lineHeight": 1.4,
+          "color": "#71717a",
+          "align": "left",
+          "italic": false,
+          "customId": ""
+        },
+        "custom": {},
+        "hidden": false,
+        "parent": "f4BioCol",
+        "isCanvas": false,
+        "displayName": "Text",
+        "linkedNodes": {}
+      },
+      "f4Skills": {
+        "type": { "resolvedName": "List" },
+        "nodes": [],
+        "props": {
+          "items": "Tailwind CSS\nAlpine.js\nFigma\nHTML / CSS\nJavaScript\nSymfony\nFramer\nWebflow",
+          "ordered": false,
+          "spacing": 8,
+          "fontSize": 14,
+          "color": "#3f3f46",
+          "customId": ""
+        },
+        "custom": {},
+        "hidden": false,
+        "parent": "f4BioCol",
+        "isCanvas": false,
+        "displayName": "List",
+        "linkedNodes": {}
+      },
+      "f5ReviewsSection": {
+        "type": { "resolvedName": "Section" },
+        "nodes": ["f5Heading", "f5Grid"],
+        "props": {
+          "background": "#ffffff",
+          "paddingY": 96,
+          "maxWidth": 1152,
+          "customId": "reviews"
+        },
+        "custom": {},
+        "hidden": false,
+        "parent": "ROOT",
+        "isCanvas": true,
+        "displayName": "Section",
+        "linkedNodes": {}
+      },
+      "f5Heading": {
+        "type": { "resolvedName": "Container" },
+        "nodes": ["f5Label", "f5Title"],
+        "props": {
+          "background": "transparent",
+          "padding": 0,
+          "maxWidth": 0,
+          "marginTop": 0,
+          "marginBottom": 32,
+          "customId": "",
+          "boxModel": { "padding": { "top": 0, "right": 0, "bottom": 32, "left": 0 } }
+        },
+        "custom": { "displayName": "Reviews header" },
+        "hidden": false,
+        "parent": "f5ReviewsSection",
+        "isCanvas": true,
+        "displayName": "Container",
+        "linkedNodes": {}
+      },
+      "f5Label": {
+        "type": { "resolvedName": "Text" },
+        "nodes": [],
+        "props": {
+          "text": "SOCIAL PROOF",
+          "fontSize": 12,
+          "fontWeight": 500,
+          "lineHeight": 1.4,
+          "color": "#FF6B2B",
+          "align": "left",
+          "italic": false,
+          "customId": ""
+        },
+        "custom": {},
+        "hidden": false,
+        "parent": "f5Heading",
+        "isCanvas": false,
+        "displayName": "Text",
+        "linkedNodes": {}
+      },
+      "f5Title": {
+        "type": { "resolvedName": "Heading" },
+        "nodes": [],
+        "props": {
+          "text": "What clients say",
+          "level": "h2",
+          "color": "#0f172a",
+          "align": "left",
+          "fontWeight": 700,
+          "letterSpacing": -1,
+          "customId": ""
+        },
+        "custom": {},
+        "hidden": false,
+        "parent": "f5Heading",
+        "isCanvas": false,
+        "displayName": "Heading",
+        "linkedNodes": {}
+      },
+      "f5Grid": {
+        "type": { "resolvedName": "Grid" },
+        "nodes": [],
+        "props": {
+          "columns": 3,
+          "gap": 24,
+          "background": "transparent",
+          "padding": 0,
+          "borderRadius": 0,
+          "customId": ""
+        },
+        "custom": {},
+        "hidden": false,
+        "parent": "f5ReviewsSection",
+        "isCanvas": true,
+        "displayName": "Grid",
+        "linkedNodes": {
+          "col-0": "f5Review1",
+          "col-1": "f5Review2",
+          "col-2": "f5Review3"
+        }
+      },
+      "f5Review1": {
+        "type": { "resolvedName": "Card" },
+        "nodes": ["f5Review1Quote", "f5Review1Author"],
+        "props": {
+          "title": "",
+          "body": "",
+          "background": "#fafafa",
+          "padding": 28,
+          "shadow": false,
+          "borderRadius": 16,
+          "customId": ""
+        },
+        "custom": {},
+        "hidden": false,
+        "parent": "f5Grid",
+        "isCanvas": true,
+        "displayName": "Card",
+        "linkedNodes": {}
+      },
+      "f5Review1Quote": {
+        "type": { "resolvedName": "Text" },
+        "nodes": [],
+        "props": {
+          "text": "“Eliott delivered our redesign in record time and the quality blew us away. Our conversion rate jumped 28% in the first month. Absolutely recommend.”",
+          "fontSize": 14,
+          "fontWeight": 400,
+          "lineHeight": 1.7,
+          "color": "#52525b",
+          "align": "left",
+          "italic": true,
+          "customId": ""
+        },
+        "custom": {},
+        "hidden": false,
+        "parent": "f5Review1",
+        "isCanvas": false,
+        "displayName": "Text",
+        "linkedNodes": {}
+      },
+      "f5Review1Author": {
+        "type": { "resolvedName": "Container" },
+        "nodes": ["f5Review1AuthorName", "f5Review1AuthorRole"],
+        "props": {
+          "background": "transparent",
+          "padding": 0,
+          "maxWidth": 0,
+          "marginTop": 16,
+          "marginBottom": 0,
+          "customId": "",
+          "boxModel": { "padding": { "top": 16, "right": 0, "bottom": 0, "left": 0 } }
+        },
+        "custom": { "displayName": "Review 1 author" },
+        "hidden": false,
+        "parent": "f5Review1",
+        "isCanvas": true,
+        "displayName": "Container",
+        "linkedNodes": {}
+      },
+      "f5Review1AuthorName": {
+        "type": { "resolvedName": "Text" },
+        "nodes": [],
+        "props": {
+          "text": "Sarah Müller — CPO, Novu",
+          "fontSize": 13,
+          "fontWeight": 500,
+          "lineHeight": 1.4,
+          "color": "#0f172a",
+          "align": "left",
+          "italic": false,
+          "customId": ""
+        },
+        "custom": {},
+        "hidden": false,
+        "parent": "f5Review1Author",
+        "isCanvas": false,
+        "displayName": "Text",
+        "linkedNodes": {}
+      },
+      "f5Review1AuthorRole": {
+        "type": { "resolvedName": "Text" },
+        "nodes": [],
+        "props": {
+          "text": "★★★★★",
+          "fontSize": 12,
+          "fontWeight": 500,
+          "lineHeight": 1.4,
+          "color": "#FF6B2B",
+          "align": "left",
+          "italic": false,
+          "customId": ""
+        },
+        "custom": {},
+        "hidden": false,
+        "parent": "f5Review1Author",
+        "isCanvas": false,
+        "displayName": "Text",
+        "linkedNodes": {}
+      },
+      "f5Review2": {
+        "type": { "resolvedName": "Card" },
+        "nodes": ["f5Review2Quote", "f5Review2Author"],
+        "props": {
+          "title": "",
+          "body": "",
+          "background": "#0f172a",
+          "padding": 28,
+          "shadow": false,
+          "borderRadius": 16,
+          "customId": ""
+        },
+        "custom": {},
+        "hidden": false,
+        "parent": "f5Grid",
+        "isCanvas": true,
+        "displayName": "Card",
+        "linkedNodes": {}
+      },
+      "f5Review2Quote": {
+        "type": { "resolvedName": "Text" },
+        "nodes": [],
+        "props": {
+          "text": "“Working with Eliott is a dream. He asks the right questions, moves fast, and the final result always exceeds what we imagined. Our best hire of 2024.”",
+          "fontSize": 14,
+          "fontWeight": 400,
+          "lineHeight": 1.7,
+          "color": "#a1a1aa",
+          "align": "left",
+          "italic": true,
+          "customId": ""
+        },
+        "custom": {},
+        "hidden": false,
+        "parent": "f5Review2",
+        "isCanvas": false,
+        "displayName": "Text",
+        "linkedNodes": {}
+      },
+      "f5Review2Author": {
+        "type": { "resolvedName": "Container" },
+        "nodes": ["f5Review2AuthorName", "f5Review2AuthorRole"],
+        "props": {
+          "background": "transparent",
+          "padding": 0,
+          "maxWidth": 0,
+          "marginTop": 16,
+          "marginBottom": 0,
+          "customId": "",
+          "boxModel": { "padding": { "top": 16, "right": 0, "bottom": 0, "left": 0 } }
+        },
+        "custom": { "displayName": "Review 2 author" },
+        "hidden": false,
+        "parent": "f5Review2",
+        "isCanvas": true,
+        "displayName": "Container",
+        "linkedNodes": {}
+      },
+      "f5Review2AuthorName": {
+        "type": { "resolvedName": "Text" },
+        "nodes": [],
+        "props": {
+          "text": "Thomas Renault — Founder, Finlo",
+          "fontSize": 13,
+          "fontWeight": 500,
+          "lineHeight": 1.4,
+          "color": "#ffffff",
+          "align": "left",
+          "italic": false,
+          "customId": ""
+        },
+        "custom": {},
+        "hidden": false,
+        "parent": "f5Review2Author",
+        "isCanvas": false,
+        "displayName": "Text",
+        "linkedNodes": {}
+      },
+      "f5Review2AuthorRole": {
+        "type": { "resolvedName": "Text" },
+        "nodes": [],
+        "props": {
+          "text": "★★★★★",
+          "fontSize": 12,
+          "fontWeight": 500,
+          "lineHeight": 1.4,
+          "color": "#FF6B2B",
+          "align": "left",
+          "italic": false,
+          "customId": ""
+        },
+        "custom": {},
+        "hidden": false,
+        "parent": "f5Review2Author",
+        "isCanvas": false,
+        "displayName": "Text",
+        "linkedNodes": {}
+      },
+      "f5Review3": {
+        "type": { "resolvedName": "Card" },
+        "nodes": ["f5Review3Quote", "f5Review3Author"],
+        "props": {
+          "title": "",
+          "body": "",
+          "background": "#fafafa",
+          "padding": 28,
+          "shadow": false,
+          "borderRadius": 16,
+          "customId": ""
+        },
+        "custom": {},
+        "hidden": false,
+        "parent": "f5Grid",
+        "isCanvas": true,
+        "displayName": "Card",
+        "linkedNodes": {}
+      },
+      "f5Review3Quote": {
+        "type": { "resolvedName": "Text" },
+        "nodes": [],
+        "props": {
+          "text": "“We had a tight deadline and a vague brief. Eliott turned both into a polished site in under two weeks. Clean code, zero hand-holding needed.”",
+          "fontSize": 14,
+          "fontWeight": 400,
+          "lineHeight": 1.7,
+          "color": "#52525b",
+          "align": "left",
+          "italic": true,
+          "customId": ""
+        },
+        "custom": {},
+        "hidden": false,
+        "parent": "f5Review3",
+        "isCanvas": false,
+        "displayName": "Text",
+        "linkedNodes": {}
+      },
+      "f5Review3Author": {
+        "type": { "resolvedName": "Container" },
+        "nodes": ["f5Review3AuthorName", "f5Review3AuthorRole"],
+        "props": {
+          "background": "transparent",
+          "padding": 0,
+          "maxWidth": 0,
+          "marginTop": 16,
+          "marginBottom": 0,
+          "customId": "",
+          "boxModel": { "padding": { "top": 16, "right": 0, "bottom": 0, "left": 0 } }
+        },
+        "custom": { "displayName": "Review 3 author" },
+        "hidden": false,
+        "parent": "f5Review3",
+        "isCanvas": true,
+        "displayName": "Container",
+        "linkedNodes": {}
+      },
+      "f5Review3AuthorName": {
+        "type": { "resolvedName": "Text" },
+        "nodes": [],
+        "props": {
+          "text": "Camille Dufresne — Creative Director, Orea",
+          "fontSize": 13,
+          "fontWeight": 500,
+          "lineHeight": 1.4,
+          "color": "#0f172a",
+          "align": "left",
+          "italic": false,
+          "customId": ""
+        },
+        "custom": {},
+        "hidden": false,
+        "parent": "f5Review3Author",
+        "isCanvas": false,
+        "displayName": "Text",
+        "linkedNodes": {}
+      },
+      "f5Review3AuthorRole": {
+        "type": { "resolvedName": "Text" },
+        "nodes": [],
+        "props": {
+          "text": "★★★★★",
+          "fontSize": 12,
+          "fontWeight": 500,
+          "lineHeight": 1.4,
+          "color": "#FF6B2B",
+          "align": "left",
+          "italic": false,
+          "customId": ""
+        },
+        "custom": {},
+        "hidden": false,
+        "parent": "f5Review3Author",
+        "isCanvas": false,
+        "displayName": "Text",
+        "linkedNodes": {}
+      },
+      "f6BlogSection": {
+        "type": { "resolvedName": "Section" },
+        "nodes": ["f6Header", "f6Grid"],
+        "props": {
+          "background": "#fafafa",
+          "paddingY": 96,
+          "maxWidth": 1152,
+          "customId": "blog"
+        },
+        "custom": {},
+        "hidden": false,
+        "parent": "ROOT",
+        "isCanvas": true,
+        "displayName": "Section",
+        "linkedNodes": {}
+      },
+      "f6Header": {
+        "type": { "resolvedName": "Container" },
+        "nodes": ["f6Label", "f6Title"],
+        "props": {
+          "background": "transparent",
+          "padding": 0,
+          "maxWidth": 0,
+          "marginTop": 0,
+          "marginBottom": 32,
+          "customId": "",
+          "boxModel": { "padding": { "top": 0, "right": 0, "bottom": 32, "left": 0 } }
+        },
+        "custom": { "displayName": "Blog header" },
+        "hidden": false,
+        "parent": "f6BlogSection",
+        "isCanvas": true,
+        "displayName": "Container",
+        "linkedNodes": {}
+      },
+      "f6Label": {
+        "type": { "resolvedName": "Text" },
+        "nodes": [],
+        "props": {
+          "text": "THOUGHTS",
+          "fontSize": 12,
+          "fontWeight": 500,
+          "lineHeight": 1.4,
+          "color": "#FF6B2B",
+          "align": "left",
+          "italic": false,
+          "customId": ""
+        },
+        "custom": {},
+        "hidden": false,
+        "parent": "f6Header",
+        "isCanvas": false,
+        "displayName": "Text",
+        "linkedNodes": {}
+      },
+      "f6Title": {
+        "type": { "resolvedName": "Heading" },
+        "nodes": [],
+        "props": {
+          "text": "From the blog",
+          "level": "h2",
+          "color": "#0f172a",
+          "align": "left",
+          "fontWeight": 700,
+          "letterSpacing": -1,
+          "customId": ""
+        },
+        "custom": {},
+        "hidden": false,
+        "parent": "f6Header",
+        "isCanvas": false,
+        "displayName": "Heading",
+        "linkedNodes": {}
+      },
+      "f6Grid": {
+        "type": { "resolvedName": "Grid" },
+        "nodes": [],
+        "props": {
+          "columns": 3,
+          "gap": 24,
+          "background": "transparent",
+          "padding": 0,
+          "borderRadius": 0,
+          "customId": ""
+        },
+        "custom": {},
+        "hidden": false,
+        "parent": "f6BlogSection",
+        "isCanvas": true,
+        "displayName": "Grid",
+        "linkedNodes": {
+          "col-0": "f6Post1",
+          "col-1": "f6Post2",
+          "col-2": "f6Post3"
+        }
+      },
+      "f6Post1": {
+        "type": { "resolvedName": "Card" },
+        "nodes": ["f6Post1Img", "f6Post1Meta", "f6Post1Title", "f6Post1Desc", "f6Post1Link"],
+        "props": {
+          "title": "",
+          "body": "",
+          "background": "#ffffff",
+          "padding": 0,
+          "shadow": false,
+          "borderRadius": 16,
+          "customId": ""
+        },
+        "custom": {},
+        "hidden": false,
+        "parent": "f6Grid",
+        "isCanvas": true,
+        "displayName": "Card",
+        "linkedNodes": {}
+      },
+      "f6Post1Img": {
+        "type": { "resolvedName": "ImageBlock" },
+        "nodes": [],
+        "props": {
+          "src": "https://images.unsplash.com/photo-1555066931-4365d14bab8c?w=700&q=80",
+          "alt": "Why I ditched CSS frameworks",
+          "height": 180,
+          "width": 100,
+          "rounded": false,
+          "borderRadius": 0,
+          "objectFit": "cover",
+          "align": "center",
+          "customId": ""
+        },
+        "custom": {},
+        "hidden": false,
+        "parent": "f6Post1",
+        "isCanvas": false,
+        "displayName": "ImageBlock",
+        "linkedNodes": {}
+      },
+      "f6Post1Meta": {
+        "type": { "resolvedName": "Container" },
+        "nodes": ["f6Post1Tag", "f6Post1Date"],
+        "props": {
+          "background": "transparent",
+          "padding": 0,
+          "maxWidth": 0,
+          "marginTop": 0,
+          "marginBottom": 0,
+          "customId": "",
+          "boxModel": { "padding": { "top": 16, "right": 24, "bottom": 8, "left": 24 } }
+        },
+        "custom": { "displayName": "Post 1 meta" },
+        "hidden": false,
+        "parent": "f6Post1",
+        "isCanvas": true,
+        "displayName": "Container",
+        "linkedNodes": {}
+      },
+      "f6Post1Tag": {
+        "type": { "resolvedName": "Badge" },
+        "nodes": [],
+        "props": {
+          "text": "Design",
+          "background": "#fff1e8",
+          "textColor": "#FF6B2B",
+          "size": "sm",
+          "customId": ""
+        },
+        "custom": {},
+        "hidden": false,
+        "parent": "f6Post1Meta",
+        "isCanvas": false,
+        "displayName": "Badge",
+        "linkedNodes": {}
+      },
+      "f6Post1Date": {
+        "type": { "resolvedName": "Text" },
+        "nodes": [],
+        "props": {
+          "text": "Mar 8, 2025",
+          "fontSize": 12,
+          "fontWeight": 400,
+          "lineHeight": 1.4,
+          "color": "#a1a1aa",
+          "align": "left",
+          "italic": false,
+          "customId": ""
+        },
+        "custom": {},
+        "hidden": false,
+        "parent": "f6Post1Meta",
+        "isCanvas": false,
+        "displayName": "Text",
+        "linkedNodes": {}
+      },
+      "f6Post1Title": {
+        "type": { "resolvedName": "Heading" },
+        "nodes": [],
+        "props": {
+          "text": "Why I ditched heavy CSS frameworks for Tailwind",
+          "level": "h3",
+          "color": "#0f172a",
+          "align": "left",
+          "fontWeight": 700,
+          "letterSpacing": -0.5,
+          "customId": ""
+        },
+        "custom": {},
+        "hidden": false,
+        "parent": "f6Post1",
+        "isCanvas": false,
+        "displayName": "Heading",
+        "linkedNodes": {}
+      },
+      "f6Post1Desc": {
+        "type": { "resolvedName": "Text" },
+        "nodes": [],
+        "props": {
+          "text": "After years of fighting specificity wars, here's what finally convinced me to make the switch.",
+          "fontSize": 14,
+          "fontWeight": 400,
+          "lineHeight": 1.6,
+          "color": "#52525b",
+          "align": "left",
+          "italic": false,
+          "customId": ""
+        },
+        "custom": {},
+        "hidden": false,
+        "parent": "f6Post1",
+        "isCanvas": false,
+        "displayName": "Text",
+        "linkedNodes": {}
+      },
+      "f6Post1Link": {
+        "type": { "resolvedName": "CtaButton" },
+        "nodes": [],
+        "props": {
+          "text": "Read more →",
+          "href": "#",
+          "variant": "ghost",
+          "size": "sm",
+          "align": "left",
+          "fullWidth": false,
+          "background": "#0f172a",
+          "textColor": "#ffffff",
+          "borderRadius": 8,
+          "customId": ""
+        },
+        "custom": {},
+        "hidden": false,
+        "parent": "f6Post1",
+        "isCanvas": false,
+        "displayName": "CtaButton",
+        "linkedNodes": {}
+      },
+      "f6Post2": {
+        "type": { "resolvedName": "Card" },
+        "nodes": ["f6Post2Img", "f6Post2Meta", "f6Post2Title", "f6Post2Desc", "f6Post2Link"],
+        "props": {
+          "title": "",
+          "body": "",
+          "background": "#ffffff",
+          "padding": 0,
+          "shadow": false,
+          "borderRadius": 16,
+          "customId": ""
+        },
+        "custom": {},
+        "hidden": false,
+        "parent": "f6Grid",
+        "isCanvas": true,
+        "displayName": "Card",
+        "linkedNodes": {}
+      },
+      "f6Post2Img": {
+        "type": { "resolvedName": "ImageBlock" },
+        "nodes": [],
+        "props": {
+          "src": "https://images.unsplash.com/photo-1581291518633-83b4ebd1d83e?w=700&q=80",
+          "alt": "Design systems",
+          "height": 180,
+          "width": 100,
+          "rounded": false,
+          "borderRadius": 0,
+          "objectFit": "cover",
+          "align": "center",
+          "customId": ""
+        },
+        "custom": {},
+        "hidden": false,
+        "parent": "f6Post2",
+        "isCanvas": false,
+        "displayName": "ImageBlock",
+        "linkedNodes": {}
+      },
+      "f6Post2Meta": {
+        "type": { "resolvedName": "Container" },
+        "nodes": ["f6Post2Tag", "f6Post2Date"],
+        "props": {
+          "background": "transparent",
+          "padding": 0,
+          "maxWidth": 0,
+          "marginTop": 0,
+          "marginBottom": 0,
+          "customId": "",
+          "boxModel": { "padding": { "top": 16, "right": 24, "bottom": 8, "left": 24 } }
+        },
+        "custom": { "displayName": "Post 2 meta" },
+        "hidden": false,
+        "parent": "f6Post2",
+        "isCanvas": true,
+        "displayName": "Container",
+        "linkedNodes": {}
+      },
+      "f6Post2Tag": {
+        "type": { "resolvedName": "Badge" },
+        "nodes": [],
+        "props": {
+          "text": "Dev",
+          "background": "#fff1e8",
+          "textColor": "#FF6B2B",
+          "size": "sm",
+          "customId": ""
+        },
+        "custom": {},
+        "hidden": false,
+        "parent": "f6Post2Meta",
+        "isCanvas": false,
+        "displayName": "Badge",
+        "linkedNodes": {}
+      },
+      "f6Post2Date": {
+        "type": { "resolvedName": "Text" },
+        "nodes": [],
+        "props": {
+          "text": "Feb 21, 2025",
+          "fontSize": 12,
+          "fontWeight": 400,
+          "lineHeight": 1.4,
+          "color": "#a1a1aa",
+          "align": "left",
+          "italic": false,
+          "customId": ""
+        },
+        "custom": {},
+        "hidden": false,
+        "parent": "f6Post2Meta",
+        "isCanvas": false,
+        "displayName": "Text",
+        "linkedNodes": {}
+      },
+      "f6Post2Title": {
+        "type": { "resolvedName": "Heading" },
+        "nodes": [],
+        "props": {
+          "text": "Building a design system from scratch in a weekend",
+          "level": "h3",
+          "color": "#0f172a",
+          "align": "left",
+          "fontWeight": 700,
+          "letterSpacing": -0.5,
+          "customId": ""
+        },
+        "custom": {},
+        "hidden": false,
+        "parent": "f6Post2",
+        "isCanvas": false,
+        "displayName": "Heading",
+        "linkedNodes": {}
+      },
+      "f6Post2Desc": {
+        "type": { "resolvedName": "Text" },
+        "nodes": [],
+        "props": {
+          "text": "Tokens, components, docs — the process I follow to spin up a coherent system in 48 hours.",
+          "fontSize": 14,
+          "fontWeight": 400,
+          "lineHeight": 1.6,
+          "color": "#52525b",
+          "align": "left",
+          "italic": false,
+          "customId": ""
+        },
+        "custom": {},
+        "hidden": false,
+        "parent": "f6Post2",
+        "isCanvas": false,
+        "displayName": "Text",
+        "linkedNodes": {}
+      },
+      "f6Post2Link": {
+        "type": { "resolvedName": "CtaButton" },
+        "nodes": [],
+        "props": {
+          "text": "Read more →",
+          "href": "#",
+          "variant": "ghost",
+          "size": "sm",
+          "align": "left",
+          "fullWidth": false,
+          "background": "#0f172a",
+          "textColor": "#ffffff",
+          "borderRadius": 8,
+          "customId": ""
+        },
+        "custom": {},
+        "hidden": false,
+        "parent": "f6Post2",
+        "isCanvas": false,
+        "displayName": "CtaButton",
+        "linkedNodes": {}
+      },
+      "f6Post3": {
+        "type": { "resolvedName": "Card" },
+        "nodes": ["f6Post3Img", "f6Post3Meta", "f6Post3Title", "f6Post3Desc", "f6Post3Link"],
+        "props": {
+          "title": "",
+          "body": "",
+          "background": "#ffffff",
+          "padding": 0,
+          "shadow": false,
+          "borderRadius": 16,
+          "customId": ""
+        },
+        "custom": {},
+        "hidden": false,
+        "parent": "f6Grid",
+        "isCanvas": true,
+        "displayName": "Card",
+        "linkedNodes": {}
+      },
+      "f6Post3Img": {
+        "type": { "resolvedName": "ImageBlock" },
+        "nodes": [],
+        "props": {
+          "src": "https://images.unsplash.com/photo-1498050108023-c5249f4df085?w=700&q=80",
+          "alt": "Freelance lessons",
+          "height": 180,
+          "width": 100,
+          "rounded": false,
+          "borderRadius": 0,
+          "objectFit": "cover",
+          "align": "center",
+          "customId": ""
+        },
+        "custom": {},
+        "hidden": false,
+        "parent": "f6Post3",
+        "isCanvas": false,
+        "displayName": "ImageBlock",
+        "linkedNodes": {}
+      },
+      "f6Post3Meta": {
+        "type": { "resolvedName": "Container" },
+        "nodes": ["f6Post3Tag", "f6Post3Date"],
+        "props": {
+          "background": "transparent",
+          "padding": 0,
+          "maxWidth": 0,
+          "marginTop": 0,
+          "marginBottom": 0,
+          "customId": "",
+          "boxModel": { "padding": { "top": 16, "right": 24, "bottom": 8, "left": 24 } }
+        },
+        "custom": { "displayName": "Post 3 meta" },
+        "hidden": false,
+        "parent": "f6Post3",
+        "isCanvas": true,
+        "displayName": "Container",
+        "linkedNodes": {}
+      },
+      "f6Post3Tag": {
+        "type": { "resolvedName": "Badge" },
+        "nodes": [],
+        "props": {
+          "text": "Freelance",
+          "background": "#fff1e8",
+          "textColor": "#FF6B2B",
+          "size": "sm",
+          "customId": ""
+        },
+        "custom": {},
+        "hidden": false,
+        "parent": "f6Post3Meta",
+        "isCanvas": false,
+        "displayName": "Badge",
+        "linkedNodes": {}
+      },
+      "f6Post3Date": {
+        "type": { "resolvedName": "Text" },
+        "nodes": [],
+        "props": {
+          "text": "Jan 14, 2025",
+          "fontSize": 12,
+          "fontWeight": 400,
+          "lineHeight": 1.4,
+          "color": "#a1a1aa",
+          "align": "left",
+          "italic": false,
+          "customId": ""
+        },
+        "custom": {},
+        "hidden": false,
+        "parent": "f6Post3Meta",
+        "isCanvas": false,
+        "displayName": "Text",
+        "linkedNodes": {}
+      },
+      "f6Post3Title": {
+        "type": { "resolvedName": "Heading" },
+        "nodes": [],
+        "props": {
+          "text": "5 lessons from my first year of full-time freelancing",
+          "level": "h3",
+          "color": "#0f172a",
+          "align": "left",
+          "fontWeight": 700,
+          "letterSpacing": -0.5,
+          "customId": ""
+        },
+        "custom": {},
+        "hidden": false,
+        "parent": "f6Post3",
+        "isCanvas": false,
+        "displayName": "Heading",
+        "linkedNodes": {}
+      },
+      "f6Post3Desc": {
+        "type": { "resolvedName": "Text" },
+        "nodes": [],
+        "props": {
+          "text": "Contracts, pricing, scope creep — the things nobody tells you before you go solo.",
+          "fontSize": 14,
+          "fontWeight": 400,
+          "lineHeight": 1.6,
+          "color": "#52525b",
+          "align": "left",
+          "italic": false,
+          "customId": ""
+        },
+        "custom": {},
+        "hidden": false,
+        "parent": "f6Post3",
+        "isCanvas": false,
+        "displayName": "Text",
+        "linkedNodes": {}
+      },
+      "f6Post3Link": {
+        "type": { "resolvedName": "CtaButton" },
+        "nodes": [],
+        "props": {
+          "text": "Read more →",
+          "href": "#",
+          "variant": "ghost",
+          "size": "sm",
+          "align": "left",
+          "fullWidth": false,
+          "background": "#0f172a",
+          "textColor": "#ffffff",
+          "borderRadius": 8,
+          "customId": ""
+        },
+        "custom": {},
+        "hidden": false,
+        "parent": "f6Post3",
+        "isCanvas": false,
+        "displayName": "CtaButton",
+        "linkedNodes": {}
+      },
+      "f7ContactSection": {
+        "type": { "resolvedName": "Section" },
+        "nodes": ["f7Card"],
+        "props": {
+          "background": "#ffffff",
+          "paddingY": 96,
+          "maxWidth": 1152,
+          "customId": "contact"
+        },
+        "custom": {},
+        "hidden": false,
+        "parent": "ROOT",
+        "isCanvas": true,
+        "displayName": "Section",
+        "linkedNodes": {}
+      },
+      "f7Card": {
+        "type": { "resolvedName": "Container" },
+        "nodes": ["f7Grid"],
+        "props": {
+          "background": "#0f172a",
+          "padding": 48,
+          "maxWidth": 0,
+          "marginTop": 0,
+          "marginBottom": 0,
+          "customId": "",
+          "boxModel": { "padding": { "top": 56, "right": 56, "bottom": 56, "left": 56 } }
+        },
+        "custom": { "displayName": "Contact card" },
+        "hidden": false,
+        "parent": "f7ContactSection",
+        "isCanvas": true,
+        "displayName": "Container",
+        "linkedNodes": {}
+      },
+      "f7Grid": {
+        "type": { "resolvedName": "Grid" },
+        "nodes": [],
+        "props": {
+          "columns": 2,
+          "gap": 48,
+          "background": "transparent",
+          "padding": 0,
+          "borderRadius": 0,
+          "customId": ""
+        },
+        "custom": {},
+        "hidden": false,
+        "parent": "f7Card",
+        "isCanvas": true,
+        "displayName": "Grid",
+        "linkedNodes": {
+          "col-0": "f7Left",
+          "col-1": "f7Right"
+        }
+      },
+      "f7Left": {
+        "type": { "resolvedName": "Container" },
+        "nodes": ["f7Label", "f7Title", "f7Lead", "f7ContactList"],
+        "props": {
+          "background": "transparent",
+          "padding": 0,
+          "maxWidth": 0,
+          "marginTop": 0,
+          "marginBottom": 0,
+          "customId": "",
+          "boxModel": { "padding": { "top": 0, "right": 0, "bottom": 0, "left": 0 } }
+        },
+        "custom": { "displayName": "Contact left column" },
+        "hidden": false,
+        "parent": "f7Grid",
+        "isCanvas": true,
+        "displayName": "Container",
+        "linkedNodes": {}
+      },
+      "f7Label": {
+        "type": { "resolvedName": "Text" },
+        "nodes": [],
+        "props": {
+          "text": "GET IN TOUCH",
+          "fontSize": 12,
+          "fontWeight": 500,
+          "lineHeight": 1.4,
+          "color": "#FF6B2B",
+          "align": "left",
+          "italic": false,
+          "customId": ""
+        },
+        "custom": {},
+        "hidden": false,
+        "parent": "f7Left",
+        "isCanvas": false,
+        "displayName": "Text",
+        "linkedNodes": {}
+      },
+      "f7Title": {
+        "type": { "resolvedName": "Heading" },
+        "nodes": [],
+        "props": {
+          "text": "Let's work together",
+          "level": "h2",
+          "color": "#ffffff",
+          "align": "left",
+          "fontWeight": 700,
+          "letterSpacing": -1,
+          "customId": ""
+        },
+        "custom": {},
+        "hidden": false,
+        "parent": "f7Left",
+        "isCanvas": false,
+        "displayName": "Heading",
+        "linkedNodes": {}
+      },
+      "f7Lead": {
+        "type": { "resolvedName": "Text" },
+        "nodes": [],
+        "props": {
+          "text": "I'm open to UI/UX and frontend missions, short or long-term. Landing page, full product redesign, or just a second pair of eyes — let's talk.",
+          "fontSize": 15,
+          "fontWeight": 400,
+          "lineHeight": 1.7,
+          "color": "#a1a1aa",
+          "align": "left",
+          "italic": false,
+          "customId": ""
+        },
+        "custom": {},
+        "hidden": false,
+        "parent": "f7Left",
+        "isCanvas": false,
+        "displayName": "Text",
+        "linkedNodes": {}
+      },
+      "f7ContactList": {
+        "type": { "resolvedName": "List" },
+        "nodes": [],
+        "props": {
+          "items": "✉  hello@eliott.dev\nin  linkedin.com/in/eliott-dev\ngh  github.com/eliott-dev",
+          "ordered": false,
+          "spacing": 12,
+          "fontSize": 14,
+          "color": "#a1a1aa",
+          "customId": ""
+        },
+        "custom": {},
+        "hidden": false,
+        "parent": "f7Left",
+        "isCanvas": false,
+        "displayName": "List",
+        "linkedNodes": {}
+      },
+      "f7Right": {
+        "type": { "resolvedName": "Container" },
+        "nodes": ["f7Form"],
+        "props": {
+          "background": "transparent",
+          "padding": 0,
+          "maxWidth": 0,
+          "marginTop": 0,
+          "marginBottom": 0,
+          "customId": "",
+          "boxModel": { "padding": { "top": 0, "right": 0, "bottom": 0, "left": 0 } }
+        },
+        "custom": { "displayName": "Contact right column" },
+        "hidden": false,
+        "parent": "f7Grid",
+        "isCanvas": true,
+        "displayName": "Container",
+        "linkedNodes": {}
+      },
+      "f7Form": {
+        "type": { "resolvedName": "ContactForm" },
+        "nodes": [],
+        "props": {
+          "title": "",
+          "nameLabel": "Name",
+          "emailLabel": "Email",
+          "messageLabel": "Message",
+          "submitText": "Send message →",
+          "background": "#18181b",
+          "accent": "#FF6B2B",
+          "borderRadius": 12,
+          "customId": ""
+        },
+        "custom": {},
+        "hidden": false,
+        "parent": "f7Right",
+        "isCanvas": false,
+        "displayName": "ContactForm",
+        "linkedNodes": {}
+      },
+      "fFooter": {
+        "type": { "resolvedName": "Section" },
+        "nodes": ["fFooterLeft", "fFooterRight"],
+        "props": {
+          "background": "#ffffff",
+          "paddingY": 32,
+          "maxWidth": 1152,
+          "customId": "footer"
+        },
+        "custom": {},
+        "hidden": false,
+        "parent": "ROOT",
+        "isCanvas": true,
+        "displayName": "Section",
+        "linkedNodes": {}
+      },
+      "fFooterLeft": {
+        "type": { "resolvedName": "Text" },
+        "nodes": [],
+        "props": {
+          "text": "© 2026 Eliott. All rights reserved.",
+          "fontSize": 13,
+          "fontWeight": 400,
+          "lineHeight": 1.6,
+          "color": "#a1a1aa",
+          "align": "left",
+          "italic": false,
+          "customId": ""
+        },
+        "custom": {},
+        "hidden": false,
+        "parent": "fFooter",
+        "isCanvas": false,
+        "displayName": "Text",
+        "linkedNodes": {}
+      },
+      "fFooterRight": {
+        "type": { "resolvedName": "Text" },
+        "nodes": [],
+        "props": {
+          "text": "Built with Tailwind CSS & Alpine.js",
+          "fontSize": 12,
+          "fontWeight": 400,
+          "lineHeight": 1.6,
+          "color": "#a1a1aa",
+          "align": "right",
+          "italic": false,
+          "customId": ""
+        },
+        "custom": {},
+        "hidden": false,
+        "parent": "fFooter",
+        "isCanvas": false,
+        "displayName": "Text",
+        "linkedNodes": {}
+      }
+    }
   }
 }
+  

@@ -32,9 +32,11 @@ export function Grid({
   boxModel,
 }: GridProps) {
   const {
+    id,
     connectors: { connect, drag },
     selected,
   } = useNode((node) => ({
+    id: node.id,
     selected: node.events.selected,
   })) as any;
 
@@ -45,9 +47,15 @@ export function Grid({
   };
 
   // Ensure exactly `columns` child canvases exist so columns render predictably.
+  // Each <Element> needs an `id` slot name so Craft.js can map it onto
+  // `parent.data.linkedNodes[col-N]` when a saved tree is rehydrated —
+  // otherwise the runtime invariant "A <Element /> that is used inside a
+  // User Component must specify an `id` prop" fires, and even if it didn't
+  // the columns wouldn't round-trip through save/load.
   const childCanvases = Array.from({ length: columns }, (_, idx) => (
     <Element
-      key={`col-${idx}`}
+      key={`${id}-col-${idx}`}
+      id={`col-${idx}`}
       canvas
       is="div"
       custom={{ displayName: `Column ${idx + 1}` }}
