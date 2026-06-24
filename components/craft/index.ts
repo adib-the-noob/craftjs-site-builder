@@ -13,3 +13,4 @@ export { Grid } from "./Grid";
 export { IconBox } from "./IconBox";
 export { Video } from "./Video";
 export { ContactForm } from "./ContactForm";
+export { Navbar } from "./Navbar";

@@ -14,6 +14,7 @@ import {
 } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
+import { PasswordInput } from "@/components/ui/password-input";
 import { register } from "@/lib/auth";
 import { toast } from "sonner";
 
@@ -81,12 +82,12 @@ export default function RegisterPage() {
             </div>
             <div className="flex flex-col gap-1.5">
               <Label htmlFor="password">Password</Label>
-              <Input
+              <PasswordInput
                 id="password"
-                type="password"
                 autoComplete="new-password"
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
+                placeholder="At least 8 characters"
                 required
                 minLength={8}
               />

@@ -8,6 +8,7 @@ import {
   LayoutTemplateIcon,
   ListIcon,
   MailIcon,
+  MenuIcon,
   MousePointerClickIcon,
   Rows3Icon,
   SparklesIcon,
@@ -35,6 +36,7 @@ import {
   IconBox,
   Video,
   ContactForm,
+  Navbar,
 } from "@/components/craft";
 import { ScrollArea } from "@/components/ui/scroll-area";
 
@@ -46,6 +48,19 @@ type Item = {
 };
 
 const toolboxItems: Item[] = [
+  {
+    name: "Navbar",
+    icon: MenuIcon,
+    group: "Layout",
+    // Wrap in <Section> so the navbar lands as a top-level page row by
+    // default — pages always render Section > children, and a navbar
+    // dropping in unparented looks odd in the canvas.
+    element: (
+      <Element canvas is={Section} paddingY={0}>
+        <Element is={Navbar} />
+      </Element>
+    ),
+  },
   {
     name: "Section",
     icon: Rows3Icon,
