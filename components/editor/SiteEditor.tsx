@@ -23,7 +23,13 @@ import {
   ResizablePanelGroup,
 } from "@/components/ui/resizable";
 import { resolver } from "@/lib/resolver";
-import { emptyPageData, getSite, updateSite, type Site } from "@/lib/sites";
+import {
+  emptyPageData,
+  getHomePageTree,
+  getSite,
+  updateSite,
+  type Site,
+} from "@/lib/sites";
 import { getTemplateById } from "@/lib/templates";
 import { setClipboard, getClipboard } from "@/lib/clipboard";
 import { AuthGuard } from "@/components/auth/AuthGuard";
@@ -224,10 +230,10 @@ function EditorInner({ siteSlug }: { siteSlug: string }) {
           router.replace("/sites");
           return;
         }
-        // Single-page model: `site_data` IS the tree.
-        const tree = s.site_data && typeof s.site_data === "object"
-          ? (s.site_data as Record<string, unknown>)
-          : emptyPageData();
+        // Single-page model: `site_data` IS the tree. Route through
+        // `getHomePageTree` so the root Container is normalised to
+        // full width (maxWidth = 0) on every load.
+        const tree = getHomePageTree(s);
         if (!tree || Object.keys(tree).length === 0) {
           setInitialTree(emptyPageData());
         } else {

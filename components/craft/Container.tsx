@@ -10,6 +10,11 @@ import { SpacingField } from "@/components/craft/settings/SpacingField";
 type ContainerProps = {
   background?: string;
   padding?: number;
+  /**
+   * Max width in px. `0` (or any non-positive value) means "no cap" —
+   * the container fills its parent. The root canvas uses this so the
+   * published site spans the full viewport by default.
+   */
   maxWidth?: number;
   marginTop?: number;
   marginBottom?: number;
@@ -20,7 +25,7 @@ type ContainerProps = {
 export function Container({
   background = "transparent",
   padding = 24,
-  maxWidth = 1200,
+  maxWidth = 0,
   marginTop = 0,
   marginBottom = 0,
   customId = "",
@@ -36,11 +41,13 @@ export function Container({
         connect(drag(ref!));
       }}
       id={customId || undefined}
-      className="mx-auto min-h-[40px] w-full"
+      className="min-h-10 w-full"
       style={{
         background,
         padding,
-        maxWidth,
+        ...(typeof maxWidth === "number" && maxWidth > 0
+          ? { maxWidth, marginLeft: "auto", marginRight: "auto" }
+          : {}),
         marginTop,
         marginBottom,
       }}
@@ -102,11 +109,12 @@ function ContainerSettings() {
         }
       />
       <SliderField
-        label="Max width"
+        label={maxWidth > 0 ? "Max width" : "Max width (full width)"}
         value={maxWidth}
-        min={480}
+        min={0}
         max={1600}
         step={20}
+        unit={maxWidth > 0 ? "px" : ""}
         onChange={(v) =>
           setProp((props: ContainerProps) => {
             props.maxWidth = v;
@@ -137,7 +145,9 @@ Container.craft = {
   props: {
     background: "transparent",
     padding: 24,
-    maxWidth: 1200,
+    // 0 = full width (no cap). Inner Containers can still be constrained
+    // by setting a positive value from the settings panel.
+    maxWidth: 0,
     marginTop: 0,
     marginBottom: 0,
     customId: "",

@@ -189,7 +189,10 @@ export function emptyPageData(): CraftTree {
       props: {
         background: "#ffffff",
         padding: 0,
-        maxWidth: 1200,
+        // 0 = full width (no cap). Inner Containers can still be
+        // constrained by setting a positive `maxWidth` in the settings
+        // panel.
+        maxWidth: 0,
         marginTop: 0,
         marginBottom: 0,
         customId: "",
@@ -248,9 +251,10 @@ export function readSitePages(site: Site): SitePage[] {
   const raw = site.site_data;
   if (isMultiPagePayload(raw)) {
     // Deep-clone so callers can't accidentally mutate backend data.
+    // Also force each page's root Container to full width.
     return raw.pages.map((p) => ({
       ...p,
-      data: { ...p.data },
+      data: normalizeRootToFullWidth({ ...p.data }),
     }));
   }
   // Legacy shape: a single Craft.js tree (or null / {}).
@@ -260,9 +264,23 @@ export function readSitePages(site: Site): SitePage[] {
       slug: "home",
       title: "Home",
       isHome: true,
-      data: isLegacyTree(raw) ? { ...raw } : emptyPageData(),
+      data: isLegacyTree(raw)
+        ? normalizeRootToFullWidth({ ...raw })
+        : emptyPageData(),
     },
   ];
+}
+
+/**
+ * Force the page's `ROOT` Container to full width (maxWidth = 0). This
+ * makes existing sites render edge-to-edge without needing a re-save.
+ * New sites are unaffected because `emptyPageData()` already uses 0.
+ */
+function normalizeRootToFullWidth(data: CraftTree): CraftTree {
+  const root = (data as { ROOT?: { props?: Record<string, unknown> } }).ROOT;
+  if (!root || !root.props) return data;
+  root.props = { ...root.props, maxWidth: 0 };
+  return data;
 }
 
 /**
