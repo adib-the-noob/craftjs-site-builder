@@ -36,12 +36,6 @@ import {
   Video,
   ContactForm,
 } from "@/components/craft";
-import {
-  Card as UICard,
-  CardContent,
-  CardHeader,
-  CardTitle,
-} from "@/components/ui/card";
 import { ScrollArea } from "@/components/ui/scroll-area";
 
 type Item = {
@@ -171,37 +165,31 @@ function ToolboxItem({ item }: { item: Item }) {
   );
 }
 
+/**
+ * Components drawer rendered inside the left sidebar's "Components"
+ * tab. The outer tabs header / fold button live on `LeftSidebar`.
+ */
 export function Toolbox() {
   const groups: Item["group"][] = ["Layout", "Content", "Media", "Form"];
 
   return (
-    <UICard className="flex h-full min-h-0 flex-col rounded-none border-0 border-r shadow-none">
-      <CardHeader className="shrink-0 border-b pb-4">
-        <CardTitle className="flex items-center gap-2 text-sm">
-          <LayoutTemplateIcon />
-          Components
-        </CardTitle>
-      </CardHeader>
-      <CardContent className="min-h-0 flex-1 p-0">
-        <ScrollArea className="h-full">
-          <div className="flex flex-col gap-4 p-4">
-            {groups.map((group) => {
-              const items = toolboxItems.filter((it) => it.group === group);
-              if (items.length === 0) return null;
-              return (
-                <div key={group} className="flex flex-col gap-2">
-                  <p className="text-[10px] font-semibold uppercase tracking-wider text-muted-foreground">
-                    {group}
-                  </p>
-                  {items.map((item) => (
-                    <ToolboxItem key={item.name} item={item} />
-                  ))}
-                </div>
-              );
-            })}
-          </div>
-        </ScrollArea>
-      </CardContent>
-    </UICard>
+    <ScrollArea className="h-full">
+      <div className="flex flex-col gap-4 p-4">
+        {groups.map((group) => {
+          const items = toolboxItems.filter((it) => it.group === group);
+          if (items.length === 0) return null;
+          return (
+            <div key={group} className="flex flex-col gap-2">
+              <p className="text-[10px] font-semibold uppercase tracking-wider text-muted-foreground">
+                {group}
+              </p>
+              {items.map((item) => (
+                <ToolboxItem key={item.name} item={item} />
+              ))}
+            </div>
+          );
+        })}
+      </div>
+    </ScrollArea>
   );
 }

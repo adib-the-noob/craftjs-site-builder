@@ -6,6 +6,7 @@ import { useMemo } from "react";
 import { Editor, Frame } from "@craftjs/core";
 
 import { RenderNode } from "@/components/editor/RenderNode";
+import { EDITOR_FONT_CLASSNAMES } from "@/components/editor/EditorFontsProvider";
 import { resolver } from "@/lib/resolver";
 import {
   getHomePageTree,
@@ -58,7 +59,7 @@ export function SitePreview({ site, page }: Props) {
   const statusLabel = STATUS_LABEL[site.status] ?? site.status;
 
   return (
-    <div className="min-h-screen flex flex-col bg-background">
+    <div className={`min-h-screen flex flex-col bg-background ${EDITOR_FONT_CLASSNAMES}`}>
       <header className="border-b bg-muted/40">
         <div className="flex items-center justify-between gap-3 px-4 py-2 text-xs">
           <div className="flex items-center gap-2 text-muted-foreground">

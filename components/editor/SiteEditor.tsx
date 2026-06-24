@@ -12,16 +12,11 @@ import {
 import React from "react";
 import { Container } from "@/components/craft";
 import { EditorToolbar } from "@/components/editor/EditorToolbar";
-import { LayersPanel } from "@/components/editor/LayersPanel";
+import { EDITOR_FONT_CLASSNAMES } from "@/components/editor/EditorFontsProvider";
+import { LeftSidebar } from "@/components/editor/LeftSidebar";
 import { RenderNode } from "@/components/editor/RenderNode";
 import { SelectionActions } from "@/components/editor/SelectionActions";
 import { SettingsPanel } from "@/components/editor/SettingsPanel";
-import { Toolbox } from "@/components/editor/Toolbox";
-import {
-  ResizableHandle,
-  ResizablePanel,
-  ResizablePanelGroup,
-} from "@/components/ui/resizable";
 import { resolver } from "@/lib/resolver";
 import {
   emptyPageData,
@@ -210,6 +205,26 @@ function TreeMirror() {
   return null;
 }
 
+const LEFT_COLLAPSED_KEY = "craftjs:left-sidebar-collapsed";
+const SETTINGS_COLLAPSED_KEY = "craftjs:settings-collapsed";
+
+function readStoredFlag(key: string): boolean {
+  if (typeof window === "undefined") return false;
+  try {
+    return window.localStorage.getItem(key) === "1";
+  } catch {
+    return false;
+  }
+}
+
+function writeStoredFlag(key: string, value: boolean) {
+  try {
+    window.localStorage.setItem(key, value ? "1" : "0");
+  } catch {
+    // localStorage unavailable — ignore.
+  }
+}
+
 function EditorInner({ siteSlug }: { siteSlug: string }) {
   const router = useRouter();
   const [site, setSite] = useState<Site | null>(null);
@@ -217,6 +232,33 @@ function EditorInner({ siteSlug }: { siteSlug: string }) {
     null
   );
   const [loadFailed, setLoadFailed] = useState(false);
+
+  // Both side columns are fixed-width with their own fold buttons.
+  // State lives here (not inside the panels) so the canvas can grow
+  // to fill the rest of the row.
+  const [leftCollapsed, setLeftCollapsed] = useState(false);
+  const [settingsCollapsed, setSettingsCollapsed] = useState(false);
+
+  useEffect(() => {
+    setLeftCollapsed(readStoredFlag(LEFT_COLLAPSED_KEY));
+    setSettingsCollapsed(readStoredFlag(SETTINGS_COLLAPSED_KEY));
+  }, []);
+
+  const toggleLeft = useCallback(() => {
+    setLeftCollapsed((prev) => {
+      const next = !prev;
+      writeStoredFlag(LEFT_COLLAPSED_KEY, next);
+      return next;
+    });
+  }, []);
+
+  const toggleSettings = useCallback(() => {
+    setSettingsCollapsed((prev) => {
+      const next = !prev;
+      writeStoredFlag(SETTINGS_COLLAPSED_KEY, next);
+      return next;
+    });
+  }, []);
 
   // Load site + tree.
   useEffect(() => {
@@ -325,77 +367,72 @@ function EditorInner({ siteSlug }: { siteSlug: string }) {
       <KeyboardShortcuts />
       <TreeMirror />
       <HydrateOnMount data={initialData} />
-      <div className="flex h-screen flex-col overflow-hidden bg-background">
+      <div
+        className={`flex h-screen flex-col overflow-hidden bg-background ${EDITOR_FONT_CLASSNAMES}`}
+      >
         <EditorToolbar
           site={site}
           onSave={handleSave}
           onLoadTemplate={handleLoadTemplate}
           onSiteChanged={handleSiteChanged}
         />
-        <ResizablePanelGroup
-          id="site-editor-layout"
-          orientation="horizontal"
-          className="min-h-0 flex-1"
-          defaultLayout={{ layers: 15, toolbox: 18, canvas: 45, settings: 22 }}
-        >
-          <ResizablePanel
-            id="layers"
-            defaultSize="15%"
-            minSize="10%"
-            maxSize="25%"
-            className="min-w-0"
+        {/*
+          Three-column layout. Both side columns are fixed-width and
+          foldable; only the canvas stretches to fill the rest of the
+          row. No resizable handles anywhere.
+        */}
+        <div className="flex min-h-0 flex-1">
+          {/* Left: Layers + Components tabs (combined). */}
+          <div
+            className={
+              leftCollapsed
+                ? "w-[48px] shrink-0 border-r"
+                : "w-[260px] shrink-0 border-r"
+            }
           >
-            <LayersPanel />
-          </ResizablePanel>
-          <ResizableHandle withHandle />
-          <ResizablePanel
-            id="toolbox"
-            defaultSize="18%"
-            minSize="14%"
-            maxSize="26%"
-            className="min-w-0"
-          >
-            <Toolbox />
-          </ResizablePanel>
-          <ResizableHandle withHandle />
-          <ResizablePanel
-            id="canvas"
-            defaultSize="45%"
-            minSize="30%"
-            className="min-w-0"
-          >
-            <div className="flex h-full flex-col bg-muted/30">
-              <div className="flex items-center justify-between border-b bg-background/80 px-4 py-2 backdrop-blur">
-                <p className="text-xs text-muted-foreground">
-                  Click an element to select it. Drag from the left to add new components.
-                </p>
-                <SelectionActions />
-              </div>
-              <div className="flex-1 overflow-auto bg-muted/30">
-                <div className="min-h-full w-full bg-background">
-                  <Frame>
-                    <Element
-                      canvas
-                      is={Container}
-                      padding={0}
-                      background="#ffffff"
-                    />
-                  </Frame>
-                </div>
+            <LeftSidebar
+              collapsed={leftCollapsed}
+              onToggleCollapsed={toggleLeft}
+            />
+          </div>
+
+          {/* Middle: canvas. Takes the remaining space. */}
+          <div className="flex min-w-0 flex-1 flex-col bg-muted/30">
+            <div className="flex items-center justify-between border-b bg-background/80 px-4 py-2 backdrop-blur">
+              <p className="text-xs text-muted-foreground">
+                Click an element to select it. Drag from the left to add new
+                components.
+              </p>
+              <SelectionActions />
+            </div>
+            <div className="flex-1 overflow-auto bg-muted/30">
+              <div className="min-h-full w-full bg-background">
+                <Frame>
+                  <Element
+                    canvas
+                    is={Container}
+                    padding={0}
+                    background="#ffffff"
+                  />
+                </Frame>
               </div>
             </div>
-          </ResizablePanel>
-          <ResizableHandle withHandle />
-          <ResizablePanel
-            id="settings"
-            defaultSize="22%"
-            minSize="18%"
-            maxSize="35%"
-            className="min-w-0"
+          </div>
+
+          {/* Right: Settings. */}
+          <div
+            className={
+              settingsCollapsed
+                ? "w-[48px] shrink-0 border-l"
+                : "w-[300px] shrink-0 border-l"
+            }
           >
-            <SettingsPanel />
-          </ResizablePanel>
-        </ResizablePanelGroup>
+            <SettingsPanel
+              collapsed={settingsCollapsed}
+              onToggleCollapsed={toggleSettings}
+            />
+          </div>
+        </div>
       </div>
     </Editor>
   );

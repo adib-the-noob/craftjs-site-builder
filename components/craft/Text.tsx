@@ -3,6 +3,7 @@
 import { useNode } from "@craftjs/core";
 import { cn } from "@/lib/utils";
 import { FieldRow } from "@/components/craft/settings/FieldRow";
+import { FontField } from "@/components/craft/settings/FontField";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { ColorField } from "@/components/craft/settings/ColorField";
@@ -20,6 +21,8 @@ type TextProps = {
   align?: "left" | "center" | "right" | "justify";
   italic?: boolean;
   customId?: string;
+  /** CSS class name from the font registry (lib/fonts.ts). */
+  fontFamily?: string;
 };
 
 export function Text({
@@ -31,6 +34,7 @@ export function Text({
   align = "left",
   italic = false,
   customId = "",
+  fontFamily = "",
 }: TextProps) {
   const {
     connectors: { connect, drag },
@@ -55,6 +59,7 @@ export function Text({
       }
       className={cn(
         "max-w-none whitespace-pre-wrap outline-none",
+        fontFamily,
         selected && "ring-2 ring-primary/40 ring-offset-2",
         italic && "italic"
       )}
@@ -82,6 +87,7 @@ function TextSettings() {
     align,
     italic,
     customId,
+    fontFamily,
   } = useNode((node) => ({
     text: node.data.props.text as string,
     fontSize: node.data.props.fontSize as number,
@@ -91,6 +97,7 @@ function TextSettings() {
     align: node.data.props.align as TextProps["align"],
     italic: (node.data.props.italic as boolean) ?? false,
     customId: (node.data.props.customId as string) ?? "",
+    fontFamily: (node.data.props.fontFamily as string) ?? "",
   })) as any;
 
   return (
@@ -117,6 +124,15 @@ function TextSettings() {
           }
         />
       </FieldRow>
+      <FontField
+        label="Font"
+        value={fontFamily}
+        onChange={(v) =>
+          setProp((props: TextProps) => {
+            props.fontFamily = v;
+          })
+        }
+      />
       <SliderField
         label="Font size"
         value={fontSize}
@@ -202,6 +218,7 @@ Text.craft = {
     align: "left",
     italic: false,
     customId: "",
+    fontFamily: "",
   },
   related: {
     settings: TextSettings,

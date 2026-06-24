@@ -3,6 +3,7 @@
 import { useNode } from "@craftjs/core";
 import { cn } from "@/lib/utils";
 import { FieldRow } from "@/components/craft/settings/FieldRow";
+import { FontField } from "@/components/craft/settings/FontField";
 import { Input } from "@/components/ui/input";
 import { ColorField } from "@/components/craft/settings/ColorField";
 import { SelectField } from "@/components/craft/settings/SelectField";
@@ -17,6 +18,8 @@ type HeadingProps = {
   fontWeight?: number;
   letterSpacing?: number;
   customId?: string;
+  /** CSS class name from the font registry (lib/fonts.ts). */
+  fontFamily?: string;
 };
 
 const headingStyles: Record<NonNullable<HeadingProps["level"]>, string> = {
@@ -34,6 +37,7 @@ export function Heading({
   fontWeight = 600,
   letterSpacing = -1,
   customId = "",
+  fontFamily = "",
 }: HeadingProps) {
   const {
     connectors: { connect, drag },
@@ -61,6 +65,7 @@ export function Heading({
       className={cn(
         headingStyles[level],
         "outline-none",
+        fontFamily,
         selected && "ring-2 ring-primary/40 ring-offset-2"
       )}
       style={{
@@ -85,6 +90,7 @@ function HeadingSettings() {
     fontWeight,
     letterSpacing,
     customId,
+    fontFamily,
   } = useNode((node) => ({
     text: node.data.props.text as string,
     level: node.data.props.level as HeadingProps["level"],
@@ -93,6 +99,7 @@ function HeadingSettings() {
     fontWeight: (node.data.props.fontWeight as number) ?? 600,
     letterSpacing: (node.data.props.letterSpacing as number) ?? -0.5,
     customId: (node.data.props.customId as string) ?? "",
+    fontFamily: (node.data.props.fontFamily as string) ?? "",
   })) as any;
 
   return (
@@ -132,6 +139,15 @@ function HeadingSettings() {
           { value: "h3", label: "Heading 3" },
           { value: "h4", label: "Heading 4" },
         ]}
+      />
+      <FontField
+        label="Font"
+        value={fontFamily}
+        onChange={(v) =>
+          setProp((props: HeadingProps) => {
+            props.fontFamily = v;
+          })
+        }
       />
       <ColorField
         label="Color"
@@ -190,6 +206,7 @@ Heading.craft = {
     fontWeight: 600,
     letterSpacing: -1,
     customId: "",
+    fontFamily: "",
   },
   related: {
     settings: HeadingSettings,
