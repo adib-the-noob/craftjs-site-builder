@@ -1,28 +1,46 @@
 "use client";
 
 import { useNode } from "@craftjs/core";
+import { cn } from "@/lib/utils";
 import { FieldRow } from "@/components/craft/settings/FieldRow";
 import { SliderField } from "@/components/craft/settings/SliderField";
 import { Input } from "@/components/ui/input";
+import { BoxModelField, boxToStyle } from "@/components/craft/settings/BoxModelField";
 
 type SpacerProps = {
   height?: number;
   customId?: string;
+  /** Tailwind-style box model. */
+  boxModel?: { margin?: any; padding?: any };
 };
 
-export function Spacer({ height = 40, customId = "" }: SpacerProps) {
+export function Spacer({
+  height = 40,
+  customId = "",
+  boxModel,
+}: SpacerProps) {
   const {
     connectors: { connect, drag },
-  } = useNode();
+    selected,
+  } = useNode((node) => ({
+    selected: node.events.selected,
+  })) as any;
 
   return (
     <div
       ref={(ref) => {
-        connect(drag(ref!));
+        if (ref) connect(drag(ref));
       }}
       id={customId || undefined}
-      style={{ height }}
-      className="w-full"
+      style={{
+        height,
+        ...boxToStyle(boxModel?.padding, "padding"),
+        ...boxToStyle(boxModel?.margin, "margin"),
+      }}
+      className={cn(
+        "w-full",
+        selected && "outline-dashed outline-1 outline-primary/40"
+      )}
     />
   );
 }
@@ -32,9 +50,11 @@ function SpacerSettings() {
     actions: { setProp },
     height,
     customId,
+    boxModel,
   } = useNode((node) => ({
     height: node.data.props.height as number,
     customId: (node.data.props.customId as string) ?? "",
+    boxModel: node.data.props.boxModel as SpacerProps["boxModel"],
   })) as any;
 
   return (
@@ -62,6 +82,15 @@ function SpacerSettings() {
           })
         }
       />
+      <BoxModelField
+        label="Spacing (margin / padding)"
+        value={boxModel ?? {}}
+        onChange={(v) =>
+          setProp((props: SpacerProps) => {
+            props.boxModel = v;
+          })
+        }
+      />
     </div>
   );
 }
@@ -71,6 +100,7 @@ Spacer.craft = {
   props: {
     height: 40,
     customId: "",
+    boxModel: undefined,
   },
   related: {
     settings: SpacerSettings,

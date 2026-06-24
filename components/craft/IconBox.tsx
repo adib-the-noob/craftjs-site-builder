@@ -10,6 +10,7 @@ import { ColorField } from "@/components/craft/settings/ColorField";
 import { SliderField } from "@/components/craft/settings/SliderField";
 import { SelectField } from "@/components/craft/settings/SelectField";
 import { AlignField } from "@/components/craft/settings/AlignField";
+import { BoxModelField, boxToStyle } from "@/components/craft/settings/BoxModelField";
 
 // Whitelist of safe icon names so users don't get arbitrary keys.
 const ICON_OPTIONS = [
@@ -45,6 +46,9 @@ type IconBoxProps = {
   iconSize?: number;
   align?: "left" | "center" | "right";
   customId?: string;
+  /** Tailwind-style box model. */
+  boxModel?: { margin?: any; padding?: any };
+  borderRadius?: number;
 };
 
 function getIcon(name: string) {
@@ -62,6 +66,8 @@ export function IconBox({
   iconSize = 36,
   align = "center",
   customId = "",
+  boxModel,
+  borderRadius = 0,
 }: IconBoxProps) {
   const {
     connectors: { connect, drag },
@@ -75,14 +81,19 @@ export function IconBox({
   return (
     <div
       ref={(ref) => {
-        connect(drag(ref!));
+        if (ref) connect(drag(ref));
       }}
       id={customId || undefined}
       className={cn(
         "flex flex-col gap-3 outline-none",
         selected && "ring-2 ring-primary/40 ring-offset-2"
       )}
-      style={{ textAlign: align }}
+      style={{
+        textAlign: align,
+        borderRadius,
+        ...boxToStyle(boxModel?.padding, "padding"),
+        ...boxToStyle(boxModel?.margin, "margin"),
+      }}
     >
       <div
         className="flex"
@@ -125,6 +136,8 @@ function IconBoxSettings() {
     iconSize,
     align,
     customId,
+    boxModel,
+    borderRadius,
   } = useNode((node) => ({
     icon: node.data.props.icon as string,
     title: node.data.props.title as string,
@@ -135,6 +148,8 @@ function IconBoxSettings() {
     iconSize: node.data.props.iconSize as number,
     align: node.data.props.align as IconBoxProps["align"],
     customId: (node.data.props.customId as string) ?? "",
+    boxModel: node.data.props.boxModel as IconBoxProps["boxModel"],
+    borderRadius: (node.data.props.borderRadius as number) ?? 0,
   })) as any;
 
   return (
@@ -228,6 +243,26 @@ function IconBoxSettings() {
           })
         }
       />
+      <BoxModelField
+        label="Spacing (margin / padding)"
+        value={boxModel ?? {}}
+        onChange={(v) =>
+          setProp((props: IconBoxProps) => {
+            props.boxModel = v;
+          })
+        }
+      />
+      <SliderField
+        label="Border radius"
+        value={borderRadius}
+        min={0}
+        max={48}
+        onChange={(v) =>
+          setProp((props: IconBoxProps) => {
+            props.borderRadius = v;
+          })
+        }
+      />
     </div>
   );
 }
@@ -244,6 +279,8 @@ IconBox.craft = {
     iconSize: 36,
     align: "center",
     customId: "",
+    boxModel: undefined,
+    borderRadius: 0,
   },
   related: {
     settings: IconBoxSettings,

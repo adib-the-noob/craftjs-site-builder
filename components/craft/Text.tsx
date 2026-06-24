@@ -11,6 +11,7 @@ import { SliderField } from "@/components/craft/settings/SliderField";
 import { SelectField } from "@/components/craft/settings/SelectField";
 import { AlignField } from "@/components/craft/settings/AlignField";
 import { ToggleField } from "@/components/craft/settings/ToggleField";
+import { BoxModelField, boxToStyle } from "@/components/craft/settings/BoxModelField";
 
 type TextProps = {
   text?: string;
@@ -23,6 +24,8 @@ type TextProps = {
   customId?: string;
   /** CSS class name from the font registry (lib/fonts.ts). */
   fontFamily?: string;
+  /** Tailwind-style box model. */
+  boxModel?: { margin?: any; padding?: any };
 };
 
 export function Text({
@@ -35,6 +38,7 @@ export function Text({
   italic = false,
   customId = "",
   fontFamily = "",
+  boxModel,
 }: TextProps) {
   const {
     connectors: { connect, drag },
@@ -47,7 +51,7 @@ export function Text({
   return (
     <p
       ref={(ref) => {
-        connect(drag(ref!));
+        if (ref) connect(drag(ref));
       }}
       id={customId || undefined}
       contentEditable={selected}
@@ -69,6 +73,8 @@ export function Text({
         lineHeight,
         color,
         textAlign: align,
+        ...boxToStyle(boxModel?.padding, "padding"),
+        ...boxToStyle(boxModel?.margin, "margin"),
       }}
     >
       {text}
@@ -88,6 +94,7 @@ function TextSettings() {
     italic,
     customId,
     fontFamily,
+    boxModel,
   } = useNode((node) => ({
     text: node.data.props.text as string,
     fontSize: node.data.props.fontSize as number,
@@ -98,6 +105,7 @@ function TextSettings() {
     italic: (node.data.props.italic as boolean) ?? false,
     customId: (node.data.props.customId as string) ?? "",
     fontFamily: (node.data.props.fontFamily as string) ?? "",
+    boxModel: node.data.props.boxModel as TextProps["boxModel"],
   })) as any;
 
   return (
@@ -203,6 +211,15 @@ function TextSettings() {
           })
         }
       />
+      <BoxModelField
+        label="Spacing (margin / padding)"
+        value={boxModel ?? {}}
+        onChange={(v) =>
+          setProp((props: TextProps) => {
+            props.boxModel = v;
+          })
+        }
+      />
     </div>
   );
 }
@@ -219,6 +236,7 @@ Text.craft = {
     italic: false,
     customId: "",
     fontFamily: "",
+    boxModel: undefined,
   },
   related: {
     settings: TextSettings,

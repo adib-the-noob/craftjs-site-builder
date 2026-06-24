@@ -1,7 +1,6 @@
 "use client";
 
 import { useNode } from "@craftjs/core";
-import { Element } from "@craftjs/core";
 import { cn } from "@/lib/utils";
 import { FieldRow } from "@/components/craft/settings/FieldRow";
 import { Input } from "@/components/ui/input";
@@ -10,6 +9,7 @@ import { Heading } from "./Heading";
 import { ColorField } from "@/components/craft/settings/ColorField";
 import { SliderField } from "@/components/craft/settings/SliderField";
 import { ToggleField } from "@/components/craft/settings/ToggleField";
+import { BoxModelField, boxToStyle } from "@/components/craft/settings/BoxModelField";
 
 type CardProps = {
   title?: string;
@@ -17,8 +17,11 @@ type CardProps = {
   background?: string;
   padding?: number;
   shadow?: boolean;
+  borderRadius?: number;
   customId?: string;
   children?: React.ReactNode;
+  /** Tailwind-style box model — overrides padding when set. */
+  boxModel?: { margin?: any; padding?: any };
 };
 
 export function Card({
@@ -27,24 +30,41 @@ export function Card({
   background = "#ffffff",
   padding = 24,
   shadow = true,
+  borderRadius = 12,
   customId = "",
   children,
+  boxModel,
 }: CardProps) {
   const {
     connectors: { connect, drag },
-  } = useNode();
+    selected,
+  } = useNode((node) => ({
+    selected: node.events.selected,
+  })) as any;
+
+  // Backward-compat: when boxModel isn't set, derive padding from legacy
+  // `padding` prop so older saved trees still render correctly.
+  const effectiveBox = boxModel ?? {
+    padding: typeof padding === "number" ? padding : undefined,
+  };
 
   return (
     <div
       ref={(ref) => {
-        connect(drag(ref!));
+        if (ref) connect(drag(ref));
       }}
       id={customId || undefined}
       className={cn(
         "rounded-xl border",
-        shadow && "shadow-md"
+        shadow && "shadow-md",
+        selected && "ring-2 ring-primary/40 ring-offset-2"
       )}
-      style={{ background, padding }}
+      style={{
+        background,
+        borderRadius,
+        ...boxToStyle(effectiveBox.padding, "padding"),
+        ...boxToStyle(effectiveBox.margin, "margin"),
+      }}
     >
       {children ?? (
         <>
@@ -65,15 +85,21 @@ function CardSettings() {
     background,
     padding,
     shadow,
+    borderRadius,
     customId,
+    boxModel,
   } = useNode((node) => ({
     title: node.data.props.title as string,
     body: node.data.props.body as string,
     background: node.data.props.background as string,
     padding: node.data.props.padding as number,
     shadow: node.data.props.shadow as boolean,
+    borderRadius: (node.data.props.borderRadius as number) ?? 12,
     customId: (node.data.props.customId as string) ?? "",
+    boxModel: node.data.props.boxModel as CardProps["boxModel"],
   })) as any;
+
+  const currentBox = boxModel ?? { padding: padding ?? 0 };
 
   return (
     <div className="flex flex-col gap-4">
@@ -117,14 +143,30 @@ function CardSettings() {
           })
         }
       />
-      <SliderField
-        label="Padding"
-        value={padding}
-        min={0}
-        max={80}
+      <BoxModelField
+        label="Spacing (margin / padding)"
+        value={currentBox}
         onChange={(v) =>
           setProp((props: CardProps) => {
-            props.padding = v;
+            props.boxModel = v;
+            if (v.padding && typeof v.padding === "number") {
+              props.padding = v.padding;
+            } else if (v.padding && typeof v.padding === "object") {
+              props.padding = v.padding.top ?? v.padding.bottom ?? 0;
+            } else {
+              props.padding = 0;
+            }
+          })
+        }
+      />
+      <SliderField
+        label="Border radius"
+        value={borderRadius}
+        min={0}
+        max={48}
+        onChange={(v) =>
+          setProp((props: CardProps) => {
+            props.borderRadius = v;
           })
         }
       />
@@ -149,7 +191,9 @@ Card.craft = {
     background: "#ffffff",
     padding: 24,
     shadow: true,
+    borderRadius: 12,
     customId: "",
+    boxModel: undefined,
   },
   rules: {
     canDrag: () => true,

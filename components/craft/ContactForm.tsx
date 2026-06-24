@@ -6,7 +6,9 @@ import { FieldRow } from "@/components/craft/settings/FieldRow";
 import { Input } from "@/components/ui/input";
 import { ColorField } from "@/components/craft/settings/ColorField";
 import { SelectField } from "@/components/craft/settings/SelectField";
+import { SliderField } from "@/components/craft/settings/SliderField";
 import { Button } from "@/components/ui/button";
+import { BoxModelField, boxToStyle } from "@/components/craft/settings/BoxModelField";
 
 type ContactFormProps = {
   title?: string;
@@ -16,7 +18,10 @@ type ContactFormProps = {
   submitText?: string;
   background?: string;
   accent?: string;
+  borderRadius?: number;
   customId?: string;
+  /** Tailwind-style box model. */
+  boxModel?: { margin?: any; padding?: any };
 };
 
 export function ContactForm({
@@ -27,7 +32,9 @@ export function ContactForm({
   submitText = "Send message",
   background = "#f8fafc",
   accent = "#0f172a",
+  borderRadius = 12,
   customId = "",
+  boxModel,
 }: ContactFormProps) {
   const {
     connectors: { connect, drag },
@@ -39,15 +46,20 @@ export function ContactForm({
   return (
     <form
       ref={(ref) => {
-        connect(drag(ref!));
+        if (ref) connect(drag(ref));
       }}
       id={customId || undefined}
       onSubmit={(e) => e.preventDefault()}
       className={cn(
-        "mx-auto flex w-full max-w-md flex-col gap-3 rounded-xl border p-6 outline-none",
+        "mx-auto flex w-full max-w-md flex-col gap-3 rounded-xl border outline-none",
         selected && "ring-2 ring-primary/40 ring-offset-2"
       )}
-      style={{ background }}
+      style={{
+        background,
+        borderRadius,
+        ...boxToStyle(boxModel?.padding, "padding"),
+        ...boxToStyle(boxModel?.margin, "margin"),
+      }}
     >
       <h3 className="text-xl font-semibold tracking-tight">{title}</h3>
       <label className="flex flex-col gap-1 text-sm">
@@ -95,7 +107,9 @@ function ContactFormSettings() {
     submitText,
     background,
     accent,
+    borderRadius,
     customId,
+    boxModel,
   } = useNode((node) => ({
     title: node.data.props.title as string,
     nameLabel: node.data.props.nameLabel as string,
@@ -104,7 +118,9 @@ function ContactFormSettings() {
     submitText: node.data.props.submitText as string,
     background: node.data.props.background as string,
     accent: node.data.props.accent as string,
+    borderRadius: (node.data.props.borderRadius as number) ?? 12,
     customId: (node.data.props.customId as string) ?? "",
+    boxModel: node.data.props.boxModel as ContactFormProps["boxModel"],
   })) as any;
 
   return (
@@ -194,6 +210,26 @@ function ContactFormSettings() {
           })
         }
       />
+      <SliderField
+        label="Border radius"
+        value={borderRadius}
+        min={0}
+        max={32}
+        onChange={(v) =>
+          setProp((props: ContactFormProps) => {
+            props.borderRadius = v;
+          })
+        }
+      />
+      <BoxModelField
+        label="Spacing (margin / padding)"
+        value={boxModel ?? {}}
+        onChange={(v) =>
+          setProp((props: ContactFormProps) => {
+            props.boxModel = v;
+          })
+        }
+      />
     </div>
   );
 }
@@ -208,7 +244,9 @@ ContactForm.craft = {
     submitText: "Send message",
     background: "#f8fafc",
     accent: "#0f172a",
+    borderRadius: 12,
     customId: "",
+    boxModel: undefined,
   },
   related: {
     settings: ContactFormSettings,

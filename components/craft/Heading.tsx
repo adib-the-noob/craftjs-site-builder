@@ -9,6 +9,7 @@ import { ColorField } from "@/components/craft/settings/ColorField";
 import { SelectField } from "@/components/craft/settings/SelectField";
 import { AlignField } from "@/components/craft/settings/AlignField";
 import { SliderField } from "@/components/craft/settings/SliderField";
+import { BoxModelField, boxToStyle } from "@/components/craft/settings/BoxModelField";
 
 type HeadingProps = {
   text?: string;
@@ -20,6 +21,8 @@ type HeadingProps = {
   customId?: string;
   /** CSS class name from the font registry (lib/fonts.ts). */
   fontFamily?: string;
+  /** Tailwind-style box model. */
+  boxModel?: { margin?: any; padding?: any };
 };
 
 const headingStyles: Record<NonNullable<HeadingProps["level"]>, string> = {
@@ -38,6 +41,7 @@ export function Heading({
   letterSpacing = -1,
   customId = "",
   fontFamily = "",
+  boxModel,
 }: HeadingProps) {
   const {
     connectors: { connect, drag },
@@ -52,7 +56,7 @@ export function Heading({
   return (
     <Tag
       ref={(ref) => {
-        connect(drag(ref!));
+        if (ref) connect(drag(ref));
       }}
       id={customId || undefined}
       contentEditable={selected}
@@ -70,9 +74,11 @@ export function Heading({
       )}
       style={{
         color,
-        textAlign: align,
         fontWeight,
         letterSpacing,
+        textAlign: align,
+        ...boxToStyle(boxModel?.padding, "padding"),
+        ...boxToStyle(boxModel?.margin, "margin"),
       }}
     >
       {text}
@@ -91,6 +97,7 @@ function HeadingSettings() {
     letterSpacing,
     customId,
     fontFamily,
+    boxModel,
   } = useNode((node) => ({
     text: node.data.props.text as string,
     level: node.data.props.level as HeadingProps["level"],
@@ -100,6 +107,7 @@ function HeadingSettings() {
     letterSpacing: (node.data.props.letterSpacing as number) ?? -0.5,
     customId: (node.data.props.customId as string) ?? "",
     fontFamily: (node.data.props.fontFamily as string) ?? "",
+    boxModel: node.data.props.boxModel as HeadingProps["boxModel"],
   })) as any;
 
   return (
@@ -192,6 +200,15 @@ function HeadingSettings() {
           })
         }
       />
+      <BoxModelField
+        label="Spacing (margin / padding)"
+        value={boxModel ?? {}}
+        onChange={(v) =>
+          setProp((props: HeadingProps) => {
+            props.boxModel = v;
+          })
+        }
+      />
     </div>
   );
 }
@@ -207,6 +224,7 @@ Heading.craft = {
     letterSpacing: -1,
     customId: "",
     fontFamily: "",
+    boxModel: undefined,
   },
   related: {
     settings: HeadingSettings,

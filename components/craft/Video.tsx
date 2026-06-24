@@ -7,14 +7,18 @@ import { Input } from "@/components/ui/input";
 import { SliderField } from "@/components/craft/settings/SliderField";
 import { ToggleField } from "@/components/craft/settings/ToggleField";
 import { AlignField } from "@/components/craft/settings/AlignField";
+import { BoxModelField, boxToStyle } from "@/components/craft/settings/BoxModelField";
 
 type VideoProps = {
   url?: string;
   height?: number;
   rounded?: boolean;
+  borderRadius?: number;
   autoplay?: boolean;
   align?: "left" | "center" | "right";
   customId?: string;
+  /** Tailwind-style box model. */
+  boxModel?: { margin?: any; padding?: any };
 };
 
 function getEmbedUrl(url: string): string | null {
@@ -39,9 +43,11 @@ export function Video({
   url = "https://www.youtube.com/watch?v=dQw4w9WgXcQ",
   height = 420,
   rounded = true,
+  borderRadius = 12,
   autoplay = false,
   align = "center",
   customId = "",
+  boxModel,
 }: VideoProps) {
   const {
     connectors: { connect, drag },
@@ -54,20 +60,28 @@ export function Video({
 
   return (
     <div
-      style={{ textAlign: align }}
+      ref={(ref) => {
+        if (ref) connect(drag(ref));
+      }}
       id={customId || undefined}
       className="w-full"
+      style={{
+        textAlign: align,
+        ...boxToStyle(boxModel?.padding, "padding"),
+        ...boxToStyle(boxModel?.margin, "margin"),
+      }}
     >
       <div
-        ref={(ref) => {
-          connect(drag(ref!));
-        }}
         className={cn(
           "mx-auto w-full overflow-hidden",
           rounded && "rounded-xl",
           selected && "ring-2 ring-primary/40 ring-offset-2"
         )}
-        style={{ height, maxWidth: "100%" }}
+        style={{
+          height,
+          maxWidth: "100%",
+          borderRadius: rounded ? borderRadius : 0,
+        }}
       >
         {embed ? (
           <iframe
@@ -96,16 +110,20 @@ function VideoSettings() {
     url,
     height,
     rounded,
+    borderRadius,
     autoplay,
     align,
     customId,
+    boxModel,
   } = useNode((node) => ({
     url: node.data.props.url as string,
     height: node.data.props.height as number,
     rounded: node.data.props.rounded as boolean,
+    borderRadius: (node.data.props.borderRadius as number) ?? 12,
     autoplay: node.data.props.autoplay as boolean,
     align: node.data.props.align as VideoProps["align"],
     customId: (node.data.props.customId as string) ?? "",
+    boxModel: node.data.props.boxModel as VideoProps["boxModel"],
   })) as any;
 
   return (
@@ -162,12 +180,32 @@ function VideoSettings() {
           })
         }
       />
+      <SliderField
+        label="Border radius"
+        value={borderRadius}
+        min={0}
+        max={48}
+        onChange={(v) =>
+          setProp((props: VideoProps) => {
+            props.borderRadius = v;
+          })
+        }
+      />
       <ToggleField
         label="Autoplay (muted browsers may block)"
         value={autoplay}
         onChange={(v) =>
           setProp((props: VideoProps) => {
             props.autoplay = v;
+          })
+        }
+      />
+      <BoxModelField
+        label="Spacing (margin / padding)"
+        value={boxModel ?? {}}
+        onChange={(v) =>
+          setProp((props: VideoProps) => {
+            props.boxModel = v;
           })
         }
       />
@@ -181,9 +219,11 @@ Video.craft = {
     url: "https://www.youtube.com/watch?v=dQw4w9WgXcQ",
     height: 420,
     rounded: true,
+    borderRadius: 12,
     autoplay: false,
     align: "center",
     customId: "",
+    boxModel: undefined,
   },
   related: {
     settings: VideoSettings,

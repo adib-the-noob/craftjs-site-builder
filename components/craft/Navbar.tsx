@@ -11,6 +11,7 @@ import { ColorField } from "@/components/craft/settings/ColorField";
 import { SelectField } from "@/components/craft/settings/SelectField";
 import { ToggleField } from "@/components/craft/settings/ToggleField";
 import { SliderField } from "@/components/craft/settings/SliderField";
+import { BoxModelField, boxToStyle } from "@/components/craft/settings/BoxModelField";
 
 /**
  * One nav link in the navbar. Stored as a newline-separated block so we
@@ -78,6 +79,8 @@ type NavbarProps = {
   maxWidth?: number;
   /** Optional customId for anchor links. */
   customId?: string;
+  /** Tailwind-style box model. */
+  boxModel?: { margin?: any; padding?: any };
 };
 
 export function Navbar({
@@ -95,6 +98,7 @@ export function Navbar({
   height = 72,
   maxWidth = 1200,
   customId = "",
+  boxModel,
 }: NavbarProps) {
   const {
     connectors: { connect, drag },
@@ -125,22 +129,21 @@ export function Navbar({
   return (
     <nav
       ref={(ref) => {
-        connect(drag(ref!));
+        if (ref) connect(drag(ref));
       }}
       id={customId || undefined}
       className={cn(
         "w-full",
-        sticky && "sticky top-0 z-40 backdrop-blur supports-[backdrop-filter]:bg-[color:var(--nav-bg,transparent)]",
+        sticky &&
+          "sticky top-0 z-40 backdrop-blur supports-[backdrop-filter]:bg-[color:var(--nav-bg,transparent)]",
         selected && "outline outline-2 outline-primary/40 outline-offset-[-2px]"
       )}
-      style={
-        {
-          ...containerStyle,
-          // CSS var so the backdrop-blur fallback above can read the chosen
-          // background colour without us re-implementing filter math.
-          "--nav-bg": background,
-        } as React.CSSProperties
-      }
+      style={{
+        ...containerStyle,
+        "--nav-bg": background,
+        ...boxToStyle(boxModel?.padding, "padding"),
+        ...boxToStyle(boxModel?.margin, "margin"),
+      } as React.CSSProperties}
     >
       <div
         className="mx-auto flex items-center justify-between gap-6 px-6"
@@ -302,6 +305,7 @@ function NavbarSettings() {
     height,
     maxWidth,
     customId,
+    boxModel,
   } = useNode((node) => ({
     brand: (node.data.props.brand as string) ?? "",
     brandIcon: (node.data.props.brandIcon as string) ?? "",
@@ -317,6 +321,7 @@ function NavbarSettings() {
     height: (node.data.props.height as number) ?? 72,
     maxWidth: (node.data.props.maxWidth as number) ?? 1200,
     customId: (node.data.props.customId as string) ?? "",
+    boxModel: node.data.props.boxModel as NavbarProps["boxModel"],
   })) as any;
 
   const items = parseNavItems(navItems);
@@ -572,6 +577,15 @@ function NavbarSettings() {
           })
         }
       />
+      <BoxModelField
+        label="Spacing (margin / padding)"
+        value={boxModel ?? {}}
+        onChange={(v) =>
+          setProp((props: NavbarProps) => {
+            props.boxModel = v;
+          })
+        }
+      />
     </div>
   );
 }
@@ -598,6 +612,7 @@ Navbar.craft = {
     height: 72,
     maxWidth: 1200,
     customId: "",
+    boxModel: undefined,
   },
   rules: {
     canDrag: () => true,

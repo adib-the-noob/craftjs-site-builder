@@ -7,6 +7,7 @@ import { ColorField } from "@/components/craft/settings/ColorField";
 import { SliderField } from "@/components/craft/settings/SliderField";
 import { SelectField } from "@/components/craft/settings/SelectField";
 import { Input } from "@/components/ui/input";
+import { BoxModelField, boxToStyle } from "@/components/craft/settings/BoxModelField";
 
 type DividerProps = {
   color?: string;
@@ -14,6 +15,8 @@ type DividerProps = {
   style?: "solid" | "dashed" | "dotted";
   width?: number;
   customId?: string;
+  /** Tailwind-style box model. */
+  boxModel?: { margin?: any; padding?: any };
 };
 
 export function Divider({
@@ -22,21 +25,36 @@ export function Divider({
   style = "solid",
   width = 100,
   customId = "",
+  boxModel,
 }: DividerProps) {
   const {
     connectors: { connect, drag },
-  } = useNode();
+    selected,
+  } = useNode((node) => ({
+    selected: node.events.selected,
+  })) as any;
 
   return (
     <div
       ref={(ref) => {
-        connect(drag(ref!));
+        if (ref) connect(drag(ref));
       }}
       id={customId || undefined}
-      className="flex w-full justify-center"
+      className={cn(
+        "flex w-full justify-center",
+        selected && "outline-dashed outline-1 outline-primary/40"
+      )}
+      style={{
+        ...boxToStyle(boxModel?.padding, "padding"),
+        ...boxToStyle(boxModel?.margin, "margin"),
+      }}
     >
       <hr
-        className={cn("border-0", style === "dashed" && "border-t", style === "dotted" && "border-t")}
+        className={cn(
+          "border-0",
+          style === "dashed" && "border-t",
+          style === "dotted" && "border-t"
+        )}
         style={{
           borderTopWidth: thickness,
           borderTopStyle: style,
@@ -58,12 +76,14 @@ function DividerSettings() {
     style,
     width,
     customId,
+    boxModel,
   } = useNode((node) => ({
     color: node.data.props.color as string,
     thickness: node.data.props.thickness as number,
     style: node.data.props.style as DividerProps["style"],
     width: node.data.props.width as number,
     customId: (node.data.props.customId as string) ?? "",
+    boxModel: node.data.props.boxModel as DividerProps["boxModel"],
   })) as any;
 
   return (
@@ -126,6 +146,15 @@ function DividerSettings() {
           })
         }
       />
+      <BoxModelField
+        label="Spacing (margin / padding)"
+        value={boxModel ?? {}}
+        onChange={(v) =>
+          setProp((props: DividerProps) => {
+            props.boxModel = v;
+          })
+        }
+      />
     </div>
   );
 }
@@ -138,6 +167,7 @@ Divider.craft = {
     style: "solid",
     width: 100,
     customId: "",
+    boxModel: undefined,
   },
   related: {
     settings: DividerSettings,
