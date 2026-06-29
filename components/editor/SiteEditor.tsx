@@ -180,30 +180,12 @@ function HydrateOnMount({ data }: { data: string | null }) {
 }
 
 /**
- * Mirrors the editor's serialised tree onto `window.__craftEditorTree`
- * every 1.5s so the toolbar's Save button (which sits outside the
- * <Editor> provider) can grab the latest snapshot without dragging
- * `useEditor` into its component tree.
+ * (Removed) `TreeMirror` — the Save button now lives inside the
+ * `<Editor>` provider, so it can call `query.serialize()` directly at
+ * click time and always send the full fresh tree. The previous
+ * 1.5-second window mirror caused stale saves when the user clicked
+ * Save immediately after a settings change.
  */
-function TreeMirror() {
-  const { query } = useEditor();
-  useEffect(() => {
-    const w = window as unknown as {
-      __craftEditorTree?: Record<string, unknown>;
-    };
-    const tick = () => {
-      try {
-        w.__craftEditorTree = JSON.parse(query.serialize());
-      } catch {
-        // editor not ready — ignore
-      }
-    };
-    tick();
-    const id = window.setInterval(tick, 1500);
-    return () => window.clearInterval(id);
-  }, [query]);
-  return null;
-}
 
 const LEFT_COLLAPSED_KEY = "craftjs:left-sidebar-collapsed";
 const SETTINGS_COLLAPSED_KEY = "craftjs:settings-collapsed";
@@ -302,30 +284,6 @@ function EditorInner({ siteSlug }: { siteSlug: string }) {
     return JSON.stringify(initialTree);
   }, [initialTree]);
 
-  /**
-   * Pull the freshest tree out of Craft.js (which lives inside the
-   * <Editor> provider). Falls back to the cached `initialTree`
-   * if the mirror hasn't ticked yet.
-   */
-  const readLatestTree = useCallback((): Record<string, unknown> => {
-    const w = window as unknown as {
-      __craftEditorTree?: Record<string, unknown>;
-    };
-    return w.__craftEditorTree ?? initialTree ?? emptyPageData();
-  }, [initialTree]);
-
-  const handleSave = useCallback(async () => {
-    if (!site) return;
-    const tree = readLatestTree();
-    try {
-      await updateSite(site.id, { data: tree });
-      toast.success("Saved");
-    } catch (err) {
-      const message = err instanceof Error ? err.message : "Save failed";
-      toast.error(message);
-    }
-  }, [site, readLatestTree]);
-
   const handleLoadTemplate = useCallback(
     async (templateId: string) => {
       if (!site) return;
@@ -365,14 +323,12 @@ function EditorInner({ siteSlug }: { siteSlug: string }) {
   return (
     <Editor resolver={resolver} onRender={RenderNode}>
       <KeyboardShortcuts />
-      <TreeMirror />
       <HydrateOnMount data={initialData} />
       <div
         className={`flex h-screen flex-col overflow-hidden bg-background ${EDITOR_FONT_CLASSNAMES}`}
       >
         <EditorToolbar
           site={site}
-          onSave={handleSave}
           onLoadTemplate={handleLoadTemplate}
           onSiteChanged={handleSiteChanged}
         />

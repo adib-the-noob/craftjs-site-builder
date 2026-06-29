@@ -28,7 +28,13 @@ import {
 import { Separator } from "@/components/ui/separator";
 import { Badge } from "@/components/ui/badge";
 import { getTemplates } from "@/lib/templates";
-import { deleteSite, publishSite, unpublishSite, type Site } from "@/lib/sites";
+import {
+  deleteSite,
+  publishSite,
+  unpublishSite,
+  updateSite,
+  type Site,
+} from "@/lib/sites";
 import type { SiteTemplate } from "@/lib/constants";
 
 /**
@@ -74,20 +80,21 @@ function StatusSwitch({
 
 type EditorToolbarProps = {
   site: Site;
-  onSave: () => void;
   onLoadTemplate: (templateId: string) => void;
   onSiteChanged: () => void;
 };
 
 export function EditorToolbar({
   site,
-  onSave,
   onLoadTemplate,
   onSiteChanged,
 }: EditorToolbarProps) {
   const { id: siteId, slug, name: siteName } = site;
   const router = useRouter();
-  const { actions, canUndo, canRedo } = useEditor((_, q) => ({
+  // We grab `query` directly so the Save button can call
+  // `query.serialize()` at click time — guaranteeing the *full*, *fresh*
+  // tree is sent (no stale window-mirrored snapshot).
+  const { actions, query, canUndo, canRedo } = useEditor((_, q) => ({
     canUndo: q.history.canUndo(),
     canRedo: q.history.canRedo(),
   }));
@@ -95,6 +102,7 @@ export function EditorToolbar({
   const [nameDraft, setNameDraft] = useState(siteName);
   const [templates, setTemplates] = useState<SiteTemplate[]>([]);
   const [togglingStatus, setTogglingStatus] = useState(false);
+  const [saving, setSaving] = useState(false);
 
   // Status derived from props so it stays in sync when the parent
   // re-fetches the site after a save/load-template/etc.
@@ -114,6 +122,30 @@ export function EditorToolbar({
       cancelled = true;
     };
   }, []);
+
+  /**
+   * Save the editor's current tree to the backend.
+   *
+   * We pull `query.serialize()` *at click time* — never from a cached
+   * snapshot — so the *full* Craft.js tree (every node, every prop,
+   * every linkedNodes entry) is sent in one PUT. The backend stores
+   * it as `site_data`; no client-side diffing.
+   */
+  const handleSave = async () => {
+    if (saving) return;
+    setSaving(true);
+    try {
+      const tree = JSON.parse(query.serialize());
+      await updateSite(siteId, { data: tree });
+      toast.success("Saved");
+    } catch (err) {
+      const message =
+        err instanceof Error ? err.message : "Save failed";
+      toast.error(message);
+    } finally {
+      setSaving(false);
+    }
+  };
 
   const handleCommitName = async () => {
     const trimmed = nameDraft.trim();
@@ -302,11 +334,12 @@ export function EditorToolbar({
         <Button
           variant="outline"
           size="sm"
-          onClick={onSave}
+          disabled={saving}
+          onClick={handleSave}
           title="Save"
         >
           <SaveIcon data-icon="inline-start" />
-          Save
+          {saving ? "Saving…" : "Save"}
         </Button>
         <Link
           href={`/preview/${slug}`}
