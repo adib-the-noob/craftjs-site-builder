@@ -3,7 +3,7 @@
 import { Label } from "@/components/ui/label";
 
 type FieldRowProps = {
-  label: string;
+  label?: string;
   htmlFor?: string;
   children: React.ReactNode;
 };
@@ -11,7 +11,7 @@ type FieldRowProps = {
 export function FieldRow({ label, htmlFor, children }: FieldRowProps) {
   return (
     <div className="flex flex-col gap-2">
-      <Label htmlFor={htmlFor}>{label}</Label>
+      {label ? <Label htmlFor={htmlFor}>{label}</Label> : null}
       {children}
     </div>
   );

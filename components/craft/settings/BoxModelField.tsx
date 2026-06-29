@@ -16,9 +16,11 @@ export type BoxSides = {
   left: number;
 };
 
+export type BoxSidesValue = Partial<BoxSides> | number;
+
 export type BoxModelValue = {
-  margin?: Partial<BoxSides>;
-  padding?: Partial<BoxSides>;
+  margin?: BoxSidesValue;
+  padding?: BoxSidesValue;
 };
 
 const SIDES: Array<keyof BoxSides> = ["top", "right", "bottom", "left"];
