@@ -1,20 +1,24 @@
-// Templates can come from two places:
+// Templates can come from three places:
 //
-//   1. The FastAPI backend (`/templates`, `/templates/{id}`) — these are
-//      the source of truth for shared/curated templates.
-//   2. The local `data/templates.json` file — these are the synchronous
-//      fallbacks we always show in the Templates dropdown so the editor
-//      has something usable even when the backend is unreachable.
+//   1. The FastAPI backend (`/templates`, `/templates/{id}`) — the source of
+//      truth for shared/curated templates.
+//   2. Built-in `.tsx` templates under lib/craftTemplate/templates (see
+//      lib/craftTemplate) — authored as real JSX and compiled to a Craft.js
+//      tree at build time. Always available, no network; this is where the
+//      polished starters live.
+//   3. The local `data/templates.json` file — synchronous JSON starters kept
+//      as a last-resort fallback.
 //
-// Backend templates are merged on top of the local ones (a backend entry
-// with the same `id` wins, so we can override a local starter remotely).
-// Detail payloads are fetched lazily — the list endpoint only returns
-// lightweight metadata (no `site_data`), and we hit `/templates/{id}`
-// on demand when the user picks one from the dropdown.
+// On id collision, the higher-priority source wins: backend > .tsx > JSON
+// (so we can override a built-in remotely). Detail payloads are fetched
+// lazily — the list endpoint only returns lightweight metadata (no
+// `site_data`), and we hit `/templates/{id}` on demand when the user picks
+// one from the dropdown.
 
 import { apiGet } from "@/lib/api";
 import type { SiteTemplate } from "@/lib/constants";
 import localTemplates from "@/data/templates.json";
+import { frontendTemplates, getFrontendTemplate } from "@/lib/craftTemplate/registry";
 
 type LocalTemplate = {
   id: string;
@@ -28,15 +32,33 @@ const localList: LocalTemplate[] = Object.values(localMap);
 
 /**
  * Synchronous starter templates used as a fallback when the backend list
- * endpoint is unreachable or returns nothing. Always available.
+ * endpoint is unreachable or returns nothing. Always available. Combines the
+ * `.tsx` built-ins (highest priority) with the JSON starters.
  */
 export function getStarterTemplates(): SiteTemplate[] {
-  return localList.map((t) => ({
-    id: t.id,
-    name: t.name,
-    description: t.description,
-    data: t.data,
-  }));
+  const merged: SiteTemplate[] = [];
+  const seen = new Set<string>();
+
+  // 1. .tsx built-ins (highest local priority).
+  for (const t of frontendTemplates) {
+    if (!seen.has(t.id)) {
+      seen.add(t.id);
+      merged.push(t);
+    }
+  }
+  // 2. JSON starters.
+  for (const t of localList) {
+    if (!seen.has(t.id)) {
+      seen.add(t.id);
+      merged.push({
+        id: t.id,
+        name: t.name,
+        description: t.description,
+        data: t.data,
+      });
+    }
+  }
+  return merged;
 }
 
 /**
@@ -106,10 +128,14 @@ export async function getTemplateById(
       data: (t.site_data ?? {}) as SiteTemplate["data"],
     };
   } catch {
-    // fall through to local map
+    // fall through to local sources
   }
 
-  // 2. Local starter fallback (always available, no network).
+  // 2. .tsx built-in (always available, no network).
+  const frontend = getFrontendTemplate(id);
+  if (frontend) return frontend;
+
+  // 3. JSON starter fallback.
   const local = localMap[id];
   if (local) {
     return {
